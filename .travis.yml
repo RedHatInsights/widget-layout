@@ -3,9 +3,9 @@ os: linux
 dist: jammy
 node_js:
 - '18'
-addons:
-  firefox: latest-esr
-  chrome: stable
+# addons:
+#   firefox: latest-esr
+#   chrome: stable
 notifications:
   email: false
 before_install:

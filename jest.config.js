@@ -3,7 +3,7 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.js', '!src/**/stories/*'],
   coverageDirectory: './coverage/',
   moduleNameMapper: {
-    '\\.(css|scss)$': 'identity-obj-proxy',
+    '\\.(css|scss|svg)$': 'identity-obj-proxy',
   },
   roots: ['<rootDir>/src/'],
   transformIgnorePatterns: ['/node_modules/(?!@patternfly/react-tokens|uuid)'],
