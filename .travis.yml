@@ -1,0 +1,31 @@
+language: node_js
+os: linux
+dist: jammy
+node_js:
+- '18'
+addons:
+  firefox: latest-esr
+  chrome: stable
+notifications:
+  email: false
+before_install:
+  - npm install -g npm@latest
+install:
+  - npm ci
+jobs:
+  include:
+    - stage: Lint
+      script: npm run lint
+    - stage: Build
+      script: npm run build
+    - stage: Test
+      script: npm run test && npx codecov
+env:
+    global:
+      - REPO="git@github.com:RedHatInsights/widget-layout-build.git"
+      - REPO_DIR="widget-layout-build"
+      - NODE_OPTIONS="--max-old-space-size=4096 --max_old_space_size=4096"
+cache:
+  directories:
+    - "$HOME/.npm"
+    - ".cache"
