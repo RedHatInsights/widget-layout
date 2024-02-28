@@ -1,6 +1,6 @@
 import { Layout } from 'react-grid-layout';
 import { WidgetTypes } from '../Components/Widgets/widgetTypes';
-import { DROPPING_ELEM_ID } from '../Components/DnDLayout/GridLayout';
+import { dropping_elem_id } from '../Components/DnDLayout/GridLayout';
 
 const getRequestHeaders = (token: string) => ({
   Accept: 'application/json',
@@ -160,7 +160,7 @@ export const mapExtendedLayoutToLayoutWithTitle = (extendedLayoutItem: ExtendedL
 export const mapExtendedTemplateConfigToTemplateConfig = (extendedTemplateConfig: ExtendedTemplateConfig): TemplateConfig => {
   const result: TemplateConfig = { sm: [], md: [], lg: [], xl: [] };
   (Object.keys(extendedTemplateConfig) as Variants[]).forEach((key) => {
-    result[key] = extendedTemplateConfig[key].map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== DROPPING_ELEM_ID);
+    result[key] = extendedTemplateConfig[key].map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== dropping_elem_id);
   });
   return result;
 };
@@ -170,7 +170,7 @@ export const mapPartialExtendedTemplateConfigToPartialTemplateConfig = (
 ): PartialTemplateConfig => {
   const result: PartialTemplateConfig = {};
   (Object.keys(extendedTemplateConfig) as Variants[]).forEach((key) => {
-    result[key] = extendedTemplateConfig[key]?.map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== DROPPING_ELEM_ID);
+    result[key] = extendedTemplateConfig[key]?.map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== dropping_elem_id);
   });
   return result;
 };

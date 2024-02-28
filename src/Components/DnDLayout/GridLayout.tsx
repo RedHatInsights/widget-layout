@@ -4,12 +4,12 @@ import { Layout, ReactGridLayoutProps, Responsive, ResponsiveProps, WidthProvide
 import ResizeHandleIcon from './resize-handle.svg';
 import GridTile, { SetWidgetAttribute } from './GridTile';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { WidgetTypes } from '../Widgets/widgetTypes';
+import { isWidgetType } from '../Widgets/widgetTypes';
 import { widgetDefaultHeight, widgetDefaultWidth, widgetMaxHeight, widgetMinHeight } from '../Widgets/widgetDefaults';
-import { atom, useAtom, useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
-import { activeLayoutVariantAtom, layoutAtom } from '../../state/layoutAtom';
-import { activeTemplateIdAtom, templateAtom } from '../../state/templateAtom';
+import { activeItemAtom, layoutAtom, layoutVariantAtom, prevLayoutAtom } from '../../state/layoutAtom';
+import { templateAtom, templateIdAtom } from '../../state/templateAtom';
 import React from 'react';
 import {
   DashboardTemplate,
@@ -24,14 +24,13 @@ import {
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { useDispatch } from 'react-redux';
 import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
+import { debounce, isEqual } from 'lodash';
+
+export const dropping_elem_id = '__dropping-elem__';
+
+export const breakpoints = { lg: 1200, md: 996, sm: 768 };
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
-
-const activeItemAtom = atom<string | undefined>(undefined);
-
-function isWidgetType(type: string): type is WidgetTypes {
-  return Object.values(WidgetTypes).includes(type as WidgetTypes);
-}
 
 const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => {
   return (
@@ -41,24 +40,24 @@ const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement
   );
 };
 
-export const DROPPING_ELEM_ID = '__dropping-elem__';
-
 const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [isInitialRender, setIsInitialRender] = useState(true);
   const [layout, setLayout] = useAtom(layoutAtom);
+  const [prevLayout, setPrevLayout] = useAtom(prevLayoutAtom);
+  const [layoutVariant, setLayoutVariant] = useAtom(layoutVariantAtom);
   const [template, setTemplate] = useAtom(templateAtom);
-  const [activeTemplateId, setActiveTemplateId] = useAtom(activeTemplateIdAtom);
-  const [activeLayoutVariant, setActiveLayoutVariant] = useAtom(activeLayoutVariantAtom);
+  const [templateId, setTemplateId] = useAtom(templateIdAtom);
   const [activeItem, setActiveItem] = useAtom(activeItemAtom);
   const layoutRef = useRef<HTMLDivElement>(null);
   const { currentToken } = useCurrentUser();
   const dispatch = useDispatch();
 
-  const currentDropInItem = useAtomValue(currentDropInItemAtom);
+  const [currentDropInItem, setCurrentDropInItem] = useAtom(currentDropInItemAtom);
   const droppingItemTemplate: ReactGridLayoutProps['droppingItem'] = useMemo(() => {
     if (currentDropInItem) {
       return {
-        i: DROPPING_ELEM_ID,
+        i: dropping_elem_id,
         w: widgetDefaultWidth[currentDropInItem],
         h: widgetDefaultHeight[currentDropInItem],
         widgetType: currentDropInItem,
@@ -91,6 +90,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         i: `${data}#${Date.now() + Math.random()}`,
         title: 'New title',
       };
+      setCurrentDropInItem(undefined);
       setLayout((prev) =>
         prev.reduce<ExtendedLayoutItem[]>(
           (acc, curr) => {
@@ -121,15 +121,24 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
 
   const onLayoutChange: ResponsiveProps['onLayoutChange'] = useCallback(
     (currentLayout: Layout[]) => {
-      if (isLayoutLocked || activeTemplateId < 0 || !activeLayoutVariant) {
+      if (isInitialRender) {
+        setIsInitialRender(false);
         return;
       }
-      const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [activeLayoutVariant]: currentLayout });
-      patchDashboardTemplate(activeTemplateId, { templateConfig: data }, currentToken)
+      if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
+        return;
+      }
+      // TODO in certain scenarios prevLayout contains additional undefined metadata on each widget causing this check to fail and multiple patches for dropping widgets in
+      if (isEqual(prevLayout, layout)) {
+        return;
+      }
+      const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: currentLayout });
+      patchDashboardTemplate(templateId, { templateConfig: data }, currentToken)
         .then((template: DashboardTemplate) => {
           const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
           setTemplate(extendedTemplateConfig);
-          setLayout(extendedTemplateConfig[activeLayoutVariant]);
+          setPrevLayout(layout);
+          setLayout(extendedTemplateConfig[layoutVariant]);
         })
         .catch((err) => {
           console.error(err);
@@ -142,11 +151,13 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
           );
         });
     },
-    [isLayoutLocked, activeTemplateId, activeLayoutVariant, currentToken]
+    [isLayoutLocked, templateId, layoutVariant, currentToken, layout, currentDropInItem, isInitialRender]
   );
 
+  const debouncedOnLayoutChange = debounce(onLayoutChange, 500);
+
   const onBreakpointChange: ResponsiveProps['onBreakpointChange'] = (newBreakpoint) => {
-    setActiveLayoutVariant(newBreakpoint as Variants);
+    setLayoutVariant(newBreakpoint as Variants);
   };
 
   const onKeyUp = (event: KeyboardEvent<HTMLDivElement>, id: string) => {
@@ -245,7 +256,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
   }, [activeItem]);
 
   useEffect(() => {
-    if (!currentToken || activeTemplateId >= 0) {
+    if (!currentToken || templateId >= 0) {
       return;
     }
     // TODO template type should be pulled from app config for reusability
@@ -256,9 +267,21 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
           throw new Error('No default template found');
         }
         const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(defaultTemplate.templateConfig);
+        const currentWidth = layoutRef?.current?.clientWidth || document.body.clientWidth;
+        let targetVariant: Variants;
+        if (currentWidth > breakpoints.lg) {
+          targetVariant = 'xl';
+        } else if (breakpoints.lg >= currentWidth && currentWidth > breakpoints.md) {
+          targetVariant = 'lg';
+        } else if (breakpoints.md >= currentWidth && currentWidth > breakpoints.sm) {
+          targetVariant = 'md';
+        } else {
+          targetVariant = 'sm';
+        }
         setTemplate(extendedTemplateConfig);
-        setLayout(extendedTemplateConfig['xl']);
-        setActiveTemplateId(defaultTemplate.id);
+        setTemplateId(defaultTemplate.id);
+        setLayout(extendedTemplateConfig[targetVariant]);
+        setLayoutVariant(targetVariant);
       })
       .catch((err) => {
         console.log(err);
@@ -270,7 +293,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
           })
         );
       });
-  }, [currentToken, activeTemplateId]);
+  }, [currentToken, templateId]);
 
   return (
     // {/* relative position is required for the grid layout to properly calculate
@@ -280,10 +303,10 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         className="layout"
         draggableHandle=".drag-handle"
         layouts={template}
-        breakpoints={{ lg: 1200, md: 996, sm: 768 }}
+        breakpoints={breakpoints}
         cols={{ xl: 4, lg: 3, md: 2, sm: 1 }}
         rowHeight={88}
-        width={1200}
+        //width={1200}
         isDraggable={!isLayoutLocked}
         isResizable={!isLayoutLocked}
         resizeHandle={getResizeHandle}
@@ -294,7 +317,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         onDrop={onDrop}
         useCSSTransforms
         verticalCompact
-        onLayoutChange={onLayoutChange}
+        onLayoutChange={debouncedOnLayoutChange}
         onBreakpointChange={onBreakpointChange}
       >
         {

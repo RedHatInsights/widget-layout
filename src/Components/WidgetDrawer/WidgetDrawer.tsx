@@ -37,6 +37,7 @@ const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: s
         e.dataTransfer.setData('text', widgetType);
         setDropInItem(widgetType);
       }}
+      onDragEnd={() => setDropInItem(undefined)}
       // eslint-disable-next-line react/no-unknown-property
       unselectable="on"
       draggable={true}
