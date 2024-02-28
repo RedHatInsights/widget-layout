@@ -1,0 +1,35 @@
+.react-grid-item {
+  .react-resizable-handle-nw, .react-resizable-handle-sw, .react-resizable-handle-se {
+    display: none;
+  }
+
+  .react-resizable-handle-nw, .react-resizable-handle-se {
+    cursor: nwse-resize;
+  }
+
+  .react-resizable-handle-ne, .react-resizable-handle-sw {
+    cursor: nesw-resize;
+  }
+
+  &:hover, &:active {
+    &:not(.static) {
+      .react-resizable-handle-nw, .react-resizable-handle-sw, .react-resizable-handle-se {
+        display: inherit;
+      }
+    }
+  }
+
+  &.react-grid-placeholder {
+    background-color: rgba(146, 146, 146, 0.5);
+    border-radius: 4px;
+  }
+
+  .react-resizable-handle {
+    &::after {
+      display: none;
+    }
+    img {
+      padding: 3px;
+    }
+  }
+}

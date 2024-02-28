@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: widget-layout
+objects:
+  - apiVersion: cloud.redhat.com/v1alpha1
+    kind: Frontend
+    metadata:
+      name: widget-layout
+    spec:
+      envName: ${ENV_NAME}
+      title: widget-layout
+      deploymentRepo: TBD
+      frontend:
+        paths:
+          - /apps/widget-layout
+      image: ${IMAGE}:${IMAGE_TAG}
+      navItems: 
+      - appId: widget-layout
+        title: widget-layout
+        href: "/staging/widget-layout"
+      module:
+        manifestLocation: "/apps/widget-layout/fed-mods.json"
+        modules:
+          - id: "widgetLayout"
+            module: "./RootApp"
+            routes: 
+            - pathname: "/staging/widget-layout"
+
+parameters:
+  - name: ENV_NAME
+    required: true
+  - name: IMAGE_TAG
+    required: true
+  - name: IMAGE
+    value: TBD

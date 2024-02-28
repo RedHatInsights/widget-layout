@@ -1,0 +1,13 @@
+.pf-v5-c-page__main-section .pf-v5-c-toolbar__group {
+  .pf-v5-c-menu-toggle {
+    min-width: 275px;
+  }
+  .pf-v5-c-clipboard-copy {
+    .pf-v5-c-form-control {
+      display: none;
+    }
+    button::after {
+      border: none;
+    }
+  }
+}
