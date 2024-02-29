@@ -1,7 +1,19 @@
 .grid-tile {
   position: relative;
   height: 100%;
-  overflow: hidden;
+
+  .pf-v5-c-card__header-main {
+    display: flex;
+    flex-direction: row;
+    .pf-v5-svg {
+      height: auto;
+      margin-right: 6px;
+    }
+  }
+
+  .pf-v5-c-card__body {
+    overflow-y: scroll;
+  }
 
   .drag-handle {
     cursor: grab;

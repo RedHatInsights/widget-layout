@@ -5,7 +5,7 @@ import ResizeHandleIcon from './resize-handle.svg';
 import GridTile, { SetWidgetAttribute } from './GridTile';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isWidgetType } from '../Widgets/widgetTypes';
-import { widgetDefaultHeight, widgetDefaultWidth, widgetMaxHeight, widgetMinHeight } from '../Widgets/widgetDefaults';
+import { widgetDefaultHeight, widgetDefaultIcons, widgetDefaultWidth, widgetMaxHeight, widgetMinHeight } from '../Widgets/widgetDefaults';
 import { useAtom } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { activeItemAtom, layoutAtom, layoutVariantAtom, prevLayoutAtom } from '../../state/layoutAtom';
@@ -17,6 +17,7 @@ import {
   Variants,
   getDashboardTemplates,
   getDefaultTemplate,
+  getWidgetIdentifier,
   mapPartialExtendedTemplateConfigToPartialTemplateConfig,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplate,
@@ -87,7 +88,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         maxH: widgetMaxHeight[data],
         minH: widgetMinHeight[data],
         widgetType: data,
-        i: `${data}#${Date.now() + Math.random()}`,
+        i: getWidgetIdentifier(data),
         title: 'New title',
       };
       setCurrentDropInItem(undefined);
@@ -304,7 +305,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         draggableHandle=".drag-handle"
         layouts={template}
         breakpoints={breakpoints}
-        cols={{ xl: 4, lg: 3, md: 2, sm: 1 }}
+        cols={{ xl: 5, lg: 4, md: 3, sm: 2 }}
         rowHeight={88}
         //width={1200}
         isDraggable={!isLayoutLocked}
@@ -337,6 +338,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
                 isDragging={isDragging}
                 setIsDragging={setIsDragging}
                 title={rest.i}
+                icon={widgetDefaultIcons[widgetType]}
                 widgetType={widgetType}
                 // these will be dynamically calculated once the dimensions are calculated
                 widgetConfig={{ ...rest, colWidth: 1200 / 4 }}

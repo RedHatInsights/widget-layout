@@ -8,6 +8,8 @@ const getRequestHeaders = (token: string) => ({
   'Content-Type': 'application/json',
 });
 
+export const widgetIdSeparator = '#';
+
 export type LayoutTypes = 'landingPage';
 
 export type Variants = 'sm' | 'md' | 'lg' | 'xl';
@@ -131,8 +133,12 @@ export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTem
   return templates.find((itm) => itm.default === true);
 };
 
+export const getWidgetIdentifier = (widgetType: WidgetTypes, uniqueId: string = crypto.randomUUID()) => {
+  return `${widgetType}${widgetIdSeparator}${uniqueId}`;
+};
+
 export const mapWidgetDefaults = (id: string): [WidgetTypes, string] => {
-  const [widgetType, i] = id.split('#');
+  const [widgetType, i] = id.split(widgetIdSeparator);
   // we will need some type guards here and schema validation to remove unknown widgets
   return [widgetType as WidgetTypes, i];
 };

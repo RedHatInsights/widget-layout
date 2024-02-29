@@ -29,6 +29,7 @@ export type SetWidgetAttribute = <T extends string | number | boolean>(id: strin
 export type GridTileProps = React.PropsWithChildren<{
   widgetType: WidgetTypes;
   title: string;
+  icon?: React.ComponentClass;
   setIsDragging: (isDragging: boolean) => void;
   isDragging: boolean;
   setWidgetAttribute: SetWidgetAttribute;
@@ -39,7 +40,7 @@ export type GridTileProps = React.PropsWithChildren<{
   removeWidget: (id: string) => void;
 }>;
 
-const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
+const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const Component = widgetMapper[widgetType] || Fragment;
@@ -143,6 +144,8 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
     () => `calc(${widgetConfig.colWidth * widgetConfig.w}px - 48px${widgetConfig.locked ? '' : ' - 88px - 16px'})`,
     [widgetConfig.colWidth, widgetConfig.w, widgetConfig.locked]
   );
+
+  const HeaderIcon = icon;
   return (
     <Card
       className={clsx('grid-tile', {
@@ -150,6 +153,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
       })}
     >
       <CardHeader actions={{ actions: headerActions }}>
+        {HeaderIcon ? <HeaderIcon /> : null}
         <CardTitle
           style={{
             userSelect: isDragging ? 'none' : 'auto',
