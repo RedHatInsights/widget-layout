@@ -1,4 +1,18 @@
-.pf-v5-c-page__main-section .pf-v5-c-toolbar__group {
+.widg-c-page__main-section--header,
+.widg-c-split--add-widget {
+  max-width: 1280px;
+}
+
+.pf-v5-c-toolbar__content {
+  padding-left: 0;
+}
+
+.pf-v5-c-button {
+  --pf-v5-c-button--m-control--Color: var(--pf-v5-global--Color--200);
+}
+
+
+.widg-c-page__main-section--header .pf-v5-c-toolbar__group {
   .pf-v5-c-menu-toggle {
     min-width: 275px;
   }
