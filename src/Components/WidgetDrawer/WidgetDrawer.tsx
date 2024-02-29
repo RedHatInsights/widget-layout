@@ -1,4 +1,4 @@
-import { Button, Card, CardHeader, CardTitle, Gallery, GalleryItem, Icon, Level, LevelItem, Title, Tooltip } from '@patternfly/react-core';
+import { Button, Card, CardHeader, CardTitle, Gallery, GalleryItem, Icon, Split, SplitItem, Title, Tooltip } from '@patternfly/react-core';
 import { useAtom, useSetAtom } from 'jotai';
 import React from 'react';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
@@ -58,24 +58,25 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         backgroundColor: '#E7F1FA',
       }}
     >
-      <Level className="pf-v5-u-p-md">
-        <LevelItem>
+      <Split className="widg-c-split--add-widget pf-v5-u-p-lg">
+        <SplitItem isFilled>
           <Title headingLevel="h2" size="md">
             Add new and previously removed widgets by clicking the <GripVerticalIcon /> icon, then drag and drop to a new location. Drag the corners
             of the cards to resize widgets.
           </Title>
-        </LevelItem>
-        <LevelItem>
+        </SplitItem>
+        <SplitItem>
           <Button
             variant="plain"
+            className="pf-v5-u-pt-0"
             onClick={() => {
               toggleOpen((prev) => !prev);
             }}
             icon={<CloseIcon />}
           />
-        </LevelItem>
-      </Level>
-      <Gallery hasGutter className="pf-v5-u-p-md">
+        </SplitItem>
+      </Split>
+      <Gallery hasGutter className="pf-v5-u-p-lg pf-v5-u-pt-0">
         <GalleryItem>
           <WidgetWrapper widgetType={WidgetTypes.LargeWidget} title="Large widget">
             <LargeWidget />
