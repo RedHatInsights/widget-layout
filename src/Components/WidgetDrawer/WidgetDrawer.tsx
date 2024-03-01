@@ -76,21 +76,16 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         </SplitItem>
       </Split>
       <Gallery hasGutter className="pf-v5-u-p-lg pf-v5-u-pt-0">
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.LargeWidget} title="Large widget">
-            <LargeWidget />
-          </WidgetWrapper>
-        </GalleryItem>
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.MediumWidget} title="Medium widget">
-            <MediumWidget />
-          </WidgetWrapper>
-        </GalleryItem>
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.SmallWidget} title="Small widget">
-            <SmallWidget />
-          </WidgetWrapper>
-        </GalleryItem>
+        {Object.keys(widgetMapper).map((type, i) => {
+          const Widget = widgetMapper[type as WidgetTypes];
+          return (
+            <GalleryItem key={i}>
+              <WidgetWrapper widgetType={type as WidgetTypes} title={widgetDefaultTitles[type as WidgetTypes]}>
+                <Widget />
+              </WidgetWrapper>
+            </GalleryItem>
+          );
+        })}
       </Gallery>
     </div>
   );
