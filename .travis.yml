@@ -16,7 +16,7 @@ jobs:
   include:
     - stage: Verify
       if: type != push
-      script: npm run verify && npx codecov
+      script: npm run verify
     - stage: Deploy
       if: type = push
       script: npm run deploy && npx codecov && curl -sSL https://raw.githubusercontent.com/RedHatInsights/insights-frontend-builder-common/master/src/bootstrap.sh | bash -s
