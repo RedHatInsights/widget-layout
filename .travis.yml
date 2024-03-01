@@ -14,12 +14,12 @@ install:
   - npm ci
 jobs:
   include:
-    - stage: Lint
-      script: npm run lint
-    - stage: Build
-      script: npm run build
-    - stage: Test
-      script: npm run test && npx codecov
+    - stage: Verify
+      if: type != push
+      script: npm run verify
+    - stage: Deploy
+      if: type = push
+      script: npm run deploy && npx codecov && curl -sSL https://raw.githubusercontent.com/RedHatInsights/insights-frontend-builder-common/master/src/bootstrap.sh | bash -s
 env:
     global:
       - REPO="git@github.com:RedHatInsights/widget-layout-build.git"

@@ -8,13 +8,13 @@ import {
   DropdownGroup,
   DropdownItem,
   DropdownList,
+  Flex,
+  FlexItem,
   Form,
   FormGroup,
   FormHelperText,
   HelperText,
   HelperTextItem,
-  Level,
-  LevelItem,
   MenuToggle,
   MenuToggleElement,
   PageSection,
@@ -22,14 +22,15 @@ import {
   Radio,
   Stack,
   StackItem,
+  Text,
   TextArea,
-  Title,
+  TextContent,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
-import { CheckIcon, ExclamationCircleIcon, PlusIcon, TimesIcon } from '@patternfly/react-icons';
+import { CheckIcon, ExclamationCircleIcon, PlusCircleIcon, TimesIcon } from '@patternfly/react-icons';
 import React from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
@@ -186,7 +187,7 @@ const Controls = () => {
             setPrevLayout(layout);
           }}
           variant="secondary"
-          icon={<PlusIcon />}
+          icon={<PlusCircleIcon />}
         >
           Add widgets
         </Button>
@@ -199,24 +200,24 @@ const Header = () => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   return (
-    <PageSection variant={PageSectionVariants.light}>
-      <Level>
-        <LevelItem>
-          <Title headingLevel="h1" size="2xl">
-            Hi{userName ? `, ${userName}` : '!'}
-          </Title>
-          <Title headingLevel="h2" size="2xl">
-            Welcome to your Hybrid Cloud Console.
-          </Title>
-        </LevelItem>
-        <LevelItem>
+    <PageSection className="widg-c-page__main-section--header pf-v5-u-p-lg" variant={PageSectionVariants.light}>
+      <Flex direction={{ default: 'column', lg: 'row' }}>
+        <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
+          <TextContent>
+            <Text component="h1">Hi{userName ? `, ${userName}` : '!'}</Text>
+            <Text component="h2" className="pf-v5-u-mt-0">
+              Welcome to your Hybrid Cloud Console.
+            </Text>
+          </TextContent>
+        </FlexItem>
+        <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
           <Toolbar>
             <ToolbarContent>
               <Controls />
             </ToolbarContent>
           </Toolbar>
-        </LevelItem>
-      </Level>
+        </FlexItem>
+      </Flex>
     </PageSection>
   );
 };
