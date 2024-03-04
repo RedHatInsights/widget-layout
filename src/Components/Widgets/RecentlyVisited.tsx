@@ -6,6 +6,7 @@ import React, { Fragment } from 'react';
 import { useLastVisited } from '@redhat-cloud-services/chrome';
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { Link } from 'react-router-dom';
+import './RecentlyVisited.scss';
 
 const LinkWrapper = ({ pathname, title }: { pathname: string; title: string }) => {
   const { updateDocumentTitle } = useChrome();
@@ -20,12 +21,7 @@ const RecentlyVisited = () => {
   const lastVisited = useLastVisited();
   const lastVisitedData = lastVisited.slice(0, 10);
   return (
-    <Gallery
-      hasGutter
-      maxWidths={{
-        default: '300px',
-      }}
-    >
+    <Gallery hasGutter className="widget-recently-visited">
       {lastVisitedData.map(({ bundle, pathname, title }, index) => (
         <Fragment key={index}>
           <TextContent>
