@@ -24,4 +24,22 @@
   .pf-v5-c-card__header:first-child {
     padding-top: var(--pf-v5-global--spacer--md);
   }
+
+  // use ellipsis without calculating width
+  .pf-v5-c-card__title {
+    position: relative;
+    &:before {
+      content: '&nbsp;';
+      visibility: hidden;
+    }
+    &-text {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }

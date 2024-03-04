@@ -24,6 +24,8 @@ import { WidgetTypes } from '../Widgets/widgetTypes';
 import widgetMapper from '../Widgets/widgetMapper';
 import { ExtendedLayoutItem } from '../../api/dashboard-templates';
 
+import { BaconIcon } from '@patternfly/react-icons';
+
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
 export type GridTileProps = React.PropsWithChildren<{
@@ -136,13 +138,6 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
     </>
   );
 
-  const titleWidth = useMemo(
-    // 88px is the width of the actions container
-    // 48px is the width padding on the card title
-    // 16px is the width of the left padding on the actions handle
-    () => `calc(${widgetConfig.colWidth * widgetConfig.w}px - 48px${widgetConfig.locked ? '' : ' - 88px - 16px'})`,
-    [widgetConfig.colWidth, widgetConfig.w, widgetConfig.locked]
-  );
   return (
     <Card
       className={clsx('grid-tile', {
@@ -150,14 +145,10 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
       })}
     >
       <CardHeader actions={{ actions: headerActions }}>
-        <CardTitle
-          style={{
-            userSelect: isDragging ? 'none' : 'auto',
-            width: titleWidth,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
+        <CardTitle>
+          <Icon className="pf-v5-u-pr-sm" isInline>
+            <BaconIcon />
+          </Icon>
           {title}
         </CardTitle>
       </CardHeader>
