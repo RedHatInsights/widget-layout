@@ -1,4 +1,17 @@
-import { Button, Card, CardHeader, CardTitle, Gallery, GalleryItem, Icon, Split, SplitItem, Title, Tooltip } from '@patternfly/react-core';
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardTitle,
+  Gallery,
+  GalleryItem,
+  Icon,
+  PageSection,
+  Split,
+  SplitItem,
+  Title,
+  Tooltip,
+} from '@patternfly/react-core';
 import { useAtom, useSetAtom } from 'jotai';
 import React from 'react';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
@@ -53,12 +66,13 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
   const [isOpen, toggleOpen] = useAtom(drawerExpandedAtom);
 
   const panelContent = (
-    <div
+    <PageSection
+      className="pf-v5-u-p-lg"
       style={{
         backgroundColor: '#E7F1FA',
       }}
     >
-      <Split className="widg-c-split--add-widget pf-v5-u-p-lg">
+      <Split className="widg-l-split--add-widget">
         <SplitItem isFilled>
           <Title headingLevel="h2" size="md">
             Add new and previously removed widgets by clicking the <GripVerticalIcon /> icon, then drag and drop to a new location. Drag the corners
@@ -68,7 +82,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         <SplitItem>
           <Button
             variant="plain"
-            className="pf-v5-u-pt-0"
+            className="pf-v5-u-pt-0 pf-v5-u-pr-0"
             onClick={() => {
               toggleOpen((prev) => !prev);
             }}
@@ -76,7 +90,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
           />
         </SplitItem>
       </Split>
-      <Gallery hasGutter className="pf-v5-u-p-lg pf-v5-u-pt-0">
+      <Gallery className="widg-l-gallery pf-v5-u-pt-sm" hasGutter>
         <GalleryItem>
           <WidgetWrapper widgetType={WidgetTypes.LargeWidget} title="Large widget">
             <LargeWidget />
@@ -93,7 +107,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
           </WidgetWrapper>
         </GalleryItem>
       </Gallery>
-    </div>
+    </PageSection>
   );
   return (
     <>

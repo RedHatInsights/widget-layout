@@ -200,8 +200,8 @@ const Header = () => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   return (
-    <PageSection className="widg-c-page__main-section--header pf-v5-u-p-lg" variant={PageSectionVariants.light}>
-      <Flex direction={{ default: 'column', lg: 'row' }}>
+    <PageSection className="pf-v5-u-p-lg" variant={PageSectionVariants.light}>
+      <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
         <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
           <TextContent>
             <Text component="h1">Hi{userName ? `, ${userName}` : '!'}</Text>
@@ -211,7 +211,7 @@ const Header = () => {
           </TextContent>
         </FlexItem>
         <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
-          <Toolbar>
+          <Toolbar className="widg-c-toolbar--header">
             <ToolbarContent>
               <Controls />
             </ToolbarContent>

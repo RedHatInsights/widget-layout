@@ -1,5 +1,8 @@
-.widg-c-page__main-section--header,
-.widg-c-split--add-widget {
+.widg-l-flex--header,
+.widg-l-split--add-widget,
+.widg-l-gallery,
+.layout
+{
   max-width: 1280px;
 }
 
@@ -11,6 +14,10 @@
   --pf-v5-c-button--m-control--Color: var(--pf-v5-global--Color--200);
 }
 
+// hack: setting max-width on the flex is causing string to appear
+.pf-v5-c-clipboard-copy__group .pf-v5-c-form-control {
+  display: none;
+}
 
 .widg-c-page__main-section--header .pf-v5-c-toolbar__group {
   .pf-v5-c-menu-toggle {
