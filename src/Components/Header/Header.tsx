@@ -84,7 +84,13 @@ const Controls = () => {
   return (
     <ToolbarGroup>
       <ToolbarItem spacer={{ default: 'spacerNone' }}>
-        <ClipboardCopy isCode hoverTip="Copy current configuration string" clickTip="Configuration string copied to clipboard">
+        <ClipboardCopy
+          isCode
+          hoverTip="Copy current configuration string"
+          position="left"
+          maxWidth="300px"
+          clickTip="Configuration string copied to clipboard"
+        >
           {JSON.stringify(layout)}
         </ClipboardCopy>
       </ToolbarItem>
