@@ -5,6 +5,9 @@
 {
   max-width: 1280px;
 }
+.pf-v5-c-page__main-section {
+  border-bottom: 1px solid var(--pf-v5-global--disabled-color--200);
+}
 
 .pf-v5-c-toolbar__content {
   padding-left: 0;
