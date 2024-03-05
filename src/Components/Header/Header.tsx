@@ -112,7 +112,7 @@ const Controls = () => {
               )}
             >
               <DropdownGroup label="Dashboard configuration" labelHeadingLevel="h3">
-                <DropdownList>
+                <DropdownList className="pf-v5-u-pb-0">
                   <Form>
                     <FormGroup>
                       <DropdownItem>
@@ -142,6 +142,7 @@ const Controls = () => {
                           checked={checked === CUSTOM}
                         ></Radio>
                         <TextArea
+                          rows={1}
                           placeholder="Paste custom string"
                           required
                           onClick={() => {
