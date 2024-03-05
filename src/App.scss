@@ -1,2 +1,13 @@
 // Importing Global Variables
 @import "~@redhat-cloud-services/frontend-components-utilities/styles/_all";
+
+.widg-l-flex--header,
+.widg-l-split--add-widget,
+.widg-l-gallery,
+.layout
+{
+  max-width: 1280px;
+}
+.pf-v5-c-page__main-section {
+  border-bottom: 1px solid var(--pf-v5-global--disabled-color--200);
+}

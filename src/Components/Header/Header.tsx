@@ -142,6 +142,7 @@ const Controls = () => {
                           checked={checked === CUSTOM}
                         ></Radio>
                         <TextArea
+                          className="pf-v5-u-mt-sm"
                           rows={1}
                           placeholder="Paste custom string"
                           required
@@ -207,7 +208,7 @@ const Header = () => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   return (
-    <PageSection className="pf-v5-u-p-lg" variant={PageSectionVariants.light}>
+    <PageSection className="widg-c-page__main-section--header pf-v5-u-p-lg" variant={PageSectionVariants.light}>
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
         <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
           <TextContent>
@@ -218,7 +219,7 @@ const Header = () => {
           </TextContent>
         </FlexItem>
         <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
-          <Toolbar className="widg-c-toolbar--header">
+          <Toolbar>
             <ToolbarContent>
               <Controls />
             </ToolbarContent>
