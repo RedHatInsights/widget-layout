@@ -83,7 +83,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
             removeWidget(widgetConfig.i);
           }}
           icon={
-            <Icon status={widgetConfig.static ? undefined : 'danger'}>
+            <Icon className="pf-v5-u-pb-2xl" status={widgetConfig.static ? undefined : 'danger'}>
               <MinusCircleIcon />
             </Icon>
           }
@@ -91,7 +91,8 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
         >
           Remove
           <HelperText>
-            <HelperTextItem variant="indeterminate">{"All 'removed' widgets can be added back by clicking the 'Add widgets' button."}</HelperTextItem>
+            <HelperTextItem variant="indeterminate">{"All 'removed' widgets can be added back"}</HelperTextItem>
+            <HelperTextItem variant="indeterminate">{"by clicking the 'Add widgets' button."}</HelperTextItem>
           </HelperText>
         </DropdownItem>
       </>
@@ -104,6 +105,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
         <Dropdown
           popperProps={{
             appendTo: document.body,
+            position: "right",
           }}
           toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
             <MenuToggle
