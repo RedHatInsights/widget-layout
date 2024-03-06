@@ -17,7 +17,8 @@
     "start": "HOT=true fec dev",
     "test": "jest",
     "postinstall": "rimraf .cache",
-    "verify": "npm-run-all build lint test"
+    "verify": "npm-run-all build lint test",
+    "static": "BETA=true PROXY=true fec static"
   },
   "dependencies": {
     "@patternfly/react-core": "^5.0.0",
@@ -70,6 +71,6 @@
     "webpack-bundle-analyzer": "4.4.2"
   },
   "insights": {
-    "appname": "frontend-starter-app"
+    "appname": "widget-layout"
   }
 }
