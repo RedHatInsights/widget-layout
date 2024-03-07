@@ -10,6 +10,10 @@ objects:
     spec:
       envName: ${ENV_NAME}
       title: widget-layout
+      deploymentRepo: https://github.com/RedHatInsights/widget-layout
+      API:
+        versions:
+          - v1
       frontend:
         paths:
           - /apps/widget-layout
