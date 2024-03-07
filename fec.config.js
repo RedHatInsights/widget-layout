@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   appUrl: ['/staging/starter'],
-  sassPrefix: '.frontendStarterApp',
+  sassPrefix: '.widgetLayout',
   debug: true,
   useProxy: true,
   proxyVerbose: true,
@@ -26,7 +26,7 @@ module.exports = {
     }),
   },
   moduleFederation: {
-    moduleName: 'frontendStarterApp',
+    moduleName: 'widgetLayout',
     exposes: {
       './RootApp': path.resolve(__dirname, './src/AppEntry.tsx'),
     },
