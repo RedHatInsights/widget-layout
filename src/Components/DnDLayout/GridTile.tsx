@@ -153,7 +153,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
         </CardTitle>
       </CardHeader>
       <Divider />
-      <CardBody>
+      <CardBody className="pf-v5-u-p-0">
         <Component></Component>
       </CardBody>
     </Card>
