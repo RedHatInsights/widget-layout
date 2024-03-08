@@ -42,4 +42,7 @@
       text-overflow: ellipsis;
     }
   }
+  .pf-v5-c-card__body {
+     overflow-y: scroll;
+  }
 }
