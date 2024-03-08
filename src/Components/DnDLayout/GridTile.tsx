@@ -137,14 +137,6 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
     </>
   );
 
-  const titleWidth = useMemo(
-    // 88px is the width of the actions container
-    // 48px is the width padding on the card title
-    // 16px is the width of the left padding on the actions handle
-    () => `calc(${widgetConfig.colWidth * widgetConfig.w}px - 48px${widgetConfig.locked ? '' : ' - 88px - 16px'})`,
-    [widgetConfig.colWidth, widgetConfig.w, widgetConfig.locked]
-  );
-
   const HeaderIcon = icon;
   return (
     <Card
@@ -153,20 +145,15 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
       })}
     >
       <CardHeader actions={{ actions: headerActions }}>
-        {HeaderIcon ? <HeaderIcon /> : null}
-        <CardTitle
-          style={{
-            userSelect: isDragging ? 'none' : 'auto',
-            width: titleWidth,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
+        <CardTitle>
+          <Icon className="pf-v5-u-pl-sm pf-v5-u-pr-md" isInline>
+            {HeaderIcon ? <HeaderIcon /> : null}
+          </Icon>
           {title}
         </CardTitle>
       </CardHeader>
       <Divider />
-      <CardBody>
+      <CardBody className="pf-v5-u-p-0">
         <Component></Component>
       </CardBody>
     </Card>

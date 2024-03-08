@@ -84,7 +84,13 @@ const Controls = () => {
   return (
     <ToolbarGroup>
       <ToolbarItem spacer={{ default: 'spacerNone' }}>
-        <ClipboardCopy isCode hoverTip="Copy current configuration string" clickTip="Configuration string copied to clipboard">
+        <ClipboardCopy
+          isCode
+          hoverTip="Copy current configuration string"
+          position="left"
+          maxWidth="300px"
+          clickTip="Configuration string copied to clipboard"
+        >
           {JSON.stringify(layout)}
         </ClipboardCopy>
       </ToolbarItem>
@@ -106,7 +112,7 @@ const Controls = () => {
               )}
             >
               <DropdownGroup label="Dashboard configuration" labelHeadingLevel="h3">
-                <DropdownList>
+                <DropdownList className="pf-v5-u-pb-0">
                   <Form>
                     <FormGroup>
                       <DropdownItem>
@@ -136,6 +142,8 @@ const Controls = () => {
                           checked={checked === CUSTOM}
                         ></Radio>
                         <TextArea
+                          className="pf-v5-u-mt-sm"
+                          rows={1}
                           placeholder="Paste custom string"
                           required
                           onClick={() => {
@@ -200,7 +208,7 @@ const Header = () => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   return (
-    <PageSection className="pf-v5-u-p-lg" variant={PageSectionVariants.light}>
+    <PageSection className="widg-c-page__main-section--header pf-v5-u-p-lg" variant={PageSectionVariants.light}>
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
         <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
           <TextContent>
@@ -211,7 +219,7 @@ const Header = () => {
           </TextContent>
         </FlexItem>
         <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
-          <Toolbar className="widg-c-toolbar--header">
+          <Toolbar>
             <ToolbarContent>
               <Controls />
             </ToolbarContent>

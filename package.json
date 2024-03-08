@@ -71,6 +71,6 @@
     "webpack-bundle-analyzer": "4.4.2"
   },
   "insights": {
-    "appname": "frontend-starter-app"
+    "appname": "widget-layout"
   }
 }
