@@ -92,6 +92,11 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
             <SmallWidget />
           </WidgetWrapper>
         </GalleryItem>
+        <GalleryItem>
+          <WidgetWrapper widgetType={WidgetTypes.EventsWidget} title="Events widget">
+            <SmallWidget />
+          </WidgetWrapper>
+        </GalleryItem>
       </Gallery>
     </div>
   );
