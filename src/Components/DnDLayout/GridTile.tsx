@@ -7,6 +7,8 @@ import {
   Dropdown,
   DropdownItem,
   DropdownList,
+  Flex,
+  FlexItem,
   HelperText,
   HelperTextItem,
   Icon,
@@ -145,12 +147,19 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
       })}
     >
       <CardHeader actions={{ actions: headerActions }}>
-        <CardTitle>
-          <Icon className="pf-v5-u-pr-sm" isInline>
+        <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
+          <Icon status="custom" className="pf-v5-u-mr-sm">
             <BaconIcon />
           </Icon>
-          {title}
-        </CardTitle>
+          <CardTitle
+            style={{
+              userSelect: isDragging ? 'none' : 'auto',
+            }}
+            className="pf-v5-u-flex-wrap pf-v5-u-text-break-word"
+          >
+            {title}
+          </CardTitle>
+        </Flex>
       </CardHeader>
       <Divider />
       <CardBody className="pf-v5-u-p-0">
