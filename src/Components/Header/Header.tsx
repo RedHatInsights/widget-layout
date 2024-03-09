@@ -82,112 +82,114 @@ const Controls = () => {
   };
 
   return (
-    <ToolbarGroup>
-      <ToolbarItem spacer={{ default: 'spacerNone' }}>
-        <ClipboardCopy
-          isCode
-          hoverTip="Copy current configuration string"
-          position="left"
-          maxWidth="300px"
-          clickTip="Configuration string copied to clipboard"
-        >
-          {JSON.stringify(layout)}
-        </ClipboardCopy>
-      </ToolbarItem>
-      <ToolbarItem spacer={{ default: 'spacerSm' }}>
-        <Stack>
-          <StackItem>
-            <Dropdown
-              isOpen={isOpen}
-              activeItemId={0}
-              onOpenChange={(isOpen: boolean) => {
-                setIsOpen(isOpen);
-                setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
-                setCustomValueValidationError('');
-              }}
-              toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
-                <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen}>
-                  Config view: {checked}
-                </MenuToggle>
-              )}
-            >
-              <DropdownGroup label="Dashboard configuration" labelHeadingLevel="h3">
-                <DropdownList className="pf-v5-u-pb-0">
-                  <Form>
-                    <FormGroup>
-                      <DropdownItem>
-                        <Radio
-                          name="config"
-                          id={CONSOLE_DEFAULT}
-                          label={CONSOLE_DEFAULT}
-                          value={CONSOLE_DEFAULT}
-                          onClick={(e) => {
-                            onToggleClick();
-                            setCustomValueValidationError('');
-                            setChecked(CONSOLE_DEFAULT);
-                            onDefaultConfigSubmit(e);
-                          }}
-                          checked={checked === CONSOLE_DEFAULT}
-                        ></Radio>
-                      </DropdownItem>
-                      <DropdownItem>
-                        <Radio
-                          name="config"
-                          id={CUSTOM}
-                          label="Custom configuration"
-                          value={CUSTOM}
-                          onClick={() => {
-                            setChecked(CUSTOM);
-                          }}
-                          checked={checked === CUSTOM}
-                        ></Radio>
-                        <TextArea
-                          className="pf-v5-u-mt-sm"
-                          rows={1}
-                          placeholder="Paste custom string"
-                          required
-                          onClick={() => {
-                            setChecked(CUSTOM);
-                          }}
-                          onChange={(_event, value) => {
-                            setCustomValue(value);
-                          }}
-                        ></TextArea>
-                        <FormHelperText>
-                          <HelperText>
-                            <HelperTextItem
-                              variant={customValueValidationError ? 'error' : 'default'}
-                              {...(customValueValidationError && { icon: <ExclamationCircleIcon /> })}
-                            >
-                              {customValueValidationError}
-                            </HelperTextItem>
-                          </HelperText>
-                        </FormHelperText>
-                        <div hidden={checked !== CUSTOM}>
-                          <Button variant="plain" type={ButtonType.submit} onClick={onCustomConfigSubmit}>
-                            <CheckIcon />
-                          </Button>
-                          <Button
-                            variant="plain"
-                            type={ButtonType.reset}
-                            onClick={() => {
-                              setIsOpen(false);
-                              setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+    <ToolbarGroup className="pf-v5-u-flex-direction-column-reverse pf-v5-u-flex-direction-row-on-md">
+      <Flex className=" pf-v5-u-flex-nowrap pf-v5-u-flex-direction-row-reverse pf-v5-u-flex-direction-row-on-md">
+        <ToolbarItem spacer={{ default: 'spacerNone' }}>
+          <ClipboardCopy
+            isCode
+            hoverTip="Copy current configuration string"
+            position="left"
+            maxWidth="300px"
+            clickTip="Configuration string copied to clipboard"
+          >
+            {JSON.stringify(layout)}
+          </ClipboardCopy>
+        </ToolbarItem>
+        <ToolbarItem spacer={{ default: 'spacerSm' }}>
+          <Stack>
+            <StackItem>
+              <Dropdown
+                isOpen={isOpen}
+                activeItemId={0}
+                onOpenChange={(isOpen: boolean) => {
+                  setIsOpen(isOpen);
+                  setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+                  setCustomValueValidationError('');
+                }}
+                toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                  <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen}>
+                    Config view: {checked}
+                  </MenuToggle>
+                )}
+              >
+                <DropdownGroup label="Dashboard configuration" labelHeadingLevel="h3">
+                  <DropdownList className="pf-v5-u-pb-0">
+                    <Form>
+                      <FormGroup>
+                        <DropdownItem>
+                          <Radio
+                            name="config"
+                            id={CONSOLE_DEFAULT}
+                            label={CONSOLE_DEFAULT}
+                            value={CONSOLE_DEFAULT}
+                            onClick={(e) => {
+                              onToggleClick();
                               setCustomValueValidationError('');
+                              setChecked(CONSOLE_DEFAULT);
+                              onDefaultConfigSubmit(e);
                             }}
-                          >
-                            <TimesIcon />
-                          </Button>
-                        </div>
-                      </DropdownItem>
-                    </FormGroup>
-                  </Form>
-                </DropdownList>
-              </DropdownGroup>
-            </Dropdown>
-          </StackItem>
-        </Stack>
-      </ToolbarItem>
+                            checked={checked === CONSOLE_DEFAULT}
+                          ></Radio>
+                        </DropdownItem>
+                        <DropdownItem>
+                          <Radio
+                            name="config"
+                            id={CUSTOM}
+                            label="Custom configuration"
+                            value={CUSTOM}
+                            onClick={() => {
+                              setChecked(CUSTOM);
+                            }}
+                            checked={checked === CUSTOM}
+                          ></Radio>
+                          <TextArea
+                            className="pf-v5-u-mt-sm"
+                            rows={1}
+                            placeholder="Paste custom string"
+                            required
+                            onClick={() => {
+                              setChecked(CUSTOM);
+                            }}
+                            onChange={(_event, value) => {
+                              setCustomValue(value);
+                            }}
+                          ></TextArea>
+                          <FormHelperText>
+                            <HelperText>
+                              <HelperTextItem
+                                variant={customValueValidationError ? 'error' : 'default'}
+                                {...(customValueValidationError && { icon: <ExclamationCircleIcon /> })}
+                              >
+                                {customValueValidationError}
+                              </HelperTextItem>
+                            </HelperText>
+                          </FormHelperText>
+                          <div hidden={checked !== CUSTOM}>
+                            <Button variant="plain" type={ButtonType.submit} onClick={onCustomConfigSubmit}>
+                              <CheckIcon />
+                            </Button>
+                            <Button
+                              variant="plain"
+                              type={ButtonType.reset}
+                              onClick={() => {
+                                setIsOpen(false);
+                                setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+                                setCustomValueValidationError('');
+                              }}
+                            >
+                              <TimesIcon />
+                            </Button>
+                          </div>
+                        </DropdownItem>
+                      </FormGroup>
+                    </Form>
+                  </DropdownList>
+                </DropdownGroup>
+              </Dropdown>
+            </StackItem>
+          </Stack>
+        </ToolbarItem>
+      </Flex>
       <ToolbarItem>
         <Button
           onClick={() => {
@@ -208,7 +210,7 @@ const Header = () => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   return (
-    <PageSection className="widg-c-page__main-section--header pf-v5-u-p-lg" variant={PageSectionVariants.light}>
+    <PageSection className="widg-c-page__main-section--header pf-v5-u-p-lg pf-v5-u-p-r-0-on-sm" variant={PageSectionVariants.light}>
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
         <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
           <TextContent>
