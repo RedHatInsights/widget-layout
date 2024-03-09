@@ -1,9 +1,13 @@
 .widg-c-page__main-section--header {
-  .pf-v5-c-toolbar__content {
-    padding-left: 0;
+  .pf-v5-c-toolbar {
+    --pf-v5-c-toolbar__content--PaddingLeft: 0;
+    --pf-v5-c-toolbar__content--PaddingRight: 0;
     .pf-v5-c-clipboard-copy {
       .pf-v5-c-button {
+        --pf-v5-c-button--after--BorderColor: var(--pf-v5-global--Color--light-100);
         --pf-v5-c-button--m-control--Color: var(--pf-v5-global--Color--200);
+        --pf-v5-c-button--PaddingRight: var(--pf-v5-global--spacer--md);
+        --pf-v5-c-button--PaddingLeft: var(--pf-v5-global--spacer--sm);
       }
       .pf-v5-c-clipboard-copy__group .pf-v5-c-form-control {
         display: none;
