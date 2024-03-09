@@ -82,16 +82,10 @@ const Controls = () => {
   };
 
   return (
-    <ToolbarGroup className="pf-v5-u-flex-direction-column-reverse pf-v5-u-flex-direction-row-on-md">
-      <Flex className=" pf-v5-u-flex-nowrap pf-v5-u-flex-direction-row-reverse pf-v5-u-flex-direction-row-on-md">
+    <ToolbarGroup className="pf-v5-u-flex-direction-column-reverse pf-v5-u-flex-direction-row-reverse-on-md pf-v5-u-flex-direction-row-on-lg">
+      <Flex className=" pf-v5-u-flex-nowrap pf-v5-u-flex-direction-row-reverse pf-v5-u-flex-direction-row-on-lg">
         <ToolbarItem spacer={{ default: 'spacerNone' }}>
-          <ClipboardCopy
-            isCode
-            hoverTip="Copy current configuration string"
-            position="left"
-            maxWidth="300px"
-            clickTip="Configuration string copied to clipboard"
-          >
+          <ClipboardCopy isCode hoverTip="Copy current configuration string" position="left" clickTip="Configuration string copied to clipboard">
             {JSON.stringify(layout)}
           </ClipboardCopy>
         </ToolbarItem>
@@ -190,7 +184,7 @@ const Controls = () => {
           </Stack>
         </ToolbarItem>
       </Flex>
-      <ToolbarItem>
+      <ToolbarItem className="pf-v5-u-pr-sm pf-v5-u-pr-0-on-lg pf-v5-u-pb-xs pf-v5-u-pb-0-on-lg">
         <Button
           onClick={() => {
             toggleOpen((prev) => !prev);
