@@ -2,47 +2,31 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-
   .drag-handle {
     cursor: grab;
   }
-  
   .drag-handle.dragging {
     cursor: grabbing;
   }
-  
   &.static {
     .drag-handle {
       cursor: not-allowed;
     }
-    
     .drag-handle.dragging {
       cursor: not-allowed;
     }
   }
-
-  .pf-v5-c-card__header:first-child {
-    padding-top: var(--pf-v5-global--spacer--md);
-  }
-
-  // use ellipsis without calculating width
-  .pf-v5-c-card__title {
-    position: relative;
-    &:before {
-      content: '&nbsp;';
-      visibility: hidden;
+  .pf-v5-c-card {
+    &__header {
+      &:first-child {
+        padding-top: var(--pf-v5-global--spacer--md);
+      }
+      .pf-v5-c-icon {
+        --pf-v5-c-icon__content--m-custom--Color: var(--pf-v5-global--primary-color--100);
+      }
     }
-    &-text {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    &__body {
+      overflow-y: scroll;
     }
-  }
-  .pf-v5-c-card__body {
-     overflow-y: scroll;
   }
 }
