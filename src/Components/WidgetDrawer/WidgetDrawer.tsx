@@ -66,7 +66,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
 
   const panelContent = (
     <PageSection
-      className="pf-v5-u-p-lg"
+      className="pf-v5-u-p-md pf-v5-u-p-lg-on-sm"
       style={{
         backgroundColor: '#E7F1FA',
       }}
