@@ -21,6 +21,7 @@ import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import LargeWidget from '../Widgets/LargeWidget';
 import MediumWidget from '../Widgets/MediumWidget';
 import SmallWidget from '../Widgets/SmallWidget';
+import ExploreCapabilities from '../Widgets/ExploreCapabilities';
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
@@ -107,8 +108,8 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
           </WidgetWrapper>
         </GalleryItem>
         <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.ExploreCapabilities} title="Events widget">
-            <SmallWidget />
+          <WidgetWrapper widgetType={WidgetTypes.ExploreCapabilities} title="Explore Capabilities">
+            <ExploreCapabilities />
           </WidgetWrapper>
         </GalleryItem>
       </Gallery>
