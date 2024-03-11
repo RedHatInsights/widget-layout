@@ -8,11 +8,14 @@ import { StackItem } from '@patternfly/react-core/dist/dynamic/layouts/Stack';
 import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { Button } from '@patternfly/react-core/dist/dynamic/components/Button';
 
-interface Notification {
-  name: string;
-  service: string;
-  date: number;
-}
+export type Notification = {
+  id: string;
+  title: string;
+  description: string;
+  read: boolean;
+  source: string;
+  created: string;
+};
 
 const EmptyStateBellIcon: React.FunctionComponent = () => (
   <svg className="pf-v5-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
@@ -22,10 +25,11 @@ const EmptyStateBellIcon: React.FunctionComponent = () => (
 
 const EventsWidget: React.FunctionComponent = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const MAX_ROWS = 5;
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('https://stage.foo.redhat.com:1337/api/notifications/v1/notifications/drawer');
+      const response = await fetch('/api/notifications/v1/notifications/drawer');
       const { data } = await response.json();
       setNotifications(data);
     } catch (error) {
@@ -43,19 +47,18 @@ const EventsWidget: React.FunctionComponent = () => {
     date: 'Date',
   };
 
-  const events = [
-    { name: 'Policy triggered', service: 'Policies - Red Hat Enterprise Linux', date: '2 May 2023, 11:43 UTC' },
-    { name: 'New advisory', service: 'Patch - Red Hat Enterprise Linux', date: '2 May 2023, 11:43 UTC' },
-    { name: 'New recommendation', service: 'Advisor - Red Hat Enterprise Linux', date: '2 May 2023, 11:43 UTC' },
-    { name: 'New advisory', service: 'Patch - Red Hat Enterprise Linux', date: '2 May 2023, 11:43 UTC' },
-    { name: 'New recommendation', service: 'Advisor - Red Hat Enterprise Linux', date: '2 May 2023, 11:43 UTC' },
-  ];
-
-  console.log(notifications);
+  // TEST DATA
+  // const notifications = [
+  //   { id: '1', title: 'Policy triggered', source: 'Policies - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+  //   { id: '2', title: 'New advisory', source: 'Patch - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+  //   { id: '3', title: 'New recommendation', source: 'Advisor - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+  //   { id: '4', title: 'New advisory', source: 'Patch - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+  //   { id: '5', title: 'New recommendation', source: 'Advisor - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+  // ];
 
   return (
     <>
-      {events.length === 0 ? (
+      {notifications.length === 0 ? (
         <EmptyState variant={EmptyStateVariant.lg}>
           <EmptyStateHeader titleText="No fired events" headingLevel="h4" icon={<EmptyStateIcon icon={EmptyStateBellIcon} />} />
           <EmptyStateBody>
@@ -70,7 +73,7 @@ const EventsWidget: React.FunctionComponent = () => {
           </EmptyStateFooter>
         </EmptyState>
       ) : (
-        <Table aria-label="Simple table" variant={TableVariant.compact}>
+        <Table aria-label="Events widget table" variant={TableVariant.compact}>
           <Thead>
             <Tr>
               <Th>{columnNames.event}</Th>
@@ -79,11 +82,11 @@ const EventsWidget: React.FunctionComponent = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {events?.map((event) => (
-              <Tr key={event.name}>
-                <Td dataLabel={columnNames.event}>{event.name}</Td>
-                <Td dataLabel={columnNames.service}>{event.service}</Td>
-                <Td dataLabel={columnNames.date}>{event.date}</Td>
+            {notifications?.slice(0, MAX_ROWS).map((event) => (
+              <Tr key={event.id}>
+                <Td dataLabel={columnNames.event}>{event.title}</Td>
+                <Td dataLabel={columnNames.service}>{event.source}</Td>
+                <Td dataLabel={columnNames.date}>{event.created}</Td>
               </Tr>
             ))}
           </Tbody>
