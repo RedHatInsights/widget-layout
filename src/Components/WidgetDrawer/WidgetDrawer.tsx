@@ -16,9 +16,9 @@ import { useAtom, useSetAtom } from 'jotai';
 import React from 'react';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { CloseIcon, GripVerticalIcon } from '@patternfly/react-icons';
-import LargeWidget from '../Widgets/LargeWidget';
 import { WidgetTypes } from '../Widgets/widgetTypes';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
+import LargeWidget from '../Widgets/LargeWidget';
 import MediumWidget from '../Widgets/MediumWidget';
 import SmallWidget from '../Widgets/SmallWidget';
 
@@ -90,7 +90,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
           />
         </SplitItem>
       </Split>
-      <Gallery className="widg-l-gallery pf-v5-u-pt-sm" hasGutter>
+      <Gallery hasGutter className="pf-v5-u-p-lg pf-v5-u-pt-0">
         <GalleryItem>
           <WidgetWrapper widgetType={WidgetTypes.LargeWidget} title="Large widget">
             <LargeWidget />
@@ -103,6 +103,11 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         </GalleryItem>
         <GalleryItem>
           <WidgetWrapper widgetType={WidgetTypes.SmallWidget} title="Small widget">
+            <SmallWidget />
+          </WidgetWrapper>
+        </GalleryItem>
+        <GalleryItem>
+          <WidgetWrapper widgetType={WidgetTypes.ExploreCapabilities} title="Events widget">
             <SmallWidget />
           </WidgetWrapper>
         </GalleryItem>
