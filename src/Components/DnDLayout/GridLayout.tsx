@@ -28,7 +28,7 @@ import { debounce, isEqual } from 'lodash';
 
 export const dropping_elem_id = '__dropping-elem__';
 
-export const breakpoints = { lg: 1200, md: 996, sm: 768 };
+export const breakpoints = { xl: 1100, lg: 996, md: 768, sm: 480 };
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
