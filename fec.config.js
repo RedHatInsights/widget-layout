@@ -3,7 +3,7 @@ const dependencies = require('./package.json').dependencies;
 
 module.exports = {
   appUrl: ['/staging/starter'],
-  sassPrefix: '.widgetLayout',
+  sassPrefix: process.env.CONFIG_PORT || process.env.PROXY ? '.frontendStarterApp' : '.widgetLayout',
   debug: true,
   useProxy: true,
   proxyVerbose: true,
@@ -27,7 +27,7 @@ module.exports = {
     }),
   },
   moduleFederation: {
-    moduleName: process.env.CONFIG_PORT ? 'frontendStarterApp' : 'widgetLayout', // overwriting starter app locally for ease of development
+    moduleName: process.env.CONFIG_PORT || process.env.PROXY ? 'frontendStarterApp' : 'widgetLayout', // overwriting starter app locally for ease of development
     exposes: {
       './RootApp': path.resolve(__dirname, './src/AppEntry.tsx'),
       // TODO these will likely need to be restructured to be more consumable
