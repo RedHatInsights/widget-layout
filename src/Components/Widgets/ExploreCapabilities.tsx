@@ -1,5 +1,20 @@
 import React from 'react';
-import { Accordion, AccordionContent, AccordionItem, AccordionToggle, Button, Flex, FlexItem, Title } from '@patternfly/react-core';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionToggle,
+  Button,
+  Flex,
+  FlexItem,
+  Panel,
+  PanelHeader,
+  PanelMain,
+  PanelMainBody,
+  Split,
+  SplitItem,
+  Title,
+} from '@patternfly/react-core';
 
 const ExploreCapabilities: React.FunctionComponent = () => {
   const [isExpanded, setIsExpanded] = React.useState('ex-toggle1');
@@ -24,21 +39,31 @@ const ExploreCapabilities: React.FunctionComponent = () => {
           Get started with the Hybrid Cloud Console
         </AccordionToggle>
         <AccordionContent id="ex-expand1" isHidden={isExpanded !== 'ex-toggle1'} className="pf-v5-u-color-100">
-          <Flex>
-            <FlexItem align={{ default: 'alignRight' }}>
-              <img src="/apps/frontend-assets/console-landing/widget-explore/Explore_Get-started.svg" />
-            </FlexItem>
-          </Flex>
-          <Title headingLevel="h4" className="pf-v5-u-mb-sm">
-            Take a tour of the Console
-          </Title>{' '}
-          <p className="pf-v5-u-mb-sm">
-            There&apos;s a lot to explore in the Hybrid Cloud Console, and understanding its capabilities will increase your efficiency.
-          </p>
-          {/* button is disabled until we have a link for the guided tour */}
-          <Button isDisabled variant="danger" href="" target="_blank" className="pf-v5-u-mb-sm">
-            Start the guided tour
-          </Button>
+          <Panel isScrollable>
+            <PanelMain>
+              <PanelHeader>
+                <Split hasGutter isWrappable>
+                  <SplitItem isFilled>
+                    <Title headingLevel="h4" className="pf-v5-u-mb-sm">
+                      Take a tour of the Console
+                    </Title>
+                  </SplitItem>
+                  <SplitItem>
+                    <img src="/apps/frontend-assets/console-landing/widget-explore/Explore_Get-started.svg" />
+                  </SplitItem>
+                </Split>
+              </PanelHeader>
+              <PanelMainBody>
+                <p className="pf-v5-u-mb-sm">
+                  There&apos;s a lot to explore in the Hybrid Cloud Console, and understanding its capabilities will increase your efficiency.
+                </p>
+                {/* button is disabled until we have a link for the guided tour */}
+                <Button isDisabled variant="danger" href="" target="_blank" className="pf-v5-u-mb-sm">
+                  Start the guided tour
+                </Button>
+              </PanelMainBody>
+            </PanelMain>
+          </Panel>
         </AccordionContent>
       </AccordionItem>
       <AccordionItem>
