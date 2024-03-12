@@ -1,26 +1,25 @@
 import React from 'react';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionToggle,
   Button,
   Card,
   Drawer,
   DrawerContent,
   DrawerContentBody,
-  DrawerHead,
   DrawerPanelBody,
   DrawerPanelContent,
   Flex,
   FlexItem,
+  SimpleList,
+  SimpleListGroup,
+  SimpleListItem,
   Split,
   SplitItem,
   Title,
 } from '@patternfly/react-core';
 
 export const Explore1: React.FunctionComponent = () => {
-  const [isExpanded, setIsExpanded] = React.useState('ex-toggle1');
+  const [isExpanded, setIsExpanded] = React.useState('');
+
   const onToggle = (id: string) => {
     if (id === isExpanded) {
       setIsExpanded('');
@@ -29,124 +28,130 @@ export const Explore1: React.FunctionComponent = () => {
     }
   };
 
+  const drawerData = [
+    {
+      id: 'ex-toggle1',
+      name: 'Get started with the Hybrid Cloud Console',
+      img: '/apps/frontend-assets/console-landing/widget-explore/Explore_Get-started.svg',
+      title: 'Take a tour of the Console',
+      body: "There's a lot to explore in the Hybrid Cloud Console, and understanding its capabilities will increase your efficiency.",
+      buttonName: 'Start the guided tour',
+      url: '',
+    },
+    {
+      id: 'ex-toggle2',
+      name: 'Try OpenShift on AWS',
+      img: '/apps/frontend-assets/console-landing/widget-explore/Explore_ROSA.svg',
+      title: 'Get started with Red Hat OpenShift Service on AWS (ROSA)',
+      body: 'Quickly build, deploy, and scale applications with out fully-managed turnkey application platform.',
+      buttonName: 'Try ROSA',
+      url: 'https://console.redhat.com/openshift/overview/rosa',
+    },
+    {
+      id: 'ex-toggle3',
+      name: 'Develop on the OpenShift Sandbox',
+      img: '/apps/frontend-assets/console-landing/widget-explore/Explore_sandbox.svg',
+      title: 'Develop in the sandbox with the Red Hat Developer program',
+      body: 'Try Red Hat&apos;s products and technologies without setup or configuration.',
+      buttonName: 'Explore the sandbox',
+      url: 'https://console.redhat.com/openshift/sandbox',
+    },
+    {
+      id: 'ex-toggle4',
+      name: 'Analyze your envionments',
+      img: '/apps/frontend-assets/console-landing/widget-explore/Explore_Insights-analyze.svg',
+      title: 'Continuously analyze with Red Hat Insights',
+      body: 'Analyze platforms and applications from the console to better manage your hybrid cloud environments.',
+      buttonName: 'Identify and resolve risks',
+      url: 'https://console.redhat.com/insights/dashboard#SIDs=&tags=',
+    },
+    {
+      id: 'ex-toggle5',
+      name: 'Connect to subscriptions',
+      img: '/apps/frontend-assets/console-landing/widget-explore/Explore_subs.svg',
+      title: 'Empower your buying decisions with data',
+      body: 'Subscription Services provides reporting to help you make data-driven subscription choices.',
+      buttonName: 'Explore subscriptions',
+      url: 'https://console.redhat.com/insights/subscriptions/inventory#SIDs=&tags=',
+    },
+    {
+      id: 'ex-toggle6',
+      name: 'Configure your console',
+      img: '/apps/frontend-assets/console-landing/widget-explore/Explore_configure.svg',
+      title: 'Customize your notification settings',
+      body: 'Opt-in and out of receiving notifications for your console services.',
+      buttonName: 'Configure settings',
+      url: 'https://console.redhat.com/settings/notifications',
+    },
+  ];
+
   const panelContent = (
     <>
-      <DrawerPanelContent id="ex-toggle1" colorVariant="no-background" widths={{ xl: 'width_75' }}>
-        <DrawerHead>
-          <Split hasGutter>
-            <SplitItem isFilled>
+      {drawerData.map((data) => (
+        <DrawerPanelContent key={data.id} colorVariant="no-background" widths={{ xl: 'width_75' }}>
+          <>
+            <DrawerPanelBody>
               <Title headingLevel="h2" size="xl">
-                Take a tour of the Console{' '}
+                {data.title}
               </Title>
-            </SplitItem>
-            <SplitItem>
-              <img src="/apps/frontend-assets/console-landing/widget-explore/Explore_Get-started.svg" />
-            </SplitItem>
-          </Split>
-        </DrawerHead>
-        <DrawerPanelBody>
-          <Flex>
-            <FlexItem>
-              <p className="pf-v5-u-mb-sm">
-                There&apos;s a lot to explore in the Hybrid Cloud Console, and understanding its capabilities will increase your efficiency.
-              </p>
-            </FlexItem>
-            <FlexItem>
-              {/* button is disabled until we have a link for the guided tour */}
-              <Button isDisabled variant="danger" href="" target="_blank" className="pf-v5-u-mb-sm">
-                Start the guided tour
-              </Button>
-            </FlexItem>
-          </Flex>
-        </DrawerPanelBody>
-      </DrawerPanelContent>
+              <img className="pf-v5-u-float-right" src={data.img} />
+              <Flex>
+                <FlexItem>
+                  <p className="pf-v5-u-mb-sm">{data.body}</p>
+                </FlexItem>
+                <FlexItem>
+                  <Button variant="danger" size="lg" href={data.url} target="_blank" className="pf-v5-u-mb-sm">
+                    {data.buttonName}
+                  </Button>
+                </FlexItem>
+              </Flex>
+            </DrawerPanelBody>
+          </>
+        </DrawerPanelContent>
+      ))}
+    </>
+  );
+
+  const drawerContent = (
+    <>
+      {drawerData.map((data) => (
+        <SimpleList key={data.id} onSelect={() => onToggle}>
+          <SimpleListGroup>
+            <SimpleListItem key={data.id} isActive>
+              {data.name}
+            </SimpleListItem>
+          </SimpleListGroup>
+        </SimpleList>
+
+        // <Accordion key={data.id} isBordered>
+        //   <AccordionItem>
+        //     <AccordionToggle
+        //       onClick={() => {
+        //         onToggle(data.id);
+        //       }}
+        //       isExpanded={isExpanded === data.id}
+        //       id={data.id}
+        //     >
+        //       {data.name}
+        //       <AccordionContent id={data.id} isHidden={isExpanded !== data.id} className="pf-v5-u-color-100"></AccordionContent>
+        //     </AccordionToggle>
+        //   </AccordionItem>
+        // </Accordion>
+      ))}
+      ;
     </>
   );
 
   return (
     <React.Fragment>
       <Card>
-        <Drawer isStatic>
-          <DrawerContent panelContent={panelContent}>
-            <DrawerContentBody>
-              <Accordion isBordered>
-                <AccordionItem>
-                  <AccordionToggle
-                    onClick={() => {
-                      onToggle('ex-toggle1');
-                    }}
-                    isExpanded={isExpanded === 'ex-toggle1'}
-                    id="ex-toggle1"
-                  >
-                    {' '}
-                    Get started with the Hybrid Cloud Console
-                  </AccordionToggle>
-                  <AccordionContent id="ex-expand1" isHidden={isExpanded !== 'ex-toggle1'} className="pf-v5-u-color-100"></AccordionContent>
-                </AccordionItem>
-                <AccordionItem>
-                  <AccordionToggle
-                    onClick={() => {
-                      onToggle('ex-toggle2');
-                    }}
-                    isExpanded={isExpanded === 'ex-toggle2'}
-                    id="ex-toggle2"
-                  >
-                    Try OpenShift on AWS
-                  </AccordionToggle>
-                  <AccordionContent id="ex-expand2" isHidden={isExpanded !== 'ex-toggle2'} className="pf-v5-u-color-100"></AccordionContent>
-                </AccordionItem>
-                <AccordionItem>
-                  <AccordionToggle
-                    onClick={() => {
-                      onToggle('ex-toggle3');
-                    }}
-                    isExpanded={isExpanded === 'ex-toggle3'}
-                    id="ex-toggle3"
-                  >
-                    Develop in the OpenShift Sandbox
-                  </AccordionToggle>
-                  <AccordionContent id="ex-expand3" isHidden={isExpanded !== 'ex-toggle3'} className="pf-v5-u-color-100"></AccordionContent>
-                </AccordionItem>
-                <AccordionItem>
-                  <AccordionToggle
-                    onClick={() => {
-                      onToggle('ex-toggle4');
-                    }}
-                    isExpanded={isExpanded === 'ex-toggle4'}
-                    id="ex-toggle4"
-                  >
-                    Analyze your environments
-                  </AccordionToggle>
-                  <AccordionContent id="ex-expand4" isHidden={isExpanded !== 'ex-toggle4'} className="pf-v5-u-color-100"></AccordionContent>
-                </AccordionItem>
-                <AccordionItem>
-                  <AccordionToggle
-                    onClick={() => {
-                      onToggle('ex-toggle5');
-                    }}
-                    isExpanded={isExpanded === 'ex-toggle5'}
-                    id="ex-toggle5"
-                  >
-                    Connect to subscriptions
-                  </AccordionToggle>
-                  <AccordionContent id="ex-expand5" isHidden={isExpanded !== 'ex-toggle5'} className="pf-v5-u-color-100"></AccordionContent>
-                </AccordionItem>
-                <AccordionItem>
-                  <AccordionToggle
-                    onClick={() => {
-                      onToggle('ex-toggle6');
-                    }}
-                    isExpanded={isExpanded === 'ex-toggle6'}
-                    id="ex-toggle6"
-                  >
-                    Configure your notifications
-                  </AccordionToggle>
-                  <AccordionContent id="ex-expand6" isHidden={isExpanded !== 'ex-toggle6'} className="pf-v5-u-color-100"></AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </DrawerContentBody>
-          </DrawerContent>
-        </Drawer>
+        {drawerData.map((data) => (
+          <Drawer isStatic key={data.id}>
+            <DrawerContent panelContent={panelContent}>
+              <DrawerContentBody>{drawerContent}</DrawerContentBody>
+            </DrawerContent>
+          </Drawer>
+        ))}
       </Card>
     </React.Fragment>
   );
