@@ -7,6 +7,7 @@ import {
   Dropdown,
   DropdownItem,
   DropdownList,
+  Flex,
   HelperText,
   HelperTextItem,
   Icon,
@@ -23,6 +24,8 @@ import { Layout } from 'react-grid-layout';
 import { WidgetTypes } from '../Widgets/widgetTypes';
 import widgetMapper from '../Widgets/widgetMapper';
 import { ExtendedLayoutItem } from '../../api/dashboard-templates';
+
+import { BaconIcon } from '@patternfly/react-icons';
 
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
@@ -84,7 +87,7 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
             removeWidget(widgetConfig.i);
           }}
           icon={
-            <Icon status={widgetConfig.static ? undefined : 'danger'}>
+            <Icon className="pf-v5-u-pb-2xl" status={widgetConfig.static ? undefined : 'danger'}>
               <MinusCircleIcon />
             </Icon>
           }
@@ -92,7 +95,9 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
         >
           Remove
           <HelperText>
-            <HelperTextItem variant="indeterminate">{"All 'removed' widgets can be added back by clicking the 'Add widgets' button."}</HelperTextItem>
+            <HelperTextItem className="pf-v5-u-text-wrap" variant="indeterminate">
+              {"All 'removed' widgets can be added back by clicking the 'Add widgets' button."}
+            </HelperTextItem>
           </HelperText>
         </DropdownItem>
       </>
@@ -105,6 +110,8 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
         <Dropdown
           popperProps={{
             appendTo: document.body,
+            maxWidth: '300px',
+            position: 'right',
           }}
           toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
             <MenuToggle
@@ -137,14 +144,6 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
     </>
   );
 
-  const titleWidth = useMemo(
-    // 88px is the width of the actions container
-    // 48px is the width padding on the card title
-    // 16px is the width of the left padding on the actions handle
-    () => `calc(${widgetConfig.colWidth * widgetConfig.w}px - 48px${widgetConfig.locked ? '' : ' - 88px - 16px'})`,
-    [widgetConfig.colWidth, widgetConfig.w, widgetConfig.locked]
-  );
-
   const HeaderIcon = icon;
   return (
     <Card
@@ -153,20 +152,22 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
       })}
     >
       <CardHeader actions={{ actions: headerActions }}>
-        {HeaderIcon ? <HeaderIcon /> : null}
-        <CardTitle
-          style={{
-            userSelect: isDragging ? 'none' : 'auto',
-            width: titleWidth,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {title}
-        </CardTitle>
+        <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
+          <Icon status="custom" className="pf-v5-u-mr-sm">
+            {HeaderIcon ? <HeaderIcon /> : null}
+          </Icon>
+          <CardTitle
+            style={{
+              userSelect: isDragging ? 'none' : 'auto',
+            }}
+            className="pf-v5-u-flex-wrap pf-v5-u-text-break-word"
+          >
+            {title}
+          </CardTitle>
+        </Flex>
       </CardHeader>
       <Divider />
-      <CardBody>
+      <CardBody className="pf-v5-u-p-0">
         <Component></Component>
       </CardBody>
     </Card>

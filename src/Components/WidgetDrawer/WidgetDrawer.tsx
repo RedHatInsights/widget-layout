@@ -29,7 +29,7 @@ const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: s
   const setDropInItem = useSetAtom(currentDropInItemAtom);
   const headerActions = (
     <Tooltip content={<p>Move widget</p>}>
-      <Icon>
+      <Icon className="pf-v5-u-pt-md">
         <GripVerticalIcon style={{ fill: '#6a6e73' }} />
       </Icon>
     </Tooltip>
@@ -54,7 +54,7 @@ const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: s
       unselectable="on"
       draggable={true}
     >
-      <CardHeader actions={{ actions: headerActions }}>
+      <CardHeader className="pf-v5-u-py-md" actions={{ actions: headerActions }}>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
     </Card>
@@ -66,7 +66,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
 
   const panelContent = (
     <PageSection
-      className="pf-v5-u-p-lg"
+      className="pf-v5-u-p-md pf-v5-u-p-lg-on-sm"
       style={{
         backgroundColor: '#E7F1FA',
       }}

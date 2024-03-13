@@ -20,7 +20,7 @@
   }
 
   &.react-grid-placeholder {
-    background-color: rgba(146, 146, 146, 0.5);
+    background-color: var(--pf-v5-global--palette--black-700);
     border-radius: 4px;
   }
 
