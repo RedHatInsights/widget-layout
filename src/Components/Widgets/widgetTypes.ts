@@ -5,6 +5,8 @@ export enum WidgetTypes {
   SmallWidget = 'SmallWidget',
   RecentlyVisitedSmall = 'RecentlyVisitedSmall',
   RecentlyVisitedLarge = 'RecentlyVisitedLarge',
+  LearningResourcesWidgetSmall = 'LearningResourcesWidgetSmall',
+  LearningResourcesWidgetLarge = 'LearningResourcesWidgetLarge',
 }
 
 export function isWidgetType(type: string): type is WidgetTypes {

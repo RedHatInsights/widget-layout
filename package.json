@@ -20,6 +20,7 @@
     "verify": "npm-run-all build lint test"
   },
   "dependencies": {
+    "@patternfly/quickstarts": "^5.1.0",
     "@patternfly/react-core": "^5.0.0",
     "@patternfly/react-table": "^5.0.0",
     "@redhat-cloud-services/chrome": "^1.0.9",
