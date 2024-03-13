@@ -35,14 +35,14 @@ const LearningResourcesWidget: React.FunctionComponent = () => {
       {bookmarks.length === 0 ? (
         <LearningResourcesEmptyState />
       ) : (
-        <Gallery hasGutter>
+        <Gallery className="widget-learning-resources pf-v5-u-p-md" hasGutter>
           {bookmarks.map(({ metadata, spec }, index) => (
             <div key={index}>
               <TextContent>
                 <LinkWrapper title={spec.displayName} pathname={spec.link?.href || ''} />
               </TextContent>
               <Flex direction={{ default: 'row' }}>
-                <FlexItem style={{ marginRight: 'var(--pf-v5-global--spacer--sm)' }}>
+                <FlexItem className="pf-v5-u-mr-sm">
                   {spec.type && <Label color={spec.type.color}>{spec.type.text}</Label>}
                 </FlexItem>
                 <FlexItem>

@@ -22,7 +22,7 @@ export const widgetDefaultHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.RecentlyVisitedSmall]: 2,
   [WidgetTypes.RecentlyVisitedLarge]: 4,
   [WidgetTypes.LearningResourcesWidgetSmall]: 2,
-  [WidgetTypes.LearningResourcesWidgetLarge]: 4,
+  [WidgetTypes.LearningResourcesWidgetLarge]: 3,
 };
 
 export const widgetMaxHeight: { [widgetName in WidgetTypes]: number } = {
