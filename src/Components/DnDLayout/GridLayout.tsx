@@ -5,7 +5,7 @@ import ResizeHandleIcon from './resize-handle.svg';
 import GridTile, { SetWidgetAttribute } from './GridTile';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isWidgetType } from '../Widgets/widgetTypes';
-import { widgetDefaultHeight, widgetDefaultWidth, widgetMaxHeight, widgetMinHeight } from '../Widgets/widgetDefaults';
+import { widgetDefaultHeight, widgetDefaultIcons, widgetDefaultWidth, widgetMaxHeight, widgetMinHeight } from '../Widgets/widgetDefaults';
 import { useAtom } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { activeItemAtom, layoutAtom, layoutVariantAtom, prevLayoutAtom } from '../../state/layoutAtom';
@@ -17,6 +17,7 @@ import {
   Variants,
   getDashboardTemplates,
   getDefaultTemplate,
+  getWidgetIdentifier,
   mapPartialExtendedTemplateConfigToPartialTemplateConfig,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplate,
@@ -87,7 +88,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         maxH: widgetMaxHeight[data],
         minH: widgetMinHeight[data],
         widgetType: data,
-        i: `${data}#${Date.now() + Math.random()}`,
+        i: getWidgetIdentifier(data),
         title: 'New title',
       };
       setCurrentDropInItem(undefined);
@@ -337,6 +338,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
                 isDragging={isDragging}
                 setIsDragging={setIsDragging}
                 title={rest.i}
+                icon={widgetDefaultIcons[widgetType]}
                 widgetType={widgetType}
                 // these will be dynamically calculated once the dimensions are calculated
                 widgetConfig={{ ...rest, colWidth: 1200 / 4 }}

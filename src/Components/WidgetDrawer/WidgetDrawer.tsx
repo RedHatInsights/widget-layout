@@ -18,10 +18,8 @@ import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { CloseIcon, GripVerticalIcon } from '@patternfly/react-icons';
 import { WidgetTypes } from '../Widgets/widgetTypes';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
-import LargeWidget from '../Widgets/LargeWidget';
-import MediumWidget from '../Widgets/MediumWidget';
-import SmallWidget from '../Widgets/SmallWidget';
-import { ExploreCapabilities } from '../Widgets/ExploreCapabilities';
+import widgetMapper from '../Widgets/widgetMapper';
+import { widgetDefaultTitles } from '../Widgets/widgetDefaults';
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
@@ -91,27 +89,17 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
           />
         </SplitItem>
       </Split>
-      <Gallery hasGutter className="pf-v5-u-p-lg pf-v5-u-pt-0">
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.LargeWidget} title="Large widget">
-            <LargeWidget />
-          </WidgetWrapper>
-        </GalleryItem>
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.MediumWidget} title="Medium widget">
-            <MediumWidget />
-          </WidgetWrapper>
-        </GalleryItem>
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.SmallWidget} title="Small widget">
-            <SmallWidget />
-          </WidgetWrapper>
-        </GalleryItem>
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.ExploreCapabilities} title="Explore Capabilities">
-            <ExploreCapabilities />
-          </WidgetWrapper>
-        </GalleryItem>
+      <Gallery hasGutter className="widg-l-gallery pf-v5-u-p-lg pf-v5-u-pt-0">
+        {Object.keys(widgetMapper).map((type, i) => {
+          const Widget = widgetMapper[type as WidgetTypes];
+          return (
+            <GalleryItem key={i}>
+              <WidgetWrapper widgetType={type as WidgetTypes} title={widgetDefaultTitles[type as WidgetTypes]}>
+                <Widget />
+              </WidgetWrapper>
+            </GalleryItem>
+          );
+        })}
       </Gallery>
     </PageSection>
   );
@@ -124,3 +112,4 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
 };
 
 export default AddWidgetDrawer;
+
