@@ -15,21 +15,7 @@ import {
 } from '@patternfly/react-core';
 
 export const Explore1: React.FunctionComponent = () => {
-  //   const [isExpanded, setIsExpanded] = React.useState('');
-
-  //   const onToggle = (id: string) => {
-  //     if (id === isExpanded) {
-  //       setIsExpanded('');
-  //     } else {
-  //       setIsExpanded(id);
-  //     }
-  //   };
-
-  const [isExpanded, setIsExpanded] = React.useState(false);
-
-  const onExpand = () => {
-    setIsExpanded(true);
-  };
+  const [activeItem, setActiveItem] = React.useState(0);
 
   const drawerData = [
     {
@@ -90,45 +76,44 @@ export const Explore1: React.FunctionComponent = () => {
 
   const panelContent = (
     <>
-      {drawerData.map((data) => (
-        <DrawerPanelContent key={data.id} colorVariant="no-background" widths={{ xl: 'width_75' }}>
-          <>
-            <DrawerPanelBody>
-              <Title headingLevel="h2" size="xl">
-                {data.title}
-              </Title>
-              <img className="pf-v5-u-float-right" src={data.img} />
-              <Flex>
-                <FlexItem>
-                  <p className="pf-v5-u-mb-sm">{data.body}</p>
-                </FlexItem>
-                <FlexItem>
-                  <Button variant="danger" size="lg" component="a" href={data.url} target="_blank" className="pf-v5-u-mb-sm">
-                    {data.buttonName}
-                  </Button>
-                </FlexItem>
-              </Flex>
-            </DrawerPanelBody>
-          </>
-        </DrawerPanelContent>
-      ))}
+      <DrawerPanelContent key={drawerData[activeItem].id} colorVariant="no-background" widths={{ xl: 'width_75' }}>
+        <DrawerPanelBody>
+          <img className="pf-v5-u-float-right" src={drawerData[activeItem].img} />
+          <Title className="pf-v5-u-mb-sm" headingLevel="h2" size="xl">
+            {drawerData[activeItem].title}
+          </Title>
+          <Flex>
+            <FlexItem>
+              <p className="pf-v5-u-mb-sm">{drawerData[activeItem].body}</p>
+            </FlexItem>
+            <FlexItem>
+              <Button variant="danger" size="lg" component="a" href={drawerData[activeItem].url} target="_blank" className="pf-v5-u-mb-sm">
+                {drawerData[activeItem].buttonName}
+              </Button>
+            </FlexItem>
+          </Flex>
+        </DrawerPanelBody>
+      </DrawerPanelContent>
     </>
   );
 
   const drawerContent = (
-    <>
-      {drawerData.map((data) => (
-        <SimpleList key={data.id} onSelect={onExpand}>
-          <SimpleListItem isActive>{data.name}</SimpleListItem>
-        </SimpleList>
-      ))}
-    </>
+    <SimpleList>
+      <SimpleListItem isActive onClick={() => setActiveItem(0)}>
+        Get started with the Hybrid Cloud Console
+      </SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(1)}>Try OpenShift with AWS</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(2)}>Develop on the OpenShift Sandbox</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(3)}>Analyze your environments</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(4)}>Connect to your subscriptions</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(5)}>Configure your console</SimpleListItem>
+    </SimpleList>
   );
 
   return (
     <React.Fragment>
       <Card>
-        <Drawer isStatic isExpanded={isExpanded}>
+        <Drawer isStatic>
           <DrawerContent panelContent={panelContent}>
             <DrawerContentBody>{drawerContent}</DrawerContentBody>
           </DrawerContent>
