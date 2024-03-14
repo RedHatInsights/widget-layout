@@ -1,8 +1,8 @@
 import { WidgetTypes } from './widgetTypes';
 
 export const widgetDefaultWidth: { [widgetName in WidgetTypes]: number } = {
-  [WidgetTypes.LargeWidget]: 3,
-  [WidgetTypes.MediumWidget]: 1,
+  [WidgetTypes.LargeWidget]: 4,
+  [WidgetTypes.MediumWidget]: 2,
   [WidgetTypes.SmallWidget]: 1,
 };
 
