@@ -305,7 +305,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         draggableHandle=".drag-handle"
         layouts={template}
         breakpoints={breakpoints}
-        cols={{ xl: 5, lg: 4, md: 3, sm: 2 }}
+        cols={{ xl: 4, lg: 3, md: 2, sm: 1 }}
         rowHeight={88}
         //width={1200}
         isDraggable={!isLayoutLocked}

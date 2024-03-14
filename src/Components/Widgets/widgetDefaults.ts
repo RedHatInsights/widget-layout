@@ -6,8 +6,8 @@ import React from 'react';
 // these will depend entirely on widget implementation
 // these control how the widget behaves as you add it to your dashboard and manipulate it
 export const widgetDefaultWidth: { [widgetName in WidgetTypes]: number } = {
-  [WidgetTypes.LargeWidget]: 3,
-  [WidgetTypes.MediumWidget]: 1,
+  [WidgetTypes.LargeWidget]: 4,
+  [WidgetTypes.MediumWidget]: 2,
   [WidgetTypes.SmallWidget]: 1,
   [WidgetTypes.RecentlyVisitedSmall]: 2,
   [WidgetTypes.RecentlyVisitedLarge]: 4,
