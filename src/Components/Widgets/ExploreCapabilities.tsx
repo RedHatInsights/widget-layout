@@ -1,18 +1,18 @@
 import React from 'react';
 import {
   Button,
-  Card,
   Drawer,
   DrawerContent,
   DrawerContentBody,
   DrawerPanelBody,
   DrawerPanelContent,
-  Flex,
-  FlexItem,
   SimpleList,
   SimpleListItem,
+  Split,
+  SplitItem,
   Title,
 } from '@patternfly/react-core';
+import './ExploreCapabilities.scss';
 
 export const ExploreCapabilities: React.FunctionComponent = () => {
   const [activeItem, setActiveItem] = React.useState(0);
@@ -76,22 +76,22 @@ export const ExploreCapabilities: React.FunctionComponent = () => {
 
   const panelContent = (
     <>
-      <DrawerPanelContent key={drawerData[activeItem].id} colorVariant="no-background" widths={{ xl: 'width_75' }}>
+      <DrawerPanelContent key={drawerData[activeItem].id} widths={{ default: 'width_66' }} colorVariant="no-background">
         <DrawerPanelBody>
-          <img className="pf-v5-u-float-right" src={drawerData[activeItem].img} />
-          <Title className="pf-v5-u-mb-sm" headingLevel="h2" size="xl">
-            {drawerData[activeItem].title}
-          </Title>
-          <Flex>
-            <FlexItem>
+          <Split>
+            <SplitItem isFilled>
+              <Title className="pf-v5-u-mb-sm" headingLevel="h2" size="xl">
+                {drawerData[activeItem].title}
+              </Title>
               <p className="pf-v5-u-mb-sm">{drawerData[activeItem].body}</p>
-            </FlexItem>
-            <FlexItem>
               <Button variant="danger" size="lg" component="a" href={drawerData[activeItem].url} target="_blank" className="pf-v5-u-mb-sm">
                 {drawerData[activeItem].buttonName}
               </Button>
-            </FlexItem>
-          </Flex>
+            </SplitItem>
+            <SplitItem className="pf-v5-u-pl-sm">
+              <img src={drawerData[activeItem].img} />
+            </SplitItem>
+          </Split>
         </DrawerPanelBody>
       </DrawerPanelContent>
     </>
@@ -112,13 +112,11 @@ export const ExploreCapabilities: React.FunctionComponent = () => {
 
   return (
     <React.Fragment>
-      <Card>
-        <Drawer isStatic>
-          <DrawerContent panelContent={panelContent}>
-            <DrawerContentBody>{drawerContent}</DrawerContentBody>
-          </DrawerContent>
-        </Drawer>
-      </Card>
+      <Drawer className="widget-explore pf-v5-u-mr-sm" isStatic>
+        <DrawerContent panelContent={panelContent}>
+          <DrawerContentBody>{drawerContent}</DrawerContentBody>
+        </DrawerContent>
+      </Drawer>
     </React.Fragment>
   );
 };
