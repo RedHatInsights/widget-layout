@@ -21,8 +21,7 @@ import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import LargeWidget from '../Widgets/LargeWidget';
 import MediumWidget from '../Widgets/MediumWidget';
 import SmallWidget from '../Widgets/SmallWidget';
-import ExploreCapabilities from '../Widgets/ExploreCapabilities';
-import { Explore1 } from '../Widgets/Explore1';
+import { ExploreCapabilities } from '../Widgets/ExploreCapabilities';
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
@@ -111,11 +110,6 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         <GalleryItem>
           <WidgetWrapper widgetType={WidgetTypes.ExploreCapabilities} title="Explore Capabilities">
             <ExploreCapabilities />
-          </WidgetWrapper>
-        </GalleryItem>
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.Explore1} title="Explore 1">
-            <Explore1 />
           </WidgetWrapper>
         </GalleryItem>
       </Gallery>

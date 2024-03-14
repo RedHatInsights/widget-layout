@@ -3,7 +3,6 @@ export enum WidgetTypes {
   MediumWidget = 'MediumWidget',
   SmallWidget = 'SmallWidget',
   ExploreCapabilities = 'ExploreCapabilities',
-  Explore1 = 'Explore1',
 }
 
 export function isWidgetType(type: string): type is WidgetTypes {

@@ -5,7 +5,6 @@ export const widgetDefaultWidth: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.MediumWidget]: 1,
   [WidgetTypes.SmallWidget]: 1,
   [WidgetTypes.ExploreCapabilities]: 3,
-  [WidgetTypes.Explore1]: 3,
 };
 
 export const widgetDefaultHeight: { [widgetName in WidgetTypes]: number } = {
@@ -13,7 +12,6 @@ export const widgetDefaultHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.MediumWidget]: 2,
   [WidgetTypes.SmallWidget]: 1,
   [WidgetTypes.ExploreCapabilities]: 4,
-  [WidgetTypes.Explore1]: 4,
 };
 
 // these will depend entirely on widget implementation
@@ -22,7 +20,6 @@ export const widgetMaxHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.MediumWidget]: 4,
   [WidgetTypes.SmallWidget]: 2,
   [WidgetTypes.ExploreCapabilities]: 6,
-  [WidgetTypes.Explore1]: 6,
 };
 
 export const widgetMinHeight: { [widgetName in WidgetTypes]: number } = {
@@ -30,5 +27,4 @@ export const widgetMinHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.MediumWidget]: 1,
   [WidgetTypes.SmallWidget]: 1,
   [WidgetTypes.ExploreCapabilities]: 3,
-  [WidgetTypes.Explore1]: 3,
 };

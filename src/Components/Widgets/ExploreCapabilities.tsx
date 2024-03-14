@@ -1,15 +1,21 @@
 import React from 'react';
-import { Accordion, AccordionContent, AccordionItem, AccordionToggle, Button, Title } from '@patternfly/react-core';
+import {
+  Button,
+  Card,
+  Drawer,
+  DrawerContent,
+  DrawerContentBody,
+  DrawerPanelBody,
+  DrawerPanelContent,
+  Flex,
+  FlexItem,
+  SimpleList,
+  SimpleListItem,
+  Title,
+} from '@patternfly/react-core';
 
-const ExploreCapabilities: React.FunctionComponent = () => {
-  const [isExpanded, setIsExpanded] = React.useState('ex-toggle1');
-  const onToggle = (id: string) => {
-    if (id === isExpanded) {
-      setIsExpanded('');
-    } else {
-      setIsExpanded(id);
-    }
-  };
+export const ExploreCapabilities: React.FunctionComponent = () => {
+  const [activeItem, setActiveItem] = React.useState(0);
 
   const drawerData = [
     {
@@ -68,35 +74,51 @@ const ExploreCapabilities: React.FunctionComponent = () => {
     },
   ];
 
-  return (
+  const panelContent = (
     <>
-      {drawerData.map((data) => (
-        <Accordion key={data.id} isBordered asDefinitionList={false}>
-          <AccordionItem>
-            <AccordionToggle
-              onClick={() => {
-                onToggle(data.id);
-              }}
-              isExpanded={isExpanded === data.id}
-              id={data.id}
-            >
-              {data.name}{' '}
-            </AccordionToggle>
-            <AccordionContent id={data.id} isHidden={isExpanded !== data.id} className="pf-v5-u-color-100">
-              <img className="pf-v5-u-float-right" src={data.img} />
-              <Title headingLevel="h4" className="pf-v5-u-mb-sm">
-                {data.title}
-              </Title>
-              <p className="pf-v5-u-mb-sm">{data.body} </p>
-              <Button variant="danger" component="a" href={data.url} target="_blank" size="lg" className="pf-v5-u-mb-sm">
-                {data.buttonName}{' '}
+      <DrawerPanelContent key={drawerData[activeItem].id} colorVariant="no-background" widths={{ xl: 'width_75' }}>
+        <DrawerPanelBody>
+          <img className="pf-v5-u-float-right" src={drawerData[activeItem].img} />
+          <Title className="pf-v5-u-mb-sm" headingLevel="h2" size="xl">
+            {drawerData[activeItem].title}
+          </Title>
+          <Flex>
+            <FlexItem>
+              <p className="pf-v5-u-mb-sm">{drawerData[activeItem].body}</p>
+            </FlexItem>
+            <FlexItem>
+              <Button variant="danger" size="lg" component="a" href={drawerData[activeItem].url} target="_blank" className="pf-v5-u-mb-sm">
+                {drawerData[activeItem].buttonName}
               </Button>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      ))}
+            </FlexItem>
+          </Flex>
+        </DrawerPanelBody>
+      </DrawerPanelContent>
     </>
   );
-};
 
-export default ExploreCapabilities;
+  const drawerContent = (
+    <SimpleList>
+      <SimpleListItem isActive onClick={() => setActiveItem(0)}>
+        Get started with the Hybrid Cloud Console
+      </SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(1)}>Try OpenShift with AWS</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(2)}>Develop on the OpenShift Sandbox</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(3)}>Analyze your environments</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(4)}>Connect to your subscriptions</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(5)}>Configure your console</SimpleListItem>
+    </SimpleList>
+  );
+
+  return (
+    <React.Fragment>
+      <Card>
+        <Drawer isStatic>
+          <DrawerContent panelContent={panelContent}>
+            <DrawerContentBody>{drawerContent}</DrawerContentBody>
+          </DrawerContent>
+        </Drawer>
+      </Card>
+    </React.Fragment>
+  );
+};
