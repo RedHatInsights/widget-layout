@@ -1,4 +1,6 @@
 import { WidgetTypes } from './widgetTypes';
+import { BaconIcon } from '@patternfly/react-icons';
+import { RocketIcon } from '@patternfly/react-icons';
 
 export const widgetDefaultWidth: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.LargeWidget]: 4,
@@ -27,4 +29,18 @@ export const widgetMinHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.MediumWidget]: 1,
   [WidgetTypes.SmallWidget]: 1,
   [WidgetTypes.ExploreCapabilities]: 3,
+};
+
+export const widgetDefaultTitles: { [widgetName in WidgetTypes]: string } = {
+  [WidgetTypes.LargeWidget]: 'Large Widget',
+  [WidgetTypes.MediumWidget]: 'Medium Widget',
+  [WidgetTypes.SmallWidget]: 'Small Widget',
+  [WidgetTypes.ExploreCapabilities]: 'Explore Capabilities',
+};
+
+export const widgetDefaultIcons: { [widgetName in WidgetTypes]: React.ComponentClass } = {
+  [WidgetTypes.LargeWidget]: BaconIcon,
+  [WidgetTypes.MediumWidget]: BaconIcon,
+  [WidgetTypes.SmallWidget]: BaconIcon,
+  [WidgetTypes.ExploreCapabilities]: RocketIcon,
 };
