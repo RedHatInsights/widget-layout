@@ -10,22 +10,25 @@ import {
   Flex,
   FlexItem,
   SimpleList,
-  SimpleListGroup,
   SimpleListItem,
-  Split,
-  SplitItem,
   Title,
 } from '@patternfly/react-core';
 
 export const Explore1: React.FunctionComponent = () => {
-  const [isExpanded, setIsExpanded] = React.useState('');
+  //   const [isExpanded, setIsExpanded] = React.useState('');
 
-  const onToggle = (id: string) => {
-    if (id === isExpanded) {
-      setIsExpanded('');
-    } else {
-      setIsExpanded(id);
-    }
+  //   const onToggle = (id: string) => {
+  //     if (id === isExpanded) {
+  //       setIsExpanded('');
+  //     } else {
+  //       setIsExpanded(id);
+  //     }
+  //   };
+
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const onExpand = () => {
+    setIsExpanded(true);
   };
 
   const drawerData = [
@@ -43,7 +46,7 @@ export const Explore1: React.FunctionComponent = () => {
       name: 'Try OpenShift on AWS',
       img: '/apps/frontend-assets/console-landing/widget-explore/Explore_ROSA.svg',
       title: 'Get started with Red Hat OpenShift Service on AWS (ROSA)',
-      body: 'Quickly build, deploy, and scale applications with out fully-managed turnkey application platform.',
+      body: 'Quickly build, deploy, and scale applications with our fully-managed turnkey application platform.',
       buttonName: 'Try ROSA',
       url: 'https://console.redhat.com/openshift/overview/rosa',
     },
@@ -52,7 +55,7 @@ export const Explore1: React.FunctionComponent = () => {
       name: 'Develop on the OpenShift Sandbox',
       img: '/apps/frontend-assets/console-landing/widget-explore/Explore_sandbox.svg',
       title: 'Develop in the sandbox with the Red Hat Developer program',
-      body: 'Try Red Hat&apos;s products and technologies without setup or configuration.',
+      body: "Try Red Hat's products and technologies without setup or configuration.",
       buttonName: 'Explore the sandbox',
       url: 'https://console.redhat.com/openshift/sandbox',
     },
@@ -100,7 +103,7 @@ export const Explore1: React.FunctionComponent = () => {
                   <p className="pf-v5-u-mb-sm">{data.body}</p>
                 </FlexItem>
                 <FlexItem>
-                  <Button variant="danger" size="lg" href={data.url} target="_blank" className="pf-v5-u-mb-sm">
+                  <Button variant="danger" size="lg" component="a" href={data.url} target="_blank" className="pf-v5-u-mb-sm">
                     {data.buttonName}
                   </Button>
                 </FlexItem>
@@ -115,43 +118,21 @@ export const Explore1: React.FunctionComponent = () => {
   const drawerContent = (
     <>
       {drawerData.map((data) => (
-        <SimpleList key={data.id} onSelect={() => onToggle}>
-          <SimpleListGroup>
-            <SimpleListItem key={data.id} isActive>
-              {data.name}
-            </SimpleListItem>
-          </SimpleListGroup>
+        <SimpleList key={data.id} onSelect={onExpand}>
+          <SimpleListItem isActive>{data.name}</SimpleListItem>
         </SimpleList>
-
-        // <Accordion key={data.id} isBordered>
-        //   <AccordionItem>
-        //     <AccordionToggle
-        //       onClick={() => {
-        //         onToggle(data.id);
-        //       }}
-        //       isExpanded={isExpanded === data.id}
-        //       id={data.id}
-        //     >
-        //       {data.name}
-        //       <AccordionContent id={data.id} isHidden={isExpanded !== data.id} className="pf-v5-u-color-100"></AccordionContent>
-        //     </AccordionToggle>
-        //   </AccordionItem>
-        // </Accordion>
       ))}
-      ;
     </>
   );
 
   return (
     <React.Fragment>
       <Card>
-        {drawerData.map((data) => (
-          <Drawer isStatic key={data.id}>
-            <DrawerContent panelContent={panelContent}>
-              <DrawerContentBody>{drawerContent}</DrawerContentBody>
-            </DrawerContent>
-          </Drawer>
-        ))}
+        <Drawer isStatic isExpanded={isExpanded}>
+          <DrawerContent panelContent={panelContent}>
+            <DrawerContentBody>{drawerContent}</DrawerContentBody>
+          </DrawerContent>
+        </Drawer>
       </Card>
     </React.Fragment>
   );

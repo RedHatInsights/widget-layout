@@ -26,7 +26,7 @@ const ExploreCapabilities: React.FunctionComponent = () => {
       name: 'Try OpenShift on AWS',
       img: '/apps/frontend-assets/console-landing/widget-explore/Explore_ROSA.svg',
       title: 'Get started with Red Hat OpenShift Service on AWS (ROSA)',
-      body: 'Quickly build, deploy, and scale applications with out fully-managed turnkey application platform.',
+      body: 'Quickly build, deploy, and scale applications with our fully-managed turnkey application platform.',
       buttonName: 'Try ROSA',
       url: 'https://console.redhat.com/openshift/overview/rosa',
     },
@@ -35,7 +35,7 @@ const ExploreCapabilities: React.FunctionComponent = () => {
       name: 'Develop on the OpenShift Sandbox',
       img: '/apps/frontend-assets/console-landing/widget-explore/Explore_sandbox.svg',
       title: 'Develop in the sandbox with the Red Hat Developer program',
-      body: 'Try Red Hat&apos;s products and technologies without setup or configuration.',
+      body: "Try Red Hat's products and technologies without setup or configuration.",
       buttonName: 'Explore the sandbox',
       url: 'https://console.redhat.com/openshift/sandbox',
     },
@@ -88,7 +88,7 @@ const ExploreCapabilities: React.FunctionComponent = () => {
                 {data.title}
               </Title>
               <p className="pf-v5-u-mb-sm">{data.body} </p>
-              <Button variant="danger" href={data.url} target="_blank" size="lg" className="pf-v5-u-mb-sm">
+              <Button variant="danger" component="a" href={data.url} target="_blank" size="lg" className="pf-v5-u-mb-sm">
                 {data.buttonName}{' '}
               </Button>
             </AccordionContent>
