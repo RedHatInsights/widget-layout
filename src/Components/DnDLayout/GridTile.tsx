@@ -18,20 +18,18 @@ import {
 import { CompressIcon, EllipsisVIcon, ExpandIcon, GripVerticalIcon, LockIcon, MinusCircleIcon, UnlockIcon } from '@patternfly/react-icons';
 import React, { Fragment, useMemo, useState } from 'react';
 import clsx from 'clsx';
-
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
 import { WidgetTypes } from '../Widgets/widgetTypes';
 import widgetMapper from '../Widgets/widgetMapper';
 import { ExtendedLayoutItem } from '../../api/dashboard-templates';
 
-import { BaconIcon } from '@patternfly/react-icons';
-
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
 export type GridTileProps = React.PropsWithChildren<{
   widgetType: WidgetTypes;
   title: string;
+  icon?: React.ComponentClass;
   setIsDragging: (isDragging: boolean) => void;
   isDragging: boolean;
   setWidgetAttribute: SetWidgetAttribute;
@@ -42,7 +40,7 @@ export type GridTileProps = React.PropsWithChildren<{
   removeWidget: (id: string) => void;
 }>;
 
-const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
+const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const Component = widgetMapper[widgetType] || Fragment;
@@ -143,6 +141,8 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
     </>
   );
 
+  const HeaderIcon = icon;
+
   return (
     <Card
       className={clsx('grid-tile', {
@@ -152,7 +152,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
       <CardHeader actions={{ actions: headerActions }}>
         <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
           <Icon status="custom" className="pf-v5-u-mr-sm">
-            <BaconIcon />
+            {HeaderIcon ? <HeaderIcon /> : null}
           </Icon>
           <CardTitle
             style={{
