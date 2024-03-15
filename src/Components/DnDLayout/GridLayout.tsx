@@ -41,6 +41,10 @@ const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement
   );
 };
 
+interface WidgetClasses {
+  [key: string]: string; // maps widget id to class name
+}
+
 const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
@@ -50,6 +54,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
   const [activeItem, setActiveItem] = useAtom(activeItemAtom);
+  const [widgetClasses, setWidgetClasses] = useState<WidgetClasses>({});
   const layoutRef = useRef<HTMLDivElement>(null);
   const { currentToken } = useCurrentUser();
   const widgetMapping = useAtomValue(widgetMappingAtom);
@@ -117,6 +122,14 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
       })),
     [isLayoutLocked, layout]
   );
+
+  useEffect(() => {
+    const updatedWidgetClasses = layout.reduce<WidgetClasses>((acc, curr) => {
+      acc[curr.i] = `widget-columns-${curr.w}`;
+      return acc;
+    }, {});
+    setWidgetClasses(updatedWidgetClasses);
+  }, [layout]);
 
   const onLayoutChange: ResponsiveProps['onLayoutChange'] = useCallback(
     (currentLayout: Layout[]) => {
@@ -333,6 +346,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
                 boxShadow: activeItem === rest.i ? '0 0 2px 2px #2684FF' : 'none',
                 ...(activeItem === rest.i ? { outline: 'none' } : {}),
               }}
+              className={widgetClasses[rest.i]}
             >
               <GridTile
                 isDragging={isDragging}
