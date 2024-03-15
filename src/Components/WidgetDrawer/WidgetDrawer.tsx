@@ -112,4 +112,3 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
 };
 
 export default AddWidgetDrawer;
-

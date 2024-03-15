@@ -173,4 +173,3 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
 };
 
 export default GridTile;
-

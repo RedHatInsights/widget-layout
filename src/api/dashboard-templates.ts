@@ -180,4 +180,3 @@ export const mapPartialExtendedTemplateConfigToPartialTemplateConfig = (
   });
   return result;
 };
-
