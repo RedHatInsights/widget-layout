@@ -3,7 +3,7 @@ const dependencies = require('./package.json').dependencies;
 
 module.exports = {
   appUrl: ['/staging/starter'],
-  sassPrefix: process.env.CONFIG_PORT || process.env.PROXY ? '.frontendStarterApp' : '.widgetLayout',
+  sassPrefix: '.widgetLayout, .landing',
   debug: true,
   useProxy: true,
   proxyVerbose: true,
