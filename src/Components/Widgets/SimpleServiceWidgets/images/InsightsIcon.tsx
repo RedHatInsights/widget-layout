@@ -1,7 +1,7 @@
 import React from 'react';
 const InsightsIcon = () => {
   return (
-    <svg width="28" height="28" viewBox="0 0 38 38">
+    <svg width="20" height="20" viewBox="0 0 38 38">
       <defs>
         <style>
           {`.fd697ec5-dedd-4cbd-b54c-c319c7282cac{fill: #fff;}`}

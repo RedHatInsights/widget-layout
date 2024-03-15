@@ -1,5 +1,6 @@
 import AnsibleIcon from './SimpleServiceWidgets/images/AnsibleIcon';
 import EdgeIcon from './SimpleServiceWidgets/images/EdgeIcon';
+import RhelIcon from './SimpleServiceWidgets/images/RhelIcon';
 import InsightsIcon from './SimpleServiceWidgets/images/InsightsIcon';
 import OpenShiftIcon from './SimpleServiceWidgets/images/OpenShiftIcon';
 import { WidgetTypes } from './widgetTypes';
@@ -60,7 +61,7 @@ export const widgetDefaultIcons: { [widgetName in WidgetTypes]: React.ComponentC
   [WidgetTypes.LargeWidget]: BaconIcon,
   [WidgetTypes.MediumWidget]: BaconIcon,
   [WidgetTypes.SmallWidget]: BaconIcon,
-  [WidgetTypes.RhelWidget]: InsightsIcon,
+  [WidgetTypes.RhelWidget]: RhelIcon,
   [WidgetTypes.OpenShiftWidget]: OpenShiftIcon,
   [WidgetTypes.AnsibleWidget]: AnsibleIcon,
   [WidgetTypes.EdgeWidget]: EdgeIcon,
