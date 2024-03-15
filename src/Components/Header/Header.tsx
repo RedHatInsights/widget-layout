@@ -31,13 +31,14 @@ import {
   ToolbarItem,
 } from '@patternfly/react-core';
 import { CheckIcon, ExclamationCircleIcon, PlusCircleIcon, TimesIcon } from '@patternfly/react-icons';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { initialLayout, isDefaultLayout, layoutAtom, prevLayoutAtom } from '../../state/layoutAtom';
 import useCurrentUser from '../../hooks/useCurrentUser';
 
 const Controls = () => {
+  type Validate = 'default' | 'error' | 'success';
   const [isOpen, setIsOpen] = React.useState(false);
   const [customValue, setCustomValue] = React.useState('');
   const [customValueValidationError, setCustomValueValidationError] = React.useState('');
@@ -47,10 +48,25 @@ const Controls = () => {
   const CONSOLE_DEFAULT = 'console-default';
   const CUSTOM = 'custom';
   const [checked, setChecked] = React.useState(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+  const [nameValidated, setNameValidated] = React.useState<Validate>('default');
 
   const onToggleClick = () => {
     setIsOpen(!isOpen);
   };
+
+  const isCustomNameValid = (name: string) => {
+    if (name === undefined || name.trim() === '') {
+      setNameValidated('default');
+    } else if (!/^\S*$/.test(name.trim())) {
+      setNameValidated('error');
+    } else {
+      setNameValidated('success');
+    }
+  };
+
+  useEffect(() => {
+    isCustomNameValid(customValue);
+  }, [customValue]);
 
   const onCustomConfigSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -147,6 +163,7 @@ const Controls = () => {
                             onChange={(_event, value) => {
                               setCustomValue(value);
                             }}
+                            validated={nameValidated}
                           ></TextArea>
                           <FormHelperText>
                             <HelperText>
@@ -159,7 +176,7 @@ const Controls = () => {
                             </HelperText>
                           </FormHelperText>
                           <div hidden={checked !== CUSTOM}>
-                            <Button variant="plain" type={ButtonType.submit} onClick={onCustomConfigSubmit}>
+                            <Button variant="plain" type={ButtonType.submit} onClick={onCustomConfigSubmit} isDisabled={nameValidated != 'success'}>
                               <CheckIcon />
                             </Button>
                             <Button
@@ -168,6 +185,7 @@ const Controls = () => {
                               onClick={() => {
                                 setIsOpen(false);
                                 setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+                                setNameValidated('default');
                                 setCustomValueValidationError('');
                               }}
                             >
