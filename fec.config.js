@@ -27,7 +27,7 @@ module.exports = {
     }),
   },
   moduleFederation: {
-    moduleName: 'widgetLayout'
+    moduleName: 'widgetLayout',
     exposes: {
       './RootApp': path.resolve(__dirname, './src/AppEntry.tsx'),
       // TODO these will likely need to be restructured to be more consumable
