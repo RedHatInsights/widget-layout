@@ -3,6 +3,9 @@ export enum WidgetTypes {
   MediumWidget = 'MediumWidget',
   SmallWidget = 'SmallWidget',
   RhelWidget = 'RhelWidget',
+  OpenShiftWidget = 'OpenShiftWidget',
+  AnsibleWidget = 'AnsibleWidget',
+  EdgeWidget = 'EdgeWidget',
 }
 
 export function isWidgetType(type: string): type is WidgetTypes {
