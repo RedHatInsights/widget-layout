@@ -27,7 +27,7 @@ module.exports = {
     }),
   },
   moduleFederation: {
-    moduleName: process.env.CONFIG_PORT || process.env.PROXY ? 'frontendStarterApp' : 'widgetLayout', // overwriting starter app locally for ease of development
+    moduleName: 'widgetLayout'
     exposes: {
       './RootApp': path.resolve(__dirname, './src/AppEntry.tsx'),
       // TODO these will likely need to be restructured to be more consumable
