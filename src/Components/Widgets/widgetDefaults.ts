@@ -1,7 +1,6 @@
 import AnsibleIcon from './SimpleServiceWidgets/images/AnsibleIcon';
 import EdgeIcon from './SimpleServiceWidgets/images/EdgeIcon';
 import RhelIcon from './SimpleServiceWidgets/images/RhelIcon';
-import InsightsIcon from './SimpleServiceWidgets/images/InsightsIcon';
 import OpenShiftIcon from './SimpleServiceWidgets/images/OpenShiftIcon';
 import { WidgetTypes } from './widgetTypes';
 import { BaconIcon } from '@patternfly/react-icons';
