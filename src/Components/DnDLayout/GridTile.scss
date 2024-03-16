@@ -26,6 +26,7 @@
       }
     }
     &__body {
+      display: flex;
       overflow-y: scroll;
     }
   }

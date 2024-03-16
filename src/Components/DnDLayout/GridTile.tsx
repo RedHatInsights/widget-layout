@@ -18,7 +18,6 @@ import {
 import { CompressIcon, EllipsisVIcon, ExpandIcon, GripVerticalIcon, LockIcon, MinusCircleIcon, UnlockIcon } from '@patternfly/react-icons';
 import React, { Fragment, useMemo, useState } from 'react';
 import clsx from 'clsx';
-
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
 import { WidgetTypes } from '../Widgets/widgetTypes';
@@ -143,6 +142,7 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
   );
 
   const HeaderIcon = icon;
+
   return (
     <Card
       className={clsx('grid-tile', {
