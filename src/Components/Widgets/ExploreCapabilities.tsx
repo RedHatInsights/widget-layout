@@ -65,6 +65,23 @@ export const ExploreCapabilities: React.FunctionComponent = () => {
     },
     {
       id: 'ex-toggle6',
+      name: 'Convert your CentOS systems to RHEL',
+      img: '/apps/frontend-assets/console-landing/widget-explore/Explore_CentOS-to-RHEL.svg',
+      title: 'Convert your CentOS systems to Red Hat Enterprise Linux (RHEL)',
+      body: (
+        <span>
+          On June 30, 2024, CentOS Linux 7 will reach End of Life (EOL), and those systems will stop receiving updates, security pathes, and new
+          featues.
+          <br></br>
+          Red Hat can help. <a href="https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux/centos-migration">Learn more</a> about
+          migrating your CentOS Linux systems to RHEL, whether on-premise or in the cloud.
+        </span>
+      ),
+      buttonName: 'Run a pre-conversion analysis',
+      url: 'https://console.redhat.com/insights/tasks?quickstart=insights-tasks-pre-conversion#SIDs=&tags=',
+    },
+    {
+      id: 'ex-toggle7',
       name: 'Configure your console',
       img: '/apps/frontend-assets/console-landing/widget-explore/Explore_configure.svg',
       title: 'Customize your notification settings',
@@ -84,11 +101,11 @@ export const ExploreCapabilities: React.FunctionComponent = () => {
                 {drawerData[activeItem].title}
               </Title>
               <p className="pf-v5-u-mb-sm">{drawerData[activeItem].body}</p>
-              <Button variant="danger" size="lg" component="a" href={drawerData[activeItem].url} target="_blank" className="pf-v5-u-mb-sm">
+              <Button variant="primary" size="lg" component="a" href={drawerData[activeItem].url} target="_blank" className="pf-v5-u-mb-sm">
                 {drawerData[activeItem].buttonName}
               </Button>
             </SplitItem>
-            <SplitItem className="pf-v5-u-pl-sm">
+            <SplitItem className="pf-v5-u-pl-sm pf-v5-u-w-20">
               <img src={drawerData[activeItem].img} />
             </SplitItem>
           </Split>
@@ -106,7 +123,8 @@ export const ExploreCapabilities: React.FunctionComponent = () => {
       <SimpleListItem onClick={() => setActiveItem(2)}>Develop on the OpenShift Sandbox</SimpleListItem>
       <SimpleListItem onClick={() => setActiveItem(3)}>Analyze your environments</SimpleListItem>
       <SimpleListItem onClick={() => setActiveItem(4)}>Connect to your subscriptions</SimpleListItem>
-      <SimpleListItem onClick={() => setActiveItem(5)}>Configure your console</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(5)}>Convert your CentOS systems to RHEL</SimpleListItem>
+      <SimpleListItem onClick={() => setActiveItem(6)}>Configure your console</SimpleListItem>
     </SimpleList>
   );
 
