@@ -2,6 +2,7 @@ import HistoryIcon from '@patternfly/react-icons/dist/js/icons/history-icon';
 import { BaconIcon } from '@patternfly/react-icons';
 import { BellIcon } from '@patternfly/react-icons';
 import { RocketIcon } from '@patternfly/react-icons';
+import { OutlinedBookmarkIcon } from '@patternfly/react-icons';
 
 import { WidgetTypes } from './widgetTypes';
 
@@ -25,6 +26,7 @@ export const widgetDefaultWidth: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.OpenShiftWidget]: 1,
   [WidgetTypes.AnsibleWidget]: 1,
   [WidgetTypes.EdgeWidget]: 1,
+  [WidgetTypes.LearningResourcesWidget]: 4,
 };
 
 export const widgetDefaultHeight: { [widgetName in WidgetTypes]: number } = {
@@ -38,6 +40,7 @@ export const widgetDefaultHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.OpenShiftWidget]: 3,
   [WidgetTypes.AnsibleWidget]: 3,
   [WidgetTypes.EdgeWidget]: 3,
+  [WidgetTypes.LearningResourcesWidget]: 3,
 };
 
 export const widgetMaxHeight: { [widgetName in WidgetTypes]: number } = {
@@ -51,6 +54,7 @@ export const widgetMaxHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.OpenShiftWidget]: 3,
   [WidgetTypes.AnsibleWidget]: 3,
   [WidgetTypes.EdgeWidget]: 3,
+  [WidgetTypes.LearningResourcesWidget]: 6,
 };
 
 export const widgetMinHeight: { [widgetName in WidgetTypes]: number } = {
@@ -64,6 +68,7 @@ export const widgetMinHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.OpenShiftWidget]: 1,
   [WidgetTypes.AnsibleWidget]: 1,
   [WidgetTypes.EdgeWidget]: 1,
+  [WidgetTypes.LearningResourcesWidget]: 2,
 };
 
 export const widgetDefaultTitles: { [widgetName in WidgetTypes]: string } = {
@@ -77,6 +82,7 @@ export const widgetDefaultTitles: { [widgetName in WidgetTypes]: string } = {
   [WidgetTypes.OpenShiftWidget]: 'Red Hat OpenShift',
   [WidgetTypes.AnsibleWidget]: 'Ansible Automation Platform',
   [WidgetTypes.EdgeWidget]: 'Edge Management',
+  [WidgetTypes.LearningResourcesWidget]: 'Bookmarked Learning Resources',
 };
 
 export const widgetDefaultIcons: { [widgetName in WidgetTypes]: React.ComponentClass } = {
@@ -90,4 +96,5 @@ export const widgetDefaultIcons: { [widgetName in WidgetTypes]: React.ComponentC
   [WidgetTypes.OpenShiftWidget]: OpenShiftIcon,
   [WidgetTypes.AnsibleWidget]: AnsibleIcon,
   [WidgetTypes.EdgeWidget]: EdgeIcon,
+  [WidgetTypes.LearningResourcesWidget]: OutlinedBookmarkIcon,
 };
