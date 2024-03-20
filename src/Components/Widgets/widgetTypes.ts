@@ -1,9 +1,5 @@
-export enum WidgetTypes {
-  LargeWidget = 'LargeWidget',
-  MediumWidget = 'MediumWidget',
-  SmallWidget = 'SmallWidget',
-}
+import { WidgetMapping } from '../../api/dashboard-templates';
 
-export function isWidgetType(type: string): type is WidgetTypes {
-  return Object.values(WidgetTypes).includes(type as WidgetTypes);
+export function isWidgetType(widgetMapping: WidgetMapping, type: string): boolean {
+  return Object.keys(widgetMapping).includes(type);
 }

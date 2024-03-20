@@ -6,8 +6,9 @@ import GridTile, { SetWidgetAttribute } from './GridTile';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isWidgetType } from '../Widgets/widgetTypes';
 import { widgetDefaultHeight, widgetDefaultWidth, widgetMaxHeight, widgetMinHeight } from '../Widgets/widgetDefaults';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
+import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { activeItemAtom, layoutAtom, layoutVariantAtom, prevLayoutAtom } from '../../state/layoutAtom';
 import { templateAtom, templateIdAtom } from '../../state/templateAtom';
 import React from 'react';
@@ -17,6 +18,7 @@ import {
   Variants,
   getDashboardTemplates,
   getDefaultTemplate,
+  getWidgetIdentifier,
   mapPartialExtendedTemplateConfigToPartialTemplateConfig,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplate,
@@ -51,6 +53,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
   const [activeItem, setActiveItem] = useAtom(activeItemAtom);
   const layoutRef = useRef<HTMLDivElement>(null);
   const { currentToken } = useCurrentUser();
+  const widgetMapping = useAtomValue(widgetMappingAtom);
   const dispatch = useDispatch();
 
   const [currentDropInItem, setCurrentDropInItem] = useAtom(currentDropInItemAtom);
@@ -77,7 +80,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
   const onDrop: ReactGridLayoutProps['onDrop'] = (_layout: ExtendedLayoutItem[], layoutItem: ExtendedLayoutItem, event: DragEvent) => {
     const data = event.dataTransfer?.getData('text') || '';
     // fix placement order
-    if (isWidgetType(data)) {
+    if (isWidgetType(widgetMapping, data)) {
       const newWidget = {
         ...layoutItem,
         // w: layoutItem.x + layoutItem.w > 3 ? 1 : 3,
@@ -87,7 +90,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         maxH: widgetMaxHeight[data],
         minH: widgetMinHeight[data],
         widgetType: data,
-        i: `${data}#${Date.now() + Math.random()}`,
+        i: getWidgetIdentifier(data),
         title: 'New title',
       };
       setCurrentDropInItem(undefined);

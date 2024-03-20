@@ -12,21 +12,19 @@ import {
   Title,
   Tooltip,
 } from '@patternfly/react-core';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { CloseIcon, GripVerticalIcon } from '@patternfly/react-icons';
-import LargeWidget from '../Widgets/LargeWidget';
-import { WidgetTypes } from '../Widgets/widgetTypes';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
-import MediumWidget from '../Widgets/MediumWidget';
-import SmallWidget from '../Widgets/SmallWidget';
+import { widgetMappingAtom } from '../../state/widgetMappingAtom';
+import { getWidget } from '../Widgets/widgetDefaults';
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
 }>;
 
-const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: string; widgetType: WidgetTypes }>) => {
+const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: string; widgetType: string }>) => {
   const setDropInItem = useSetAtom(currentDropInItemAtom);
   const headerActions = (
     <Tooltip content={<p>Move widget</p>}>
@@ -64,6 +62,7 @@ const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: s
 
 const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
   const [isOpen, toggleOpen] = useAtom(drawerExpandedAtom);
+  const widgetMapping = useAtomValue(widgetMappingAtom);
 
   const panelContent = (
     <PageSection
@@ -91,21 +90,15 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         </SplitItem>
       </Split>
       <Gallery className="widg-l-gallery pf-v5-u-pt-sm" hasGutter>
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.LargeWidget} title="Large widget">
-            <LargeWidget />
-          </WidgetWrapper>
-        </GalleryItem>
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.MediumWidget} title="Medium widget">
-            <MediumWidget />
-          </WidgetWrapper>
-        </GalleryItem>
-        <GalleryItem>
-          <WidgetWrapper widgetType={WidgetTypes.SmallWidget} title="Small widget">
-            <SmallWidget />
-          </WidgetWrapper>
-        </GalleryItem>
+        {Object.keys(widgetMapping).map((type, i) => {
+          return (
+            <GalleryItem key={i}>
+              <WidgetWrapper widgetType={type} title={type}>
+                {getWidget(widgetMapping, type)}
+              </WidgetWrapper>
+            </GalleryItem>
+          );
+        })}
       </Gallery>
     </PageSection>
   );
