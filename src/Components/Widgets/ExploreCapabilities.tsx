@@ -105,7 +105,7 @@ export const ExploreCapabilities: React.FunctionComponent = () => {
                 <Text component="p" className="pf-v5-u-font-size-md pf-v5-u-mb-sm">
                   {drawerData[activeItem].body}
                 </Text>
-                <Button variant="primary" size="sm" component="a" href={drawerData[activeItem].url} target="_blank" className="pf-v5-u-mb-sm">
+                <Button size="lg" component="a" href={drawerData[activeItem].url} target="_blank" className="pf-m-danger pf-v5-u-mb-sm">
                   {drawerData[activeItem].buttonName}
                 </Button>
               </TextContent>
