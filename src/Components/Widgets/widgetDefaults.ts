@@ -21,7 +21,7 @@ export const widgetMaxHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.LargeWidget]: 6,
   [WidgetTypes.MediumWidget]: 4,
   [WidgetTypes.SmallWidget]: 2,
-  [WidgetTypes.ExploreCapabilities]: 3,
+  [WidgetTypes.ExploreCapabilities]: 5,
 };
 
 export const widgetMinHeight: { [widgetName in WidgetTypes]: number } = {

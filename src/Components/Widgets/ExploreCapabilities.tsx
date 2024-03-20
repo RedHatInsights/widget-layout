@@ -10,7 +10,8 @@ import {
   SimpleListItem,
   Split,
   SplitItem,
-  Title,
+  Text,
+  TextContent,
 } from '@patternfly/react-core';
 import './ExploreCapabilities.scss';
 
@@ -73,7 +74,7 @@ export const ExploreCapabilities: React.FunctionComponent = () => {
           On June 30, 2024, CentOS Linux 7 will reach End of Life (EOL), and those systems will stop receiving updates, security pathes, and new
           featues.
           <br></br>
-          Red Hat can help.<a href="https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux/centos-migration">Learn more</a> about
+          Red Hat can help. <a href="https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux/centos-migration">Learn more</a> about
           migrating your CentOS Linux systems to RHEL, whether on-premise or in the cloud.
         </span>
       ),
@@ -97,15 +98,19 @@ export const ExploreCapabilities: React.FunctionComponent = () => {
         <DrawerPanelBody>
           <Split>
             <SplitItem isFilled>
-              <Title className="pf-v5-u-mb-sm" headingLevel="h2" size="xl">
-                {drawerData[activeItem].title}
-              </Title>
-              <p className="pf-v5-u-mb-sm">{drawerData[activeItem].body}</p>
-              <Button variant="primary" size="lg" component="a" href={drawerData[activeItem].url} target="_blank" className="pf-v5-u-mb-sm">
-                {drawerData[activeItem].buttonName}
-              </Button>
+              <TextContent>
+                <Text component="h2" className="pf-v5-u-mb-sm">
+                  {drawerData[activeItem].title}
+                </Text>
+                <Text component="p" className="pf-v5-u-font-size-md pf-v5-u-mb-sm">
+                  {drawerData[activeItem].body}
+                </Text>
+                <Button variant="primary" size="sm" component="a" href={drawerData[activeItem].url} target="_blank" className="pf-v5-u-mb-sm">
+                  {drawerData[activeItem].buttonName}
+                </Button>
+              </TextContent>
             </SplitItem>
-            <SplitItem className="pf-v5-u-w-25 pf-v5-u-h-25 pf-v5-u-pl-sm">
+            <SplitItem className="pf-v5-u-pl-sm">
               <img src={drawerData[activeItem].img} />
             </SplitItem>
           </Split>

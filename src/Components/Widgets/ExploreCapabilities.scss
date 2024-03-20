@@ -3,6 +3,12 @@
     min-width: 300px;
     width: 300;
   }
+  .pf-v5-c-drawer__body {
+    img {
+      width: 60px;
+      max-width: 60px;
+    }
+  }
   .pf-v5-c-simple-list {
     --pf-v5-c-simple-list__item-link--PaddingBottom: 5px;
     --pf-v5-c-simple-list__item-link--PaddingTop: 5.5px;
