@@ -310,6 +310,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         isDraggable={!isLayoutLocked}
         isResizable={!isLayoutLocked}
         resizeHandle={getResizeHandle}
+        margin={{ xl: [16, 16], lg: [16, 16], md: [16, 16], sm: [16, 16] }}
         resizeHandles={['sw', 'nw', 'se', 'ne']}
         // add droppping item default based on dragged template
         droppingItem={droppingItemTemplate}
