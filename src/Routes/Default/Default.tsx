@@ -12,7 +12,7 @@ const DefaultRoute = () => {
     <>
       <Header />
       <AddWidgetDrawer dismissible={false}>
-        <PageSection className="pf-v5-u-p-xs pf-v5-u-p-md-on-sm">
+        <PageSection className="pf-v5-u-p-md pf-v5-u-p-lg-on-sm">
           <GridLayout isLayoutLocked={isLayoutLocked} />
         </PageSection>
       </AddWidgetDrawer>
