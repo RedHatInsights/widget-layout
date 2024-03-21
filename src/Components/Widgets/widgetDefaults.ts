@@ -24,3 +24,9 @@ export const widgetMinHeight: { [widgetName in WidgetTypes]: number } = {
   [WidgetTypes.MediumWidget]: 1,
   [WidgetTypes.SmallWidget]: 1,
 };
+
+export const widgetDefaultLink: { [widgetName in WidgetTypes]: { title: string; href: string } | undefined } = {
+  [WidgetTypes.LargeWidget]: { title: 'Learn more', href: '#' },
+  [WidgetTypes.MediumWidget]: undefined,
+  [WidgetTypes.SmallWidget]: undefined,
+};
