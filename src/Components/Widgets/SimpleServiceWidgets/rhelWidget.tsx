@@ -6,7 +6,7 @@ export const RhelWidget: React.FunctionComponent = () => {
     <>
       <SimpleServiceWidget
         id={0}
-        body="Proactively assess, secure, and stabilize the business-critical services that you scale from your RHEL systems"
+        body="Proactively assess, secure, and stabilize the business-critical services that you scale from your RHEL systems."
         linkTitle="Insights for Rhel"
         url="/insights/"
       />
