@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   CardBody,
   CardHeader,
@@ -40,9 +41,10 @@ export type GridTileProps = React.PropsWithChildren<{
     locked?: boolean;
   };
   removeWidget: (id: string) => void;
+  link?: { title: string; href: string };
 }>;
 
-const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
+const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget, link }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
 
@@ -161,6 +163,11 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
           >
             {title}
           </CardTitle>
+          {link && (
+            <Button className="pf-v5-u-p-0" variant="link" onClick={() => window.open(link.href, '_blank')}>
+              {link.title}
+            </Button>
+          )}
         </Flex>
       </CardHeader>
       <Divider />

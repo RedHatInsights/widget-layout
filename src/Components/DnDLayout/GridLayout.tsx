@@ -5,7 +5,7 @@ import ResizeHandleIcon from './resize-handle.svg';
 import GridTile, { SetWidgetAttribute } from './GridTile';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isWidgetType } from '../Widgets/widgetTypes';
-import { widgetDefaultHeight, widgetDefaultWidth, widgetMaxHeight, widgetMinHeight } from '../Widgets/widgetDefaults';
+import { widgetDefaultHeight, widgetDefaultWidth, widgetHeaderLink, widgetMaxHeight, widgetMinHeight } from '../Widgets/widgetDefaults';
 import { useAtom, useAtomValue } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
@@ -347,6 +347,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
                 widgetConfig={{ ...rest, colWidth: 1200 / 4 }}
                 setWidgetAttribute={setWidgetAttribute}
                 removeWidget={removeWidget}
+                link={widgetHeaderLink[widgetType]}
               >
                 {rest.i}
               </GridTile>

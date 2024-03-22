@@ -23,6 +23,11 @@ export const widgetMinHeight: { [widgetName: string]: number } = {
   ['notificationsEvents']: 1,
 };
 
+export const widgetHeaderLink: { [widgetName: string]: { title: string; href: string } | undefined } = {
+  ['favoriteServices']: { title: 'View all services', href: '/allservices' },
+  ['notificationsEvents']: undefined,
+};
+
 export const getWidget = (widgetMapping: WidgetMapping, type: string) => {
   const mappedWidget = widgetMapping[type];
   return mappedWidget ? <ScalprumComponent {...mappedWidget} /> : Fragment;
