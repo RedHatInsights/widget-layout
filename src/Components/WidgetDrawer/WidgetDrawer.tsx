@@ -3,6 +3,7 @@ import {
   Card,
   CardHeader,
   CardTitle,
+  Flex,
   Gallery,
   GalleryItem,
   Icon,
@@ -18,14 +19,15 @@ import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { CloseIcon, GripVerticalIcon } from '@patternfly/react-icons';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
-import { getWidget } from '../Widgets/widgetDefaults';
+import { getWidget, widgetDefaultIcons } from '../Widgets/widgetDefaults';
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
 }>;
 
-const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: string; widgetType: string }>) => {
+const WidgetWrapper = ({ title, icon, widgetType }: React.PropsWithChildren<{ title: string; icon?: React.ComponentClass; widgetType: string }>) => {
   const setDropInItem = useSetAtom(currentDropInItemAtom);
+  const HeaderIcon = icon;
   const headerActions = (
     <Tooltip content={<p>Move widget</p>}>
       <Icon className="pf-v5-u-pt-md">
@@ -52,9 +54,15 @@ const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: s
       // eslint-disable-next-line react/no-unknown-property
       unselectable="on"
       draggable={true}
+      className="grid-tile"
     >
       <CardHeader className="pf-v5-u-py-md" actions={{ actions: headerActions }}>
-        <CardTitle>{title}</CardTitle>
+        <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
+          <Icon status="custom" className="pf-v5-u-mr-sm">
+            {HeaderIcon ? <HeaderIcon /> : null}
+          </Icon>
+          <CardTitle>{title}</CardTitle>
+        </Flex>
       </CardHeader>
     </Card>
   );
@@ -93,7 +101,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         {Object.keys(widgetMapping).map((type, i) => {
           return (
             <GalleryItem key={i}>
-              <WidgetWrapper widgetType={type} title={type}>
+              <WidgetWrapper widgetType={type} title={type} icon={widgetDefaultIcons[type]}>
                 {getWidget(widgetMapping, type)}
               </WidgetWrapper>
             </GalleryItem>

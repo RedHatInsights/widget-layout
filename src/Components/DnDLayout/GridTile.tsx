@@ -32,6 +32,7 @@ export type SetWidgetAttribute = <T extends string | number | boolean>(id: strin
 export type GridTileProps = React.PropsWithChildren<{
   widgetType: string;
   title: string;
+  icon?: React.ComponentClass;
   setIsDragging: (isDragging: boolean) => void;
   isDragging: boolean;
   setWidgetAttribute: SetWidgetAttribute;
@@ -42,9 +43,10 @@ export type GridTileProps = React.PropsWithChildren<{
   removeWidget: (id: string) => void;
 }>;
 
-const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
+const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
+  const HeaderIcon = icon;
 
   const dropdownItems = useMemo(() => {
     const isMaximized = widgetConfig.h === widgetConfig.maxH;
@@ -151,7 +153,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
       <CardHeader actions={{ actions: headerActions }}>
         <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
           <Icon status="custom" className="pf-v5-u-mr-sm">
-            <BaconIcon />
+            {HeaderIcon ? <HeaderIcon /> : null}
           </Icon>
           <CardTitle
             style={{
