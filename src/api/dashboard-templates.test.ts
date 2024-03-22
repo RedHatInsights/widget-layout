@@ -1,4 +1,3 @@
-import { WidgetTypes } from '../Components/Widgets/widgetTypes';
 import { ExtendedLayoutItem, LayoutWithTitle, mapExtendedLayoutToLayoutWithTitle } from './dashboard-templates';
 
 describe('mapExtendedLayoutToLayoutWithTitle', function () {
@@ -17,7 +16,7 @@ describe('mapExtendedLayoutToLayoutWithTitle', function () {
       x: 0,
       y: 0,
     };
-    extendedLayoutItem = { ...layoutWithTitle, widgetType: WidgetTypes.LargeWidget };
+    extendedLayoutItem = { ...layoutWithTitle, widgetType: 'foobar' };
   });
   test('handles ExtendedLayoutItem type objects', function () {
     expect(mapExtendedLayoutToLayoutWithTitle(extendedLayoutItem)).toEqual(layoutWithTitle);

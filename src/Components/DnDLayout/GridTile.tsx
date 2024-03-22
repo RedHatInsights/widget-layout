@@ -21,16 +21,16 @@ import clsx from 'clsx';
 
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
-import { WidgetTypes } from '../Widgets/widgetTypes';
-import widgetMapper from '../Widgets/widgetMapper';
 import { ExtendedLayoutItem } from '../../api/dashboard-templates';
-
+import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { BaconIcon } from '@patternfly/react-icons';
+import { getWidget } from '../Widgets/widgetDefaults';
+import { useAtomValue } from 'jotai';
 
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
 export type GridTileProps = React.PropsWithChildren<{
-  widgetType: WidgetTypes;
+  widgetType: string;
   title: string;
   setIsDragging: (isDragging: boolean) => void;
   isDragging: boolean;
@@ -44,8 +44,7 @@ export type GridTileProps = React.PropsWithChildren<{
 
 const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const Component = widgetMapper[widgetType] || Fragment;
+  const widgetMapping = useAtomValue(widgetMappingAtom);
 
   const dropdownItems = useMemo(() => {
     const isMaximized = widgetConfig.h === widgetConfig.maxH;
@@ -165,9 +164,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
         </Flex>
       </CardHeader>
       <Divider />
-      <CardBody className="pf-v5-u-p-0">
-        <Component></Component>
-      </CardBody>
+      <CardBody className="pf-v5-u-p-0">{getWidget(widgetMapping, widgetType)}</CardBody>
     </Card>
   );
 };

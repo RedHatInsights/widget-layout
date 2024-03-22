@@ -1,12 +1,14 @@
 import { Layout } from 'react-grid-layout';
-import { WidgetTypes } from '../Components/Widgets/widgetTypes';
 import { dropping_elem_id } from '../Components/DnDLayout/GridLayout';
+import { ScalprumComponentProps } from '@scalprum/react-core';
 
 const getRequestHeaders = (token: string) => ({
   Accept: 'application/json',
   Authorization: `Bearer ${token}`,
   'Content-Type': 'application/json',
 });
+
+export const widgetIdSeparator = '#';
 
 export type LayoutTypes = 'landingPage';
 
@@ -22,7 +24,7 @@ export type PartialTemplateConfig = Partial<TemplateConfig>;
 
 // extended type the UI tracks but not the backend
 export type ExtendedLayoutItem = LayoutWithTitle & {
-  widgetType: WidgetTypes;
+  widgetType: string;
   locked?: boolean;
 };
 
@@ -72,10 +74,18 @@ export class DashboardTemplatesError extends Error {
   }
 }
 
+export type WidgetMapping = {
+  [key: string]: Pick<ScalprumComponentProps, 'scope' | 'module' | 'importName'>;
+};
+
 const handleErrors = (resp: Response) => {
   if (!resp.ok) {
     throw new DashboardTemplatesError('chrome-service dashboard-templates API fetch error', resp.status, resp);
   }
+};
+
+export const getWidgetIdentifier = (widgetType: string, uniqueId: string = crypto.randomUUID()) => {
+  return `${widgetType}${widgetIdSeparator}${uniqueId}`;
 };
 
 export async function getBaseDashboardTemplate(token: string): Promise<BaseTemplate[]>;
@@ -95,6 +105,16 @@ export async function getDashboardTemplates(token: string): Promise<DashboardTem
 export async function getDashboardTemplates(token: string, type: LayoutTypes): Promise<DashboardTemplate[]>;
 export async function getDashboardTemplates(token: string, type?: LayoutTypes): Promise<DashboardTemplate | DashboardTemplate[]> {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates${type ? `?dashboard=${type}` : ''}`, {
+    method: 'GET',
+    headers: getRequestHeaders(token),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+}
+
+export async function getWidgetMapping(token: string): Promise<WidgetMapping> {
+  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/widget-mapping`, {
     method: 'GET',
     headers: getRequestHeaders(token),
   });
@@ -131,10 +151,9 @@ export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTem
   return templates.find((itm) => itm.default === true);
 };
 
-export const mapWidgetDefaults = (id: string): [WidgetTypes, string] => {
-  const [widgetType, i] = id.split('#');
-  // we will need some type guards here and schema validation to remove unknown widgets
-  return [widgetType as WidgetTypes, i];
+export const mapWidgetDefaults = (id: string): [string, string] => {
+  const [widgetType, i] = id.split(widgetIdSeparator);
+  return [widgetType, i];
 };
 
 export const mapLayoutWithTitleToExtendedLayout = (layoutWithTitle: LayoutWithTitle): ExtendedLayoutItem => {
