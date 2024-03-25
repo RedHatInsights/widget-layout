@@ -5,7 +5,6 @@ import ResizeHandleIcon from './resize-handle.svg';
 import GridTile, { SetWidgetAttribute } from './GridTile';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isWidgetType } from '../Widgets/widgetTypes';
-import { widgetDefaultHeight, widgetDefaultWidth, widgetMaxHeight, widgetMinHeight } from '../Widgets/widgetDefaults';
 import { useAtom, useAtomValue } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
@@ -58,11 +57,10 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
 
   const [currentDropInItem, setCurrentDropInItem] = useAtom(currentDropInItemAtom);
   const droppingItemTemplate: ReactGridLayoutProps['droppingItem'] = useMemo(() => {
-    if (currentDropInItem) {
+    if (currentDropInItem && isWidgetType(widgetMapping, currentDropInItem)) {
       return {
+        ...widgetMapping[currentDropInItem].defaults,
         i: dropping_elem_id,
-        w: widgetDefaultWidth[currentDropInItem],
-        h: widgetDefaultHeight[currentDropInItem],
         widgetType: currentDropInItem,
         title: 'New title',
       };
@@ -83,12 +81,10 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
     if (isWidgetType(widgetMapping, data)) {
       const newWidget = {
         ...layoutItem,
+        ...widgetMapping[data].defaults,
         // w: layoutItem.x + layoutItem.w > 3 ? 1 : 3,
         // x: 4 % layoutItem.w,
         // x: layoutItem.x + layoutItem.w > 3 ? 3 : 0,
-        h: widgetDefaultHeight[data],
-        maxH: widgetMaxHeight[data],
-        minH: widgetMinHeight[data],
         widgetType: data,
         i: getWidgetIdentifier(data),
         title: 'New title',
