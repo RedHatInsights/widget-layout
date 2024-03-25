@@ -160,7 +160,8 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
             }}
             className="pf-v5-u-flex-wrap pf-v5-u-text-break-word"
           >
-            {title}
+
+            {title.indexOf('#') > -1 ? title.split('#')[0] : title}
           </CardTitle>
         </Flex>
       </CardHeader>
