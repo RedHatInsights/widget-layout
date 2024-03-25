@@ -47,14 +47,13 @@ const EventsWidget: React.FunctionComponent = () => {
     date: 'Date',
   };
 
-  // TEST DATA
-  // const notifications = [
-  //   { id: '1', title: 'Policy triggered', source: 'Policies - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
-  //   { id: '2', title: 'New advisory', source: 'Patch - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
-  //   { id: '3', title: 'New recommendation', source: 'Advisor - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
-  //   { id: '4', title: 'New advisory', source: 'Patch - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
-  //   { id: '5', title: 'New recommendation', source: 'Advisor - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
-  // ];
+  const notifications = [
+    { id: '1', title: 'Policy triggered', source: 'Policies - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+    { id: '2', title: 'New advisory', source: 'Patch - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+    { id: '3', title: 'New recommendation', source: 'Advisor - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+    { id: '4', title: 'New advisory', source: 'Patch - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+    { id: '5', title: 'New recommendation', source: 'Advisor - Red Hat Enterprise Linux', created: '2 May 2023, 11:43 UTC' },
+  ];
 
   return (
     <>
