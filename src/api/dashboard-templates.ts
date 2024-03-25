@@ -74,8 +74,17 @@ export class DashboardTemplatesError extends Error {
   }
 }
 
+export type WidgetDefaults = {
+  w: number;
+  h: number;
+  maxH: number;
+  minH: number;
+};
+
 export type WidgetMapping = {
-  [key: string]: Pick<ScalprumComponentProps, 'scope' | 'module' | 'importName'>;
+  [key: string]: Pick<ScalprumComponentProps, 'scope' | 'module' | 'importName'> & {
+    defaults: WidgetDefaults;
+  };
 };
 
 const handleErrors = (resp: Response) => {
