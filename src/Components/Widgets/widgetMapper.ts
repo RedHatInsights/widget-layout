@@ -1,8 +1,5 @@
 import React from 'react';
-import LargeWidget from './LargeWidget';
 import { WidgetTypes } from './widgetTypes';
-import MediumWidget from './MediumWidget';
-import SmallWidget from './SmallWidget';
 import RecentlyVisited from './RecentlyVisited';
 import Events from './EventsWidget';
 import { ExploreCapabilities } from './ExploreCapabilities';
@@ -15,9 +12,6 @@ import { EdgeWidget } from './SimpleServiceWidgets/edgeWidget';
 const widgetMapper: {
   [widgetName in WidgetTypes]: React.ComponentType<React.PropsWithChildren<object>>;
 } = {
-  [WidgetTypes.LargeWidget]: LargeWidget,
-  [WidgetTypes.MediumWidget]: MediumWidget,
-  [WidgetTypes.SmallWidget]: SmallWidget,
   [WidgetTypes.RecentlyVisited]: RecentlyVisited,
   [WidgetTypes.Events]: Events,
   [WidgetTypes.ExploreCapabilities]: ExploreCapabilities,
