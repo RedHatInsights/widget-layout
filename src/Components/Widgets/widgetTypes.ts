@@ -10,7 +10,6 @@ export enum WidgetTypes {
   OpenShiftWidget = 'OpenShiftWidget',
   AnsibleWidget = 'AnsibleWidget',
   EdgeWidget = 'EdgeWidget',
-  LearningResourcesWidget = 'LearningResourcesWidget',
 }
 
 export function isWidgetType(type: string): type is WidgetTypes {

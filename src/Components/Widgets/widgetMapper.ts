@@ -10,7 +10,6 @@ import { RhelWidget } from './SimpleServiceWidgets/rhelWidget';
 import { OpenShiftWidget } from './SimpleServiceWidgets/openshiftWidget';
 import { AnsibleWidget } from './SimpleServiceWidgets/ansibleWidget';
 import { EdgeWidget } from './SimpleServiceWidgets/edgeWidget';
-import LearningResourcesWidget from './LearningResourcesWidget/LearningResourcesWidget';
 
 // This maps the unique widget ID to the actual React component to be rendered
 const widgetMapper: {
@@ -26,7 +25,6 @@ const widgetMapper: {
   [WidgetTypes.OpenShiftWidget]: OpenShiftWidget,
   [WidgetTypes.AnsibleWidget]: AnsibleWidget,
   [WidgetTypes.EdgeWidget]: EdgeWidget,
-  [WidgetTypes.LearningResourcesWidget]: LearningResourcesWidget,
 };
 
 export default widgetMapper;
