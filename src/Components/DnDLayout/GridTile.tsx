@@ -26,6 +26,7 @@ import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { BaconIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 import { useAtomValue } from 'jotai';
+import classNames from 'classnames';
 
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
@@ -45,6 +46,10 @@ export type GridTileProps = React.PropsWithChildren<{
 const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
+
+  const { node, module, scope } = useMemo(() => {
+    return getWidget(widgetMapping, widgetType);
+  }, [widgetMapping, widgetType]);
 
   const dropdownItems = useMemo(() => {
     const isMaximized = widgetConfig.h === widgetConfig.maxH;
@@ -146,6 +151,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
     <Card
       className={clsx('grid-tile', {
         static: widgetConfig.static,
+        [scope]: scope && module,
       })}
     >
       <CardHeader actions={{ actions: headerActions }}>
@@ -164,7 +170,13 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
         </Flex>
       </CardHeader>
       <Divider />
-      <CardBody className="pf-v5-u-p-0">{getWidget(widgetMapping, widgetType)}</CardBody>
+      <CardBody
+        className={classNames('pf-v5-u-p-0', {
+          [`${scope}-${module}`]: scope && module,
+        })}
+      >
+        {node}
+      </CardBody>
     </Card>
   );
 };

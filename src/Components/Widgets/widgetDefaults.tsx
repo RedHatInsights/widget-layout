@@ -4,5 +4,10 @@ import React, { Fragment } from 'react';
 
 export const getWidget = (widgetMapping: WidgetMapping, type: string) => {
   const mappedWidget = widgetMapping[type];
-  return mappedWidget ? <ScalprumComponent {...mappedWidget} /> : Fragment;
+  return {
+    node: mappedWidget ? <ScalprumComponent {...mappedWidget} /> : <Fragment />,
+    scope: mappedWidget?.scope,
+    module: mappedWidget?.module,
+    importName: mappedWidget?.importName,
+  };
 };
