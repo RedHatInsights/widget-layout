@@ -33,3 +33,8 @@
     }
   }
 }
+
+.react-grid-layout {
+  // if the height is 0, you can't drop anything in the grid
+  min-height: 200px;
+}

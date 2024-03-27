@@ -54,7 +54,6 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
   const [activeItem, setActiveItem] = useAtom(activeItemAtom);
-  const [widgetClasses, setWidgetClasses] = useState<WidgetClasses>({});
   const layoutRef = useRef<HTMLDivElement>(null);
   const { currentToken } = useCurrentUser();
   const widgetMapping = useAtomValue(widgetMappingAtom);
@@ -123,48 +122,37 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
     [isLayoutLocked, layout]
   );
 
-  useEffect(() => {
-    const updatedWidgetClasses = layout.reduce<WidgetClasses>((acc, curr) => {
-      acc[curr.i] = `widget-columns-${curr.w}`;
-      return acc;
-    }, {});
-    setWidgetClasses(updatedWidgetClasses);
-  }, [layout]);
-
-  const onLayoutChange: ResponsiveProps['onLayoutChange'] = useCallback(
-    (currentLayout: Layout[]) => {
-      if (isInitialRender) {
-        setIsInitialRender(false);
-        return;
-      }
-      if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
-        return;
-      }
-      // TODO in certain scenarios prevLayout contains additional undefined metadata on each widget causing this check to fail and multiple patches for dropping widgets in
-      if (isEqual(prevLayout, layout)) {
-        return;
-      }
-      const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: currentLayout });
-      patchDashboardTemplate(templateId, { templateConfig: data }, currentToken)
-        .then((template: DashboardTemplate) => {
-          const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
-          setTemplate(extendedTemplateConfig);
-          setPrevLayout(layout);
-          setLayout(extendedTemplateConfig[layoutVariant]);
-        })
-        .catch((err) => {
-          console.error(err);
-          dispatch(
-            addNotification({
-              variant: 'danger',
-              title: 'Failed to patch dashboard configuration',
-              description: 'Your dashboard changes were unable to be saved.',
-            })
-          );
-        });
-    },
-    [isLayoutLocked, templateId, layoutVariant, currentToken, layout, currentDropInItem, isInitialRender]
-  );
+  const onLayoutChange: ResponsiveProps['onLayoutChange'] = (currentLayout: Layout[]) => {
+    if (isInitialRender) {
+      setIsInitialRender(false);
+      return;
+    }
+    if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
+      return;
+    }
+    // TODO in certain scenarios prevLayout contains additional undefined metadata on each widget causing this check to fail and multiple patches for dropping widgets in
+    if (isEqual(prevLayout, layout)) {
+      return;
+    }
+    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: currentLayout });
+    patchDashboardTemplate(templateId, { templateConfig: data }, currentToken)
+      .then((template: DashboardTemplate) => {
+        const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
+        setTemplate(extendedTemplateConfig);
+        setPrevLayout(layout);
+        setLayout(extendedTemplateConfig[layoutVariant]);
+      })
+      .catch((err) => {
+        console.error(err);
+        dispatch(
+          addNotification({
+            variant: 'danger',
+            title: 'Failed to patch dashboard configuration',
+            description: 'Your dashboard changes were unable to be saved.',
+          })
+        );
+      });
+  };
 
   const debouncedOnLayoutChange = debounce(onLayoutChange, 500);
 
@@ -346,7 +334,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
                 boxShadow: activeItem === rest.i ? '0 0 2px 2px #2684FF' : 'none',
                 ...(activeItem === rest.i ? { outline: 'none' } : {}),
               }}
-              className={widgetClasses[rest.i]}
+              className={`widget-columns-${rest.w}`}
             >
               <GridTile
                 isDragging={isDragging}
