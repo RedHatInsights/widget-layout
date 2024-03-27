@@ -343,6 +343,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
                 widgetConfig={{ ...rest, colWidth: 1200 / 4 }}
                 setWidgetAttribute={setWidgetAttribute}
                 removeWidget={removeWidget}
+                link={widgetHeaderLink[widgetType]}
               >
                 {rest.i}
               </GridTile>
