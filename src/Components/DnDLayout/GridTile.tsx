@@ -22,7 +22,7 @@ import clsx from 'clsx';
 
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
-import { ExtendedLayoutItem } from '../../api/dashboard-templates';
+import { ExtendedLayoutItem, WidgetConfiguration } from '../../api/dashboard-templates';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { BaconIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
@@ -40,14 +40,15 @@ export type GridTileProps = React.PropsWithChildren<{
   widgetConfig: Layout & {
     colWidth: number;
     locked?: boolean;
+    config?: WidgetConfiguration;
   };
   removeWidget: (id: string) => void;
-  link?: { title: string; href: string };
 }>;
 
-const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget, link }: GridTileProps) => {
+const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
+  const { headerLink } = widgetConfig.config || {};
 
   const { node, module, scope } = useMemo(() => {
     return getWidget(widgetMapping, widgetType);
@@ -169,9 +170,9 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
           >
             {title}
           </CardTitle>
-          {link && (
-            <Button className="pf-v5-u-p-0" variant="link" onClick={() => window.open(link.href, '_blank')}>
-              {link.title}
+          {headerLink && (
+            <Button className="widget-header-link pf-v5-u-p-0" variant="link" onClick={() => window.open(headerLink.href, '_blank')}>
+              {headerLink.title}
             </Button>
           )}
         </Flex>

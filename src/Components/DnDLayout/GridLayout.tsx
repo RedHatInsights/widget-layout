@@ -26,6 +26,7 @@ import useCurrentUser from '../../hooks/useCurrentUser';
 import { useDispatch } from 'react-redux';
 import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
 import { debounce, isEqual } from 'lodash';
+import { getWidget } from '../Widgets/widgetDefaults';
 
 export const dropping_elem_id = '__dropping-elem__';
 
@@ -63,6 +64,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         i: dropping_elem_id,
         widgetType: currentDropInItem,
         title: 'New title',
+        config: widgetMapping[currentDropInItem].config,
       };
     }
   }, [currentDropInItem]);
@@ -88,6 +90,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         widgetType: data,
         i: getWidgetIdentifier(data),
         title: 'New title',
+        config: widgetMapping[data].config,
       };
       setCurrentDropInItem(undefined);
       setLayout((prev) =>
@@ -323,32 +326,34 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
       >
         {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          activeLayout.map(({ widgetType, title, ...rest }, index) => (
-            <div
-              key={rest.i}
-              data-grid={rest}
-              onKeyUp={(e) => onKeyUp(e, rest.i)}
-              tabIndex={index}
-              style={{
-                boxShadow: activeItem === rest.i ? '0 0 2px 2px #2684FF' : 'none',
-                ...(activeItem === rest.i ? { outline: 'none' } : {}),
-              }}
-            >
-              <GridTile
-                isDragging={isDragging}
-                setIsDragging={setIsDragging}
-                title={rest.i}
-                widgetType={widgetType}
-                // these will be dynamically calculated once the dimensions are calculated
-                widgetConfig={{ ...rest, colWidth: 1200 / 4 }}
-                setWidgetAttribute={setWidgetAttribute}
-                removeWidget={removeWidget}
-                link={widgetHeaderLink[widgetType]}
+          activeLayout.map(({ widgetType, title, ...rest }, index) => {
+            const { config } = getWidget(widgetMapping, widgetType);
+            return (
+              <div
+                key={rest.i}
+                data-grid={rest}
+                onKeyUp={(e) => onKeyUp(e, rest.i)}
+                tabIndex={index}
+                style={{
+                  boxShadow: activeItem === rest.i ? '0 0 2px 2px #2684FF' : 'none',
+                  ...(activeItem === rest.i ? { outline: 'none' } : {}),
+                }}
               >
-                {rest.i}
-              </GridTile>
-            </div>
-          ))
+                <GridTile
+                  isDragging={isDragging}
+                  setIsDragging={setIsDragging}
+                  title={rest.i}
+                  widgetType={widgetType}
+                  // these will be dynamically calculated once the dimensions are calculated
+                  widgetConfig={{ ...rest, colWidth: 1200 / 4, config }}
+                  setWidgetAttribute={setWidgetAttribute}
+                  removeWidget={removeWidget}
+                >
+                  {rest.i}
+                </GridTile>
+              </div>
+            );
+          })
         }
       </ResponsiveGridLayout>
     </div>
