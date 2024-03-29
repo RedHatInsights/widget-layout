@@ -26,6 +26,8 @@ import useCurrentUser from '../../hooks/useCurrentUser';
 import { useDispatch } from 'react-redux';
 import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
 import { debounce, isEqual } from 'lodash';
+import { Button, Flex, Icon, PageSection, Text, TextContent } from '@patternfly/react-core';
+import { ExternalLinkAltIcon, GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 
 export const dropping_elem_id = '__dropping-elem__';
 
@@ -38,6 +40,28 @@ const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement
     <div ref={ref} className={`react-resizable-handle react-resizable-handle-${resizeHandleAxis}`}>
       <img src={ResizeHandleIcon} />
     </div>
+  );
+};
+
+const LayoutEmptyState = () => {
+  return (
+    <PageSection className="pf-v5-u-p-lg pf-v5-u-p-r-0-on-sm ">
+      <Flex justifyContent={{ default: 'justifyContentCenter' }}>
+        <TextContent className="pf-v5-u-text-align-center">
+          <Icon iconSize="xl">
+            <PlusCircleIcon />
+          </Icon>
+          <Text component="h2">No dashboard content</Text>
+          <Text>
+            You don’t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to
+            this dashboard body here.
+          </Text>
+          <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end">
+            Learn about your widget dashboard
+          </Button>
+        </TextContent>
+      </Flex>
+    </PageSection>
   );
 };
 
@@ -350,6 +374,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
           ))
         }
       </ResponsiveGridLayout>
+      {activeLayout.length === 0 && <LayoutEmptyState />}
     </div>
   );
 };
