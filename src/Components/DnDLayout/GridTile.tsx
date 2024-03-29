@@ -49,6 +49,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
   const [isOpen, setIsOpen] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const { headerLink } = widgetConfig.config || {};
+  const hasHeader = headerLink && headerLink.href && headerLink.title;
 
   const { node, module, scope } = useMemo(() => {
     return getWidget(widgetMapping, widgetType);
@@ -170,7 +171,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
           >
             {title}
           </CardTitle>
-          {headerLink && (
+          {hasHeader && (
             <Button className="widget-header-link pf-v5-u-p-0" variant="link" onClick={() => window.open(headerLink.href, '_blank')}>
               {headerLink.title}
             </Button>
