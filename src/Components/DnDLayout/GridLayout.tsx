@@ -26,7 +26,16 @@ import useCurrentUser from '../../hooks/useCurrentUser';
 import { useDispatch } from 'react-redux';
 import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
 import { debounce, isEqual } from 'lodash';
-import { Button, Flex, Icon, PageSection, Text, TextContent } from '@patternfly/react-core';
+import {
+  Button,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateBody,
+  EmptyStateHeader,
+  EmptyStateIcon,
+  EmptyStateVariant,
+  PageSection,
+} from '@patternfly/react-core';
 import { ExternalLinkAltIcon, GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 
 export const dropping_elem_id = '__dropping-elem__';
@@ -45,22 +54,19 @@ const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement
 
 const LayoutEmptyState = () => {
   return (
-    <PageSection className="pf-v5-u-p-lg pf-v5-u-p-r-0-on-sm ">
-      <Flex justifyContent={{ default: 'justifyContentCenter' }}>
-        <TextContent className="pf-v5-u-text-align-center">
-          <Icon iconSize="xl">
-            <PlusCircleIcon />
-          </Icon>
-          <Text component="h2">No dashboard content</Text>
-          <Text>
-            You don’t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to
-            this dashboard body here.
-          </Text>
+    <PageSection className="empty-layout pf-v5-u-p-0">
+      <EmptyState variant={EmptyStateVariant.lg} className="pf-v5-u-p-sm">
+        <EmptyStateHeader titleText="No dashboard content" headingLevel="h2" icon={<EmptyStateIcon icon={PlusCircleIcon} />} />
+        <EmptyStateBody>
+          You don’t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to
+          dashboard body here.
+        </EmptyStateBody>
+        <EmptyStateActions>
           <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end">
             Learn about your widget dashboard
           </Button>
-        </TextContent>
-      </Flex>
+        </EmptyStateActions>
+      </EmptyState>
     </PageSection>
   );
 };
