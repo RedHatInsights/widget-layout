@@ -59,8 +59,8 @@ const LayoutEmptyState = () => {
       <EmptyState variant={EmptyStateVariant.lg} className="pf-v5-u-p-sm">
         <EmptyStateHeader titleText="No dashboard content" headingLevel="h2" icon={<EmptyStateIcon icon={PlusCircleIcon} />} />
         <EmptyStateBody>
-          You don’t have any widgets on your dashboard. To populate <br /> your dashboard, drag <GripVerticalIcon /> items from the blue widget bank
-          to <br /> this dashboard body here.
+          You don’t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to this
+          dashboard body here.
         </EmptyStateBody>
         <EmptyStateActions>
           {/* TODO: Add link to documentation */}
