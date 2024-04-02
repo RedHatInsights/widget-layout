@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   CardBody,
   CardHeader,
@@ -21,11 +22,12 @@ import clsx from 'clsx';
 
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
-import { ExtendedLayoutItem } from '../../api/dashboard-templates';
+import { ExtendedLayoutItem, WidgetConfiguration } from '../../api/dashboard-templates';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { BaconIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 import { useAtomValue } from 'jotai';
+import classNames from 'classnames';
 
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
@@ -39,6 +41,7 @@ export type GridTileProps = React.PropsWithChildren<{
   widgetConfig: Layout & {
     colWidth: number;
     locked?: boolean;
+    config?: WidgetConfiguration;
   };
   removeWidget: (id: string) => void;
 }>;
@@ -46,7 +49,12 @@ export type GridTileProps = React.PropsWithChildren<{
 const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
-  const HeaderIcon = icon;
+  const { headerLink } = widgetConfig.config || {};
+  const hasHeader = headerLink && headerLink.href && headerLink.title;
+
+  const { node, module, scope } = useMemo(() => {
+    return getWidget(widgetMapping, widgetType);
+  }, [widgetMapping, widgetType]);
 
   const dropdownItems = useMemo(() => {
     const isMaximized = widgetConfig.h === widgetConfig.maxH;
@@ -148,6 +156,7 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
     <Card
       className={clsx('grid-tile', {
         static: widgetConfig.static,
+        [scope]: scope && module,
       })}
     >
       <CardHeader actions={{ actions: headerActions }}>
@@ -163,10 +172,21 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
           >
             {title}
           </CardTitle>
+          {hasHeader && (
+            <Button className="widget-header-link pf-v5-u-p-0" variant="link" onClick={() => window.open(headerLink.href, '_blank')}>
+              {headerLink.title}
+            </Button>
+          )}
         </Flex>
       </CardHeader>
       <Divider />
-      <CardBody className="pf-v5-u-p-0">{getWidget(widgetMapping, widgetType)}</CardBody>
+      <CardBody
+        className={classNames('pf-v5-u-p-0', {
+          [`${scope}-${module}`]: scope && module,
+        })}
+      >
+        {node}
+      </CardBody>
     </Card>
   );
 };
