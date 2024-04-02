@@ -332,7 +332,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
     // {/* relative position is required for the grid layout to properly calculate
     // child translation while dragging is in progress */}
     <div style={{ position: 'relative' }} ref={layoutRef}>
-      {activeLayout.length === 0 && <LayoutEmptyState />}
+      {activeLayout.length === 0 && !currentDropInItem && <LayoutEmptyState />}
       <ResponsiveGridLayout
         className="layout"
         draggableHandle=".drag-handle"
