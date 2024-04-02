@@ -62,12 +62,12 @@ const LayoutEmptyState = () => {
           You don’t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to this
           dashboard body here.
         </EmptyStateBody>
+        {/* TODO: Add link to documentation once available [HCCDOC-2108]
         <EmptyStateActions>
-          {/* TODO: Add link to documentation */}
-          <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end">
+          <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end" component="a" href={`#`}>
             Learn about your widget dashboard
           </Button>
-        </EmptyStateActions>
+        </EmptyStateActions> */}
       </EmptyState>
     </PageSection>
   );
