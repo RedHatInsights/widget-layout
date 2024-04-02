@@ -138,26 +138,28 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
       return;
     }
     const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: currentLayout });
-    patchDashboardTemplate(templateId, { templateConfig: data }, currentToken)
-      .then((template: DashboardTemplate) => {
-        const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
-        setTemplate(extendedTemplateConfig);
-        setPrevLayout(layout);
-        setLayout(extendedTemplateConfig[layoutVariant]);
-      })
-      .catch((err) => {
-        console.error(err);
-        dispatch(
-          addNotification({
-            variant: 'danger',
-            title: 'Failed to patch dashboard configuration',
-            description: 'Your dashboard changes were unable to be saved.',
-          })
-        );
-      });
-  };
+    const debouncedPatchDashboardTemplate = debounce(() => {
+      patchDashboardTemplate(templateId, { templateConfig: data }, currentToken)
+        .then((template: DashboardTemplate) => {
+          const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
+          setTemplate(extendedTemplateConfig);
+          setPrevLayout(layout);
+          setLayout(extendedTemplateConfig[layoutVariant]);
+        })
+        .catch((err) => {
+          console.error(err);
+          dispatch(
+            addNotification({
+              variant: 'danger',
+              title: 'Failed to patch dashboard configuration',
+              description: 'Your dashboard changes were unable to be saved.',
+            })
+          );
+        });
+    }, 500);
 
-  const debouncedOnLayoutChange = debounce(onLayoutChange, 500);
+    debouncedPatchDashboardTemplate();
+  };
 
   const onBreakpointChange: ResponsiveProps['onBreakpointChange'] = (newBreakpoint) => {
     setLayoutVariant(newBreakpoint as Variants);
@@ -190,63 +192,66 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
       e.stopPropagation();
       e.preventDefault();
 
+      const updateLayout = (updatedItem: ExtendedLayoutItem) => {
+        setLayout((prev) => prev.map((layoutItem) => (layoutItem.i === activeItem ? updatedItem : layoutItem)));
+
+        if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
+          return;
+        }
+
+        const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: layout });
+        const debouncedPatchDashboardTemplate = debounce(() => {
+          patchDashboardTemplate(templateId, { templateConfig: data }, currentToken)
+            .then((template: DashboardTemplate) => {
+              const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
+              setTemplate(extendedTemplateConfig);
+              setPrevLayout(layout);
+              setLayout(extendedTemplateConfig[layoutVariant]);
+            })
+            .catch((err) => {
+              console.error(err);
+              dispatch(
+                addNotification({
+                  variant: 'danger',
+                  title: 'Failed to patch dashboard configuration',
+                  description: 'Your dashboard changes were unable to be saved.',
+                })
+              );
+            });
+        }, 500);
+
+        debouncedPatchDashboardTemplate();
+      };
+
       if (e.code === 'ArrowUp') {
-        setLayout((prev) =>
-          prev.map((layoutItem) => {
-            if (layoutItem.i === activeItem) {
-              return {
-                ...layoutItem,
-                y: Math.max(layoutItem.y - 1, 0),
-              };
-            }
-            return layoutItem;
-          })
-        );
+        updateLayout({
+          ...item,
+          y: Math.max(item.y - 1, 0),
+        });
       }
 
       if (e.code === 'ArrowDown') {
-        setLayout((prev) =>
-          prev.map((layoutItem) => {
-            if (layoutItem.i === activeItem) {
-              return {
-                ...layoutItem,
-                y: layoutItem.y + 1,
-              };
-            }
-            return layoutItem;
-          })
-        );
+        updateLayout({
+          ...item,
+          y: item.y + 1,
+        });
       }
 
       if (e.code === 'ArrowLeft') {
-        setLayout((prev) =>
-          prev.map((layoutItem) => {
-            if (layoutItem.i === activeItem) {
-              return {
-                ...layoutItem,
-                x: Math.max(layoutItem.x - 1, 0),
-              };
-            }
-            return layoutItem;
-          })
-        );
+        updateLayout({
+          ...item,
+          x: Math.max(item.x - 1, 0),
+        });
       }
 
       if (e.code === 'ArrowRight') {
-        setLayout((prev) =>
-          prev.map((layoutItem) => {
-            if (layoutItem.i === activeItem) {
-              return {
-                ...layoutItem,
-                x: layoutItem.x + 1,
-              };
-            }
-            return layoutItem;
-          })
-        );
+        updateLayout({
+          ...item,
+          x: item.x + 1,
+        });
       }
     },
-    [activeItem]
+    [activeItem, layout, isLayoutLocked, templateId, layoutVariant, currentDropInItem, currentToken, dispatch]
   );
 
   useEffect(() => {
@@ -322,7 +327,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
         onDrop={onDrop}
         useCSSTransforms
         verticalCompact
-        onLayoutChange={debouncedOnLayoutChange}
+        onLayoutChange={onLayoutChange}
         onBreakpointChange={onBreakpointChange}
       >
         {
