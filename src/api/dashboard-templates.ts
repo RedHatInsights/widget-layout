@@ -25,6 +25,7 @@ export type PartialTemplateConfig = Partial<TemplateConfig>;
 // extended type the UI tracks but not the backend
 export type ExtendedLayoutItem = LayoutWithTitle & {
   widgetType: string;
+  config?: WidgetConfiguration;
   locked?: boolean;
 };
 
@@ -81,9 +82,20 @@ export type WidgetDefaults = {
   minH: number;
 };
 
+export type WidgetHeaderLink = {
+  title?: string;
+  href?: string;
+};
+
+export type WidgetConfiguration = {
+  icon?: string;
+  headerLink?: WidgetHeaderLink;
+};
+
 export type WidgetMapping = {
   [key: string]: Pick<ScalprumComponentProps, 'scope' | 'module' | 'importName'> & {
     defaults: WidgetDefaults;
+    config?: WidgetConfiguration;
   };
 };
 
