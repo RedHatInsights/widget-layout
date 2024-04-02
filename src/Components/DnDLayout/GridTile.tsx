@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   CardBody,
   CardHeader,
@@ -21,7 +22,7 @@ import clsx from 'clsx';
 
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
-import { ExtendedLayoutItem } from '../../api/dashboard-templates';
+import { ExtendedLayoutItem, WidgetConfiguration } from '../../api/dashboard-templates';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { BaconIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
@@ -39,6 +40,7 @@ export type GridTileProps = React.PropsWithChildren<{
   widgetConfig: Layout & {
     colWidth: number;
     locked?: boolean;
+    config?: WidgetConfiguration;
   };
   removeWidget: (id: string) => void;
 }>;
@@ -46,6 +48,8 @@ export type GridTileProps = React.PropsWithChildren<{
 const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
+  const { headerLink } = widgetConfig.config || {};
+  const hasHeader = headerLink && headerLink.href && headerLink.title;
 
   const { node, module, scope } = useMemo(() => {
     return getWidget(widgetMapping, widgetType);
@@ -167,6 +171,11 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
           >
             {title}
           </CardTitle>
+          {hasHeader && (
+            <Button className="widget-header-link pf-v5-u-p-0" variant="link" onClick={() => window.open(headerLink.href, '_blank')}>
+              {headerLink.title}
+            </Button>
+          )}
         </Flex>
       </CardHeader>
       <Divider />

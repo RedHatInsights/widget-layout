@@ -9,5 +9,6 @@ export const getWidget = (widgetMapping: WidgetMapping, type: string) => {
     scope: mappedWidget?.scope,
     module: mappedWidget?.module,
     importName: mappedWidget?.importName,
+    config: mappedWidget?.config,
   };
 };
