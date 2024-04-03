@@ -34,7 +34,10 @@
   }
 }
 
-.react-grid-layout {
-  // if the height is 0, you can't drop anything in the grid
+.layout {
   min-height: 200px;
+}
+
+.empty-layout {
+  border-bottom: none;
 }

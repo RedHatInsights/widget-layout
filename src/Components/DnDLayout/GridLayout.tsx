@@ -26,6 +26,17 @@ import useCurrentUser from '../../hooks/useCurrentUser';
 import { useDispatch } from 'react-redux';
 import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
 import { debounce, isEqual } from 'lodash';
+import {
+  Button,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateBody,
+  EmptyStateHeader,
+  EmptyStateIcon,
+  EmptyStateVariant,
+  PageSection,
+} from '@patternfly/react-core';
+import { ExternalLinkAltIcon, GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 
 export const dropping_elem_id = '__dropping-elem__';
@@ -42,9 +53,25 @@ const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement
   );
 };
 
-interface WidgetClasses {
-  [key: string]: string; // maps widget id to class name
-}
+const LayoutEmptyState = () => {
+  return (
+    <PageSection className="empty-layout pf-v5-u-p-0">
+      <EmptyState variant={EmptyStateVariant.lg} className="pf-v5-u-p-sm">
+        <EmptyStateHeader titleText="No dashboard content" headingLevel="h2" icon={<EmptyStateIcon icon={PlusCircleIcon} />} />
+        <EmptyStateBody>
+          You don’t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to this
+          dashboard body here.
+        </EmptyStateBody>
+        {/* TODO: Add link to documentation once available [HCCDOC-2108]
+        <EmptyStateActions>
+          <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end" component="a" href={`#`}>
+            Learn about your widget dashboard
+          </Button>
+        </EmptyStateActions> */}
+      </EmptyState>
+    </PageSection>
+  );
+};
 
 const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -307,6 +334,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
     // {/* relative position is required for the grid layout to properly calculate
     // child translation while dragging is in progress */}
     <div style={{ position: 'relative' }} ref={layoutRef}>
+      {activeLayout.length === 0 && !currentDropInItem && <LayoutEmptyState />}
       <ResponsiveGridLayout
         className="layout"
         draggableHandle=".drag-handle"
