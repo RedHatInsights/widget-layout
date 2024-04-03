@@ -24,10 +24,10 @@ import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
 import { ExtendedLayoutItem, WidgetConfiguration } from '../../api/dashboard-templates';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
-import { BaconIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 import { useAtomValue } from 'jotai';
 import classNames from 'classnames';
+import HeaderIcon from '../Icons/HeaderIcon';
 
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
@@ -46,7 +46,7 @@ export type GridTileProps = React.PropsWithChildren<{
   removeWidget: (id: string) => void;
 }>;
 
-const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
+const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const { headerLink } = widgetConfig.config || {};
@@ -162,7 +162,7 @@ const GridTile = ({ widgetType, title, icon, isDragging, setIsDragging, setWidge
       <CardHeader actions={{ actions: headerActions }}>
         <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
           <Icon status="custom" className="pf-v5-u-mr-sm">
-            {HeaderIcon ? <HeaderIcon /> : null}
+            <HeaderIcon icon={widgetConfig.config?.icon} />
           </Icon>
           <CardTitle
             style={{
