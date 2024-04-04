@@ -90,6 +90,7 @@ export type WidgetHeaderLink = {
 export type WidgetConfiguration = {
   icon?: string;
   headerLink?: WidgetHeaderLink;
+  title?: string;
 };
 
 export type WidgetMapping = {

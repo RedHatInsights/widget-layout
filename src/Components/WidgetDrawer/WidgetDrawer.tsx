@@ -27,11 +27,7 @@ export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
 }>;
 
-const WidgetWrapper = ({
-  title,
-  widgetType,
-  config,
-}: React.PropsWithChildren<{ title: string; widgetType: string; config?: WidgetConfiguration }>) => {
+const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetType: string; config?: WidgetConfiguration }>) => {
   const setDropInItem = useSetAtom(currentDropInItemAtom);
   const headerActions = (
     <Tooltip content={<p>Move widget</p>}>
@@ -66,7 +62,7 @@ const WidgetWrapper = ({
           <Icon status="custom" className="pf-v5-u-mr-sm">
             <HeaderIcon icon={config?.icon} />
           </Icon>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle>{config?.title || widgetType}</CardTitle>
         </Flex>
       </CardHeader>
     </Card>
@@ -106,7 +102,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         {Object.entries(widgetMapping).map(([type, { config }], i) => {
           return (
             <GalleryItem key={i}>
-              <WidgetWrapper widgetType={type} title={type} config={config}>
+              <WidgetWrapper widgetType={type} config={config}>
                 {getWidget(widgetMapping, type)}
               </WidgetWrapper>
             </GalleryItem>
