@@ -1,6 +1,6 @@
 import React from 'react';
 
-const QuayIoIcon = () => {
+const QuayIcon = () => {
   return (
     <svg width="28" height="28" viewBox="0 0 38 38">
       <g id="Symbols" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
@@ -46,4 +46,4 @@ const QuayIoIcon = () => {
   );
 };
 
-export default QuayIoIcon;
+export default QuayIcon;
