@@ -33,7 +33,6 @@ export type SetWidgetAttribute = <T extends string | number | boolean>(id: strin
 
 export type GridTileProps = React.PropsWithChildren<{
   widgetType: string;
-  title: string;
   icon?: React.ComponentClass;
   setIsDragging: (isDragging: boolean) => void;
   isDragging: boolean;
@@ -46,7 +45,7 @@ export type GridTileProps = React.PropsWithChildren<{
   removeWidget: (id: string) => void;
 }>;
 
-const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
+const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const { headerLink } = widgetConfig.config || {};
@@ -170,7 +169,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
             }}
             className="pf-v5-u-flex-wrap pf-v5-u-text-break-word"
           >
-            {title}
+            {widgetConfig?.config?.title || widgetType}
           </CardTitle>
           {hasHeader && (
             <Button className="widget-header-link pf-v5-u-p-0" variant="link" onClick={() => window.open(headerLink.href, '_blank')}>

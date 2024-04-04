@@ -377,7 +377,6 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
                 <GridTile
                   isDragging={isDragging}
                   setIsDragging={setIsDragging}
-                  title={rest.i}
                   widgetType={widgetType}
                   // these will be dynamically calculated once the dimensions are calculated
                   widgetConfig={{ ...rest, colWidth: 1200 / 4, config }}
