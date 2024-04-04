@@ -181,7 +181,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
       <Divider />
       <CardBody
         className={classNames('pf-v5-u-p-0', {
-          [`${scope}-${module}`]: scope && module,
+          [`${scope}-${widgetType}`]: scope && module,
         })}
       >
         {node}

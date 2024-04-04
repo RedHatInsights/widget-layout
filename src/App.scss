@@ -12,3 +12,12 @@
 .pf-v5-c-page__main-section {
   border-bottom: 1px solid var(--pf-v5-global--disabled-color--200);
 }
+
+.landing-edge, .landing-rhel, .landing-ansible, .landing-openshift, .landing-quay, .landing-openshift-ai, .landing-openshift-acs, .landing-exploreCapabilities  {    
+  display: flex !important; 
+  overflow: hidden;
+}
+
+.chrome-favoriteServices, .learningResources-learningResources, .notifications-notificationsEvents {
+  overflow-y: auto;
+}
