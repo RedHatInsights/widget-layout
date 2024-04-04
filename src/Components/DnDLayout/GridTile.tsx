@@ -24,16 +24,17 @@ import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
 import { ExtendedLayoutItem, WidgetConfiguration } from '../../api/dashboard-templates';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
-import { BaconIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 import { useAtomValue } from 'jotai';
 import classNames from 'classnames';
+import HeaderIcon from '../Icons/HeaderIcon';
 
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
 export type GridTileProps = React.PropsWithChildren<{
   widgetType: string;
   title: string;
+  icon?: React.ComponentClass;
   setIsDragging: (isDragging: boolean) => void;
   isDragging: boolean;
   setWidgetAttribute: SetWidgetAttribute;
@@ -161,7 +162,7 @@ const GridTile = ({ widgetType, title, isDragging, setIsDragging, setWidgetAttri
       <CardHeader actions={{ actions: headerActions }}>
         <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
           <Icon status="custom" className="pf-v5-u-mr-sm">
-            <BaconIcon />
+            <HeaderIcon icon={widgetConfig.config?.icon} />
           </Icon>
           <CardTitle
             style={{

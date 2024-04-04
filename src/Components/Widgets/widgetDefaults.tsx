@@ -1,6 +1,7 @@
 import { ScalprumComponent } from '@scalprum/react-core';
 import { WidgetMapping } from '../../api/dashboard-templates';
 import React, { Fragment } from 'react';
+import { BellIcon, StarIcon } from '@patternfly/react-icons';
 
 export const getWidget = (widgetMapping: WidgetMapping, type: string) => {
   const mappedWidget = widgetMapping[type];

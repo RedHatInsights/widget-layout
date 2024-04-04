@@ -3,6 +3,7 @@ import {
   Card,
   CardHeader,
   CardTitle,
+  Flex,
   Gallery,
   GalleryItem,
   Icon,
@@ -19,12 +20,18 @@ import { CloseIcon, GripVerticalIcon } from '@patternfly/react-icons';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { getWidget } from '../Widgets/widgetDefaults';
+import HeaderIcon from '../Icons/HeaderIcon';
+import { WidgetConfiguration } from '../../api/dashboard-templates';
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
 }>;
 
-const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: string; widgetType: string }>) => {
+const WidgetWrapper = ({
+  title,
+  widgetType,
+  config,
+}: React.PropsWithChildren<{ title: string; widgetType: string; config?: WidgetConfiguration }>) => {
   const setDropInItem = useSetAtom(currentDropInItemAtom);
   const headerActions = (
     <Tooltip content={<p>Move widget</p>}>
@@ -52,9 +59,15 @@ const WidgetWrapper = ({ title, widgetType }: React.PropsWithChildren<{ title: s
       // eslint-disable-next-line react/no-unknown-property
       unselectable="on"
       draggable={true}
+      className="grid-tile"
     >
       <CardHeader className="pf-v5-u-py-md" actions={{ actions: headerActions }}>
-        <CardTitle>{title}</CardTitle>
+        <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
+          <Icon status="custom" className="pf-v5-u-mr-sm">
+            <HeaderIcon icon={config?.icon} />
+          </Icon>
+          <CardTitle>{title}</CardTitle>
+        </Flex>
       </CardHeader>
     </Card>
   );
@@ -90,10 +103,10 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         </SplitItem>
       </Split>
       <Gallery className="widg-l-gallery pf-v5-u-pt-sm" hasGutter>
-        {Object.keys(widgetMapping).map((type, i) => {
+        {Object.entries(widgetMapping).map(([type, { config }], i) => {
           return (
             <GalleryItem key={i}>
-              <WidgetWrapper widgetType={type} title={type}>
+              <WidgetWrapper widgetType={type} title={type} config={config}>
                 {getWidget(widgetMapping, type)}
               </WidgetWrapper>
             </GalleryItem>
