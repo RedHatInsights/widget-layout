@@ -13,11 +13,25 @@
   border-bottom: 1px solid var(--pf-v5-global--disabled-color--200);
 }
 
-.landing-edge, .landing-rhel, .landing-ansible, .landing-openshift, .landing-quay, .landing-openshift-ai, .landing-openshift-acs, .landing-exploreCapabilities  {    
+/* stylelint-disable */
+.landing-exploreCapabilities {
+  container-type: inline-size; 
+  @container (width < 1000px) { 
+    .pf-v5-l-split__item img {
+      display: none;
+    }
+  }
+}
+/* stylelint-enable */
+
+// scrollable widgets
+.chrome-favoriteServices, .learningResources-learningResources, .notifications-notificationsEvents, .landing-recentlyVisited {
+  overflow-y: auto;
+}
+
+// non-scrollable widgets using flex
+.landing-edge, .landing-rhel, .landing-ansible, .landing-openshift, .landing-quay, .landing-openshift-ai, .landing-openshift-acs {    
   display: flex; 
   overflow: hidden;
 }
 
-.chrome-favoriteServices, .learningResources-learningResources, .notifications-notificationsEvents {
-  overflow-y: auto;
-}
