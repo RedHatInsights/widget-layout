@@ -30,3 +30,14 @@ Update `config/dev.webpack.config.js` according to your application URL. [Read m
 ### Testing
 
 `npm run verify` will run `npm run lint` (eslint) and `npm test` (Jest)
+
+### Run locally with chrome service BE
+
+!Prerequisites!
+Podman, podman-compose and go (ideally [gvm](https://github.com/moovweb/gvm)) installed
+
+1. Pull [chrome-services repository](https://github.com/RedHatInsights/chrome-service-backend)
+2. Run `make infra` in chrome-services repository
+3. Create .env file and copy default values as mentioned in [chrome-service-backend#local-testing](https://github.com/RedHatInsights/chrome-service-backend?tab=readme-ov-file#local-testing) in chrome-services repository
+4. Run `go run main.go` in chrome-services repository
+5. Run `CONFIG_PORT=8000 npm run start` in widget-layout reposiroty
