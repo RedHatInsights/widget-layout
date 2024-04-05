@@ -14,6 +14,7 @@ import {
   Icon,
   MenuToggle,
   MenuToggleElement,
+  Skeleton,
   Tooltip,
 } from '@patternfly/react-core';
 import { CompressIcon, EllipsisVIcon, ExpandIcon, GripVerticalIcon, LockIcon, MinusCircleIcon, UnlockIcon } from '@patternfly/react-icons';
@@ -47,12 +48,13 @@ export type GridTileProps = React.PropsWithChildren<{
 
 const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, widgetConfig, removeWidget }: GridTileProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const { headerLink } = widgetConfig.config || {};
   const hasHeader = headerLink && headerLink.href && headerLink.title;
 
   const { node, module, scope } = useMemo(() => {
-    return getWidget(widgetMapping, widgetType);
+    return getWidget(widgetMapping, widgetType, () => setIsLoaded(true));
   }, [widgetMapping, widgetType]);
 
   const dropdownItems = useMemo(() => {
@@ -161,17 +163,21 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
       <CardHeader actions={{ actions: headerActions }}>
         <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
           <Icon status="custom" className="pf-v5-u-mr-sm">
-            <HeaderIcon icon={widgetConfig.config?.icon} />
+            {isLoaded ? <HeaderIcon icon={widgetConfig?.config?.icon} /> : <Skeleton shape="circle" width="25px" height="25px" />}
           </Icon>
-          <CardTitle
-            style={{
-              userSelect: isDragging ? 'none' : 'auto',
-            }}
-            className="pf-v5-u-flex-wrap pf-v5-u-text-break-word"
-          >
-            {widgetConfig?.config?.title || widgetType}
-          </CardTitle>
-          {hasHeader && (
+          {isLoaded ? (
+            <CardTitle
+              style={{
+                userSelect: isDragging ? 'none' : 'auto',
+              }}
+              className="pf-v5-u-flex-wrap pf-v5-u-text-break-word"
+            >
+              {widgetConfig?.config?.title || widgetType}
+            </CardTitle>
+          ) : (
+            <Skeleton width="50%" />
+          )}
+          {hasHeader && isLoaded && (
             <Button className="widget-header-link pf-v5-u-p-0" variant="link" onClick={() => window.open(headerLink.href, '_blank')}>
               {headerLink.title}
             </Button>

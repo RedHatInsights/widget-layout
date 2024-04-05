@@ -26,17 +26,8 @@ import useCurrentUser from '../../hooks/useCurrentUser';
 import { useDispatch } from 'react-redux';
 import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
 import { debounce, isEqual } from 'lodash';
-import {
-  Button,
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateBody,
-  EmptyStateHeader,
-  EmptyStateIcon,
-  EmptyStateVariant,
-  PageSection,
-} from '@patternfly/react-core';
-import { ExternalLinkAltIcon, GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
+import { EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStateVariant, PageSection } from '@patternfly/react-core';
+import { GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 
 export const dropping_elem_id = '__dropping-elem__';
@@ -76,6 +67,7 @@ const LayoutEmptyState = () => {
 const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [layout, setLayout] = useAtom(layoutAtom);
   const [prevLayout, setPrevLayout] = useAtom(prevLayoutAtom);
   const [layoutVariant, setLayoutVariant] = useAtom(layoutVariantAtom);
@@ -327,6 +319,9 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
             description: 'Try reloading the page.',
           })
         );
+      })
+      .finally(() => {
+        setIsLoaded(true);
       });
   }, [currentToken, templateId]);
 
@@ -334,7 +329,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
     // {/* relative position is required for the grid layout to properly calculate
     // child translation while dragging is in progress */}
     <div style={{ position: 'relative' }} ref={layoutRef}>
-      {activeLayout.length === 0 && !currentDropInItem && <LayoutEmptyState />}
+      {activeLayout.length === 0 && !currentDropInItem && isLoaded && <LayoutEmptyState />}
       <ResponsiveGridLayout
         className="layout"
         draggableHandle=".drag-handle"
