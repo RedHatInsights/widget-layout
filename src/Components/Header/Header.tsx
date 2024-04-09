@@ -34,8 +34,10 @@ import { CheckIcon, ExclamationCircleIcon, PlusCircleIcon, TimesIcon } from '@pa
 import React from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-import { initialLayout, isDefaultLayout, layoutAtom, prevLayoutAtom } from '../../state/layoutAtom';
+import { activeItemAtom, initialLayout, isDefaultLayout, layoutAtom, layoutVariantAtom, prevLayoutAtom } from '../../state/layoutAtom';
 import useCurrentUser from '../../hooks/useCurrentUser';
+import { DashboardTemplate, decodeCustomLayout, encodeCustomLayout, mapTemplateConfigToExtendedTemplateConfig } from '../../api/dashboard-templates';
+import { templateAtom, templateIdAtom } from '../../state/templateAtom';
 
 const Controls = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -44,27 +46,59 @@ const Controls = () => {
   const toggleOpen = useSetAtom(drawerExpandedAtom);
   const setPrevLayout = useSetAtom(prevLayoutAtom);
   const [layout, setLayout] = useAtom(layoutAtom);
+  const [layoutVariant, setLayoutVariant] = useAtom(layoutVariantAtom);
   const CONSOLE_DEFAULT = 'console-default';
   const CUSTOM = 'custom';
   const [checked, setChecked] = React.useState(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+  const [template, setTemplate] = useAtom(templateAtom);
+  const [templateId, setTemplateId] = useAtom(templateIdAtom);
+  const [activeItem, setActiveItem] = useAtom(activeItemAtom);
+  const { currentToken } = useCurrentUser();
 
   const onToggleClick = () => {
     setIsOpen(!isOpen);
   };
 
-  const onCustomConfigSubmit = (e: { preventDefault: () => void }) => {
+  const encodeLayout = async () => {
+    console.log(layout);
+    console.log(templateId);
+    const encodedString = await encodeCustomLayout(templateId, currentToken).then((encodedLayout) => {
+      console.log(encodedLayout);
+      if (!encodedLayout) {
+        throw new Error('Error encoding string');
+      }
+      return encodedLayout;
+    });
+    return encodedString;
+  };
+
+  const decodeLayout = async (encodedString: string) => {
+    const decodedLayout = await decodeCustomLayout(encodedString, currentToken).then((layout) => {
+      if (!layout) {
+        throw new Error('Error decoding layout string');
+      }
+      console.log(layout);
+      return layout;
+    });
+    return decodedLayout;
+  };
+
+  const onCustomConfigSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (!customValue) {
       setCustomValueValidationError('Input value is required.');
       return;
     }
     try {
-      const layout = JSON.parse(customValue);
+      const newLayout = await decodeLayout(customValue);
+      const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(newLayout.templateConfig);
+      setTemplate(extendedTemplateConfig);
+      setPrevLayout(layout);
+      setLayout(extendedTemplateConfig[layoutVariant]);
+      setIsOpen(false);
       if (isDefaultLayout(layout)) {
         setChecked(CONSOLE_DEFAULT);
       }
-      setLayout(layout);
-      setIsOpen(false);
       setCustomValue('');
     } catch (e) {
       console.error(e);
@@ -81,11 +115,22 @@ const Controls = () => {
     setCustomValue('');
   };
 
+  const onCopyEncodedString = async () => {
+    const encodedString = await encodeLayout();
+    navigator.clipboard.writeText(encodedString);
+  };
+
   return (
     <ToolbarGroup className="pf-v5-u-flex-direction-column-reverse pf-v5-u-flex-direction-row-reverse-on-md pf-v5-u-flex-direction-row-on-lg">
       <Flex className=" pf-v5-u-flex-nowrap pf-v5-u-flex-direction-row-reverse pf-v5-u-flex-direction-row-on-lg">
         <ToolbarItem spacer={{ default: 'spacerNone' }}>
-          <ClipboardCopy isCode hoverTip="Copy current configuration string" position="left" clickTip="Configuration string copied to clipboard">
+          <ClipboardCopy
+            isCode
+            hoverTip="Copy current configuration string"
+            position="left"
+            clickTip="Configuration string copied to clipboard"
+            onCopy={onCopyEncodedString}
+          >
             {JSON.stringify(layout)}
           </ClipboardCopy>
         </ToolbarItem>

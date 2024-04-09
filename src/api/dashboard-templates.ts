@@ -173,6 +173,27 @@ export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTem
   return templates.find((itm) => itm.default === true);
 };
 
+export const encodeCustomLayout = async (templateId: DashboardTemplate['id'], token: string): Promise<string> => {
+  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}/encode`, {
+    method: 'GET',
+    headers: getRequestHeaders(token),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+};
+
+export const decodeCustomLayout = async (encodedTemplate: string, token: string): Promise<DashboardTemplate> => {
+  const resp = await fetch('/api/chrome-service/v1/dashboard-templates/decode', {
+    method: 'POST',
+    headers: getRequestHeaders(token),
+    body: JSON.stringify({ encodedTemplate }),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+};
+
 export const mapWidgetDefaults = (id: string): [string, string] => {
   const [widgetType, i] = id.split(widgetIdSeparator);
   return [widgetType, i];
