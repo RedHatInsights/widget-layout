@@ -5,7 +5,7 @@ import ResizeHandleIcon from './resize-handle.svg';
 import GridTile, { SetWidgetAttribute } from './GridTile';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isWidgetType } from '../Widgets/widgetTypes';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { activeItemAtom, layoutAtom, layoutVariantAtom } from '../../state/layoutAtom';
@@ -46,7 +46,7 @@ const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement
 };
 
 const LayoutEmptyState = () => {
-  const [, setDrawerExpanded] = useAtom(drawerExpandedAtom);
+  const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
 
   useEffect(() => {
     setDrawerExpanded(true);
