@@ -362,7 +362,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
                   boxShadow: activeItem === rest.i ? '0 0 2px 2px #2684FF' : 'none',
                   ...(activeItem === rest.i ? { outline: 'none' } : {}),
                 }}
-                className={`widget-columns-${rest.w}`}
+                className={`widget-columns-${rest.w} widget-rows-${rest.h}`}
               >
                 <GridTile
                   isDragging={isDragging}
