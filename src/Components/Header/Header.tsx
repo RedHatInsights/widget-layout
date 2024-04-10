@@ -34,7 +34,7 @@ import { CheckIcon, ExclamationCircleIcon, PlusCircleIcon, TimesIcon } from '@pa
 import React from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-import { initialLayout, isDefaultLayout, layoutAtom, prevLayoutAtom } from '../../state/layoutAtom';
+import { initialLayout, isDefaultLayout, layoutAtom } from '../../state/layoutAtom';
 import useCurrentUser from '../../hooks/useCurrentUser';
 
 const Controls = () => {
@@ -42,7 +42,6 @@ const Controls = () => {
   const [customValue, setCustomValue] = React.useState('');
   const [customValueValidationError, setCustomValueValidationError] = React.useState('');
   const toggleOpen = useSetAtom(drawerExpandedAtom);
-  const setPrevLayout = useSetAtom(prevLayoutAtom);
   const [layout, setLayout] = useAtom(layoutAtom);
   const CONSOLE_DEFAULT = 'console-default';
   const CUSTOM = 'custom';
@@ -188,7 +187,6 @@ const Controls = () => {
         <Button
           onClick={() => {
             toggleOpen((prev) => !prev);
-            setPrevLayout(layout);
           }}
           variant="secondary"
           icon={<PlusCircleIcon />}
