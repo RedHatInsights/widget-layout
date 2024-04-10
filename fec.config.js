@@ -30,10 +30,7 @@ module.exports = {
     moduleName: 'widgetLayout',
     exposes: {
       './RootApp': path.resolve(__dirname, './src/AppEntry.tsx'),
-      // TODO these will likely need to be restructured to be more consumable
-      './WidgetLayout': path.resolve(__dirname, './src/Components/DnDLayout/GridLayout.tsx'),
-      './WidgetDrawer': path.resolve(__dirname, './src/Components/WidgetDrawer/WidgetDrawer.tsx'),
-      './WidgetHeader': path.resolve(__dirname, './src/Components/Header/Header.tsx'),
+      './WidgetLayout': path.resolve(__dirname, './src/Routes/Default/Default.tsx'),
     },
     exclude: ['@patternfly/react-core', 'jotai', 'react', 'react-dom', 'react-redux', 'react-router-dom'],
     shared: [
