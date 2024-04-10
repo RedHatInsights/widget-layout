@@ -29,6 +29,7 @@ import { addNotification } from '@redhat-cloud-services/frontend-components-noti
 import { EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStateVariant, PageSection } from '@patternfly/react-core';
 import { GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
+import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 
 export const dropping_elem_id = '__dropping-elem__';
 
@@ -45,6 +46,12 @@ const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement
 };
 
 const LayoutEmptyState = () => {
+  const [, setDrawerExpanded] = useAtom(drawerExpandedAtom);
+
+  useEffect(() => {
+    setDrawerExpanded(true);
+  }, []);
+
   return (
     <PageSection className="empty-layout pf-v5-u-p-0">
       <EmptyState variant={EmptyStateVariant.lg} className="pf-v5-u-p-sm">
