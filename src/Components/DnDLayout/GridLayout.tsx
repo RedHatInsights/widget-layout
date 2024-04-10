@@ -8,11 +8,11 @@ import { isWidgetType } from '../Widgets/widgetTypes';
 import { useAtom, useAtomValue } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
-import { activeItemAtom, layoutAtom, layoutVariantAtom, prevLayoutAtom } from '../../state/layoutAtom';
+import { activeItemAtom, layoutAtom, layoutVariantAtom } from '../../state/layoutAtom';
 import { templateAtom, templateIdAtom } from '../../state/templateAtom';
+import DebouncePromise from 'awesome-debounce-promise';
 import React from 'react';
 import {
-  DashboardTemplate,
   ExtendedLayoutItem,
   LayoutTypes,
   Variants,
@@ -26,7 +26,6 @@ import {
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { useDispatch } from 'react-redux';
 import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
-import { debounce, isEqual } from 'lodash';
 import { EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStateVariant, PageSection } from '@patternfly/react-core';
 import { GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
@@ -65,12 +64,15 @@ const LayoutEmptyState = () => {
   );
 };
 
+const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplate, 2500, {
+  onlyResolvesLast: true,
+});
+
 const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { isLayoutLocked?: boolean; layoutType?: LayoutTypes }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [layout, setLayout] = useAtom(layoutAtom);
-  const [prevLayout, setPrevLayout] = useAtom(prevLayoutAtom);
   const [layoutVariant, setLayoutVariant] = useAtom(layoutVariantAtom);
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
@@ -145,7 +147,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     [isLayoutLocked, layout]
   );
 
-  const onLayoutChange: ResponsiveProps['onLayoutChange'] = (currentLayout: Layout[]) => {
+  const onLayoutChange: ResponsiveProps['onLayoutChange'] = async (currentLayout: Layout[]) => {
     if (isInitialRender) {
       setIsInitialRender(false);
       return;
@@ -153,36 +155,33 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
       return;
     }
-    // TODO in certain scenarios prevLayout contains additional undefined metadata on each widget causing this check to fail and multiple patches for dropping widgets in
-    if (isEqual(prevLayout, layout)) {
-      return;
-    }
-    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: currentLayout });
-    const debouncedPatchDashboardTemplate = debounce(() => {
-      patchDashboardTemplate(templateId, { templateConfig: data }, currentToken)
-        .then((template: DashboardTemplate) => {
-          const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
-          setTemplate(extendedTemplateConfig);
-          setPrevLayout(layout);
-          setLayout(extendedTemplateConfig[layoutVariant]);
-        })
-        .catch((err) => {
-          console.error(err);
-          dispatch(
-            addNotification({
-              variant: 'danger',
-              title: 'Failed to patch dashboard configuration',
-              description: 'Your dashboard changes were unable to be saved.',
-            })
-          );
-        });
-    }, 500);
 
-    debouncedPatchDashboardTemplate();
+    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: currentLayout });
+
+    try {
+      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data }, currentToken);
+      if (!template) {
+        return;
+      }
+
+      const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
+      setTemplate(extendedTemplateConfig);
+      setLayout(extendedTemplateConfig[layoutVariant]);
+    } catch (error) {
+      console.error(error);
+      dispatch(
+        addNotification({
+          variant: 'danger',
+          title: 'Failed to patch dashboard configuration',
+          description: 'Your dashboard changes were unable to be saved.',
+        })
+      );
+    }
   };
 
-  const onBreakpointChange: ResponsiveProps['onBreakpointChange'] = (newBreakpoint) => {
-    setLayoutVariant(newBreakpoint as Variants);
+  const onBreakpointChange: ResponsiveProps['onBreakpointChange'] = (newBreakpoint: Variants) => {
+    setLayoutVariant(newBreakpoint);
+    setLayout(template[newBreakpoint]);
   };
 
   const onKeyUp = (event: KeyboardEvent<HTMLDivElement>, id: string) => {
@@ -195,6 +194,32 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         }
         return id;
       });
+    }
+  };
+
+  const updateLayout = async (updatedItem: ExtendedLayoutItem) => {
+    setLayout((prev) => prev.map((layoutItem) => (layoutItem.i === activeItem ? updatedItem : layoutItem)));
+
+    if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
+      return;
+    }
+
+    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: layout });
+
+    try {
+      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data }, currentToken);
+      const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
+      setTemplate(extendedTemplateConfig);
+      setLayout(extendedTemplateConfig[layoutVariant]);
+    } catch (error) {
+      console.error(error);
+      dispatch(
+        addNotification({
+          variant: 'danger',
+          title: 'Failed to patch dashboard configuration',
+          description: 'Your dashboard changes were unable to be saved.',
+        })
+      );
     }
   };
 
@@ -211,37 +236,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
 
       e.stopPropagation();
       e.preventDefault();
-
-      const updateLayout = (updatedItem: ExtendedLayoutItem) => {
-        setLayout((prev) => prev.map((layoutItem) => (layoutItem.i === activeItem ? updatedItem : layoutItem)));
-
-        if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
-          return;
-        }
-
-        const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: layout });
-        const debouncedPatchDashboardTemplate = debounce(() => {
-          patchDashboardTemplate(templateId, { templateConfig: data }, currentToken)
-            .then((template: DashboardTemplate) => {
-              const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
-              setTemplate(extendedTemplateConfig);
-              setPrevLayout(layout);
-              setLayout(extendedTemplateConfig[layoutVariant]);
-            })
-            .catch((err) => {
-              console.error(err);
-              dispatch(
-                addNotification({
-                  variant: 'danger',
-                  title: 'Failed to patch dashboard configuration',
-                  description: 'Your dashboard changes were unable to be saved.',
-                })
-              );
-            });
-        }, 500);
-
-        debouncedPatchDashboardTemplate();
-      };
 
       if (e.code === 'ArrowUp') {
         updateLayout({
@@ -312,7 +306,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         setLayoutVariant(targetVariant);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         dispatch(
           addNotification({
             variant: 'danger',
