@@ -6,10 +6,10 @@ import { lockedLayoutAtom } from '../../state/lockedLayoutAtom';
 import Header from '../../Components/Header/Header';
 import React, { useEffect } from 'react';
 import useCurrentUser from '../../hooks/useCurrentUser';
-import { getWidgetMapping } from '../../api/dashboard-templates';
+import { LayoutTypes, getWidgetMapping } from '../../api/dashboard-templates';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 
-const DefaultRoute = () => {
+const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
   const setWidgetMapping = useSetAtom(widgetMappingAtom);
   const { currentToken } = useCurrentUser();
@@ -32,7 +32,7 @@ const DefaultRoute = () => {
       <Header />
       <AddWidgetDrawer dismissible={false}>
         <PageSection className="pf-v5-u-p-md pf-v5-u-p-lg-on-sm">
-          <GridLayout isLayoutLocked={isLayoutLocked} />
+          <GridLayout isLayoutLocked={isLayoutLocked} {...props} />
         </PageSection>
       </AddWidgetDrawer>
     </>

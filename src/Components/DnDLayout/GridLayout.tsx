@@ -14,6 +14,7 @@ import React from 'react';
 import {
   DashboardTemplate,
   ExtendedLayoutItem,
+  LayoutTypes,
   Variants,
   getDashboardTemplates,
   getDefaultTemplate,
@@ -64,7 +65,7 @@ const LayoutEmptyState = () => {
   );
 };
 
-const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) => {
+const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { isLayoutLocked?: boolean; layoutType?: LayoutTypes }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -287,7 +288,7 @@ const GridLayout = ({ isLayoutLocked = false }: { isLayoutLocked?: boolean }) =>
       return;
     }
     // TODO template type should be pulled from app config for reusability
-    getDashboardTemplates(currentToken, 'landingPage')
+    getDashboardTemplates(currentToken, layoutType)
       .then((templates) => {
         const defaultTemplate = getDefaultTemplate(templates);
         if (!defaultTemplate) {
