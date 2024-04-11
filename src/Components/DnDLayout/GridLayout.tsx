@@ -284,11 +284,11 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     // TODO template type should be pulled from app config for reusability
     getDashboardTemplates(currentToken, layoutType)
       .then((templates) => {
-        const defaultTemplate = getDefaultTemplate(templates);
-        if (!defaultTemplate) {
-          throw new Error('No default template found');
+        const customDefaultTemplate = getDefaultTemplate(templates);
+        if (!customDefaultTemplate) {
+          throw new Error('No custom default template found');
         }
-        const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(defaultTemplate.templateConfig);
+        const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(customDefaultTemplate.templateConfig);
         const currentWidth = layoutRef?.current?.clientWidth || document.body.clientWidth;
         let targetVariant: Variants;
         if (currentWidth > breakpoints.lg) {
@@ -301,7 +301,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
           targetVariant = 'sm';
         }
         setTemplate(extendedTemplateConfig);
-        setTemplateId(defaultTemplate.id);
+        setTemplateId(customDefaultTemplate.id);
         setLayout(extendedTemplateConfig[targetVariant]);
         setLayoutVariant(targetVariant);
       })
