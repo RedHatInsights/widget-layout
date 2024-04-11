@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Reducer } from 'redux';
 
 import Routes from './Routes';
-import './App.scss';
 
 import { getRegistry } from '@redhat-cloud-services/frontend-components-utilities/Registry';
 import NotificationsPortal from '@redhat-cloud-services/frontend-components-notifications/NotificationPortal';

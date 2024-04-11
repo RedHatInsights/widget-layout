@@ -8,6 +8,7 @@ import React, { useEffect } from 'react';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { LayoutTypes, getWidgetMapping } from '../../api/dashboard-templates';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
+import '../../App.scss';
 
 const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
@@ -28,14 +29,14 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   }, [currentToken]);
 
   return (
-    <>
+    <div className="widgetLayout">
       <Header />
       <AddWidgetDrawer dismissible={false}>
         <PageSection className="pf-v5-u-p-md pf-v5-u-p-lg-on-sm">
           <GridLayout isLayoutLocked={isLayoutLocked} {...props} />
         </PageSection>
       </AddWidgetDrawer>
-    </>
+    </div>
   );
 };
 
