@@ -145,6 +145,16 @@ export async function getWidgetMapping(token: string): Promise<WidgetMapping> {
   return json.data;
 }
 
+export const resetDashboardTemplate = async (type: LayoutTypes, token: string): Promise<DashboardTemplate> => {
+  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/base-template/fork${type ? `?dashboard=${type}` : ''}`, {
+    method: 'GET',
+    headers: getRequestHeaders(token),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+};
+
 export const patchDashboardTemplate = async (
   templateId: DashboardTemplate['id'],
   data: { templateConfig: PartialTemplateConfig },

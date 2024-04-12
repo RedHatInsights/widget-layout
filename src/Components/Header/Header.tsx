@@ -3,6 +3,7 @@ import './Header.scss';
 import {
   Button,
   ButtonType,
+  ButtonVariant,
   ClipboardCopy,
   Dropdown,
   DropdownGroup,
@@ -30,21 +31,24 @@ import {
   ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
-import { CheckIcon, ExclamationCircleIcon, PlusCircleIcon, TimesIcon } from '@patternfly/react-icons';
 import React from 'react';
+import { CheckIcon, ExclamationCircleIcon, PlusCircleIcon, TimesIcon } from '@patternfly/react-icons';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-import { activeItemAtom, initialLayout, isDefaultLayout, layoutAtom, layoutVariantAtom, prevLayoutAtom } from '../../state/layoutAtom';
+import { activeItemAtom, initialLayout, isDefaultLayout, layoutAtom, layoutVariantAtom } from '../../state/layoutAtom';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { DashboardTemplate, decodeCustomLayout, encodeCustomLayout, mapTemplateConfigToExtendedTemplateConfig } from '../../api/dashboard-templates';
 import { templateAtom, templateIdAtom } from '../../state/templateAtom';
 
+import { resetDashboardTemplate } from '../../api/dashboard-templates';
+import { WarningModal } from '@patternfly/react-component-groups';
+
 const Controls = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isCustomMenuOpen, setIsCustomMenuOpen] = React.useState(false);
   const [customValue, setCustomValue] = React.useState('');
   const [customValueValidationError, setCustomValueValidationError] = React.useState('');
   const toggleOpen = useSetAtom(drawerExpandedAtom);
-  const setPrevLayout = useSetAtom(prevLayoutAtom);
   const [layout, setLayout] = useAtom(layoutAtom);
   const [layoutVariant, setLayoutVariant] = useAtom(layoutVariantAtom);
   const CONSOLE_DEFAULT = 'console-default';
@@ -56,7 +60,7 @@ const Controls = () => {
   const { currentToken } = useCurrentUser();
 
   const onToggleClick = () => {
-    setIsOpen(!isOpen);
+    setIsCustomMenuOpen(!isCustomMenuOpen);
   };
 
   const encodeLayout = async () => {
@@ -93,9 +97,8 @@ const Controls = () => {
       const newLayout = await decodeLayout(customValue);
       const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(newLayout.templateConfig);
       setTemplate(extendedTemplateConfig);
-      setPrevLayout(layout);
       setLayout(extendedTemplateConfig[layoutVariant]);
-      setIsOpen(false);
+      setIsCustomMenuOpen(false);
       if (isDefaultLayout(layout)) {
         setChecked(CONSOLE_DEFAULT);
       }
@@ -111,7 +114,7 @@ const Controls = () => {
     e.preventDefault();
     setChecked(CONSOLE_DEFAULT);
     setLayout(initialLayout);
-    setIsOpen(false);
+    setIsCustomMenuOpen(false);
     setCustomValue('');
   };
 
@@ -121,8 +124,46 @@ const Controls = () => {
   };
 
   return (
-    <ToolbarGroup className="pf-v5-u-flex-direction-column-reverse pf-v5-u-flex-direction-row-reverse-on-md pf-v5-u-flex-direction-row-on-lg">
-      <Flex className=" pf-v5-u-flex-nowrap pf-v5-u-flex-direction-row-reverse pf-v5-u-flex-direction-row-on-lg">
+    <>
+      <WarningModal
+        withCheckbox
+        isOpen={isOpen}
+        title="Reset layout?"
+        checkboxLabel="I understand that this action cannot be undone"
+        confirmButtonLabel="Reset layout"
+        confirmButtonVariant={ButtonVariant.danger}
+        onClose={() => setIsOpen(false)}
+        onConfirm={() => {
+          setIsOpen(false);
+          resetDashboardTemplate('landingPage', currentToken).then(() => {
+            setTemplateId(NaN);
+          });
+        }}
+      >
+        All your widget customizations will be discarded.
+      </WarningModal>
+      <ToolbarGroup className="pf-v5-u-flex-direction-column-reverse pf-v5-u-flex-direction-row-reverse-on-md pf-v5-u-flex-direction-row-on-lg">
+        <ToolbarItem>
+          <Button
+            onClick={() => {
+              setIsOpen(true);
+            }}
+            variant={ButtonVariant.link}
+          >
+            Reset to default
+          </Button>
+        </ToolbarItem>
+        <ToolbarItem className="pf-v5-u-pr-sm pf-v5-u-pr-0-on-lg pf-v5-u-pb-xs pf-v5-u-pb-0-on-lg">
+          <Button
+            onClick={() => {
+              toggleOpen((prev) => !prev);
+            }}
+            variant="secondary"
+            icon={<PlusCircleIcon />}
+          >
+            Add widgets
+          </Button>
+        </ToolbarItem>
         <ToolbarItem spacer={{ default: 'spacerNone' }}>
           <ClipboardCopy
             isCode
@@ -138,10 +179,10 @@ const Controls = () => {
           <Stack>
             <StackItem>
               <Dropdown
-                isOpen={isOpen}
+                isOpen={isCustomMenuOpen}
                 activeItemId={0}
                 onOpenChange={(isOpen: boolean) => {
-                  setIsOpen(isOpen);
+                  setIsCustomMenuOpen(isOpen);
                   setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
                   setCustomValueValidationError('');
                 }}
@@ -211,7 +252,7 @@ const Controls = () => {
                               variant="plain"
                               type={ButtonType.reset}
                               onClick={() => {
-                                setIsOpen(false);
+                                setIsCustomMenuOpen(false);
                                 setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
                                 setCustomValueValidationError('');
                               }}
@@ -228,20 +269,8 @@ const Controls = () => {
             </StackItem>
           </Stack>
         </ToolbarItem>
-      </Flex>
-      <ToolbarItem className="pf-v5-u-pr-sm pf-v5-u-pr-0-on-lg pf-v5-u-pb-xs pf-v5-u-pb-0-on-lg">
-        <Button
-          onClick={() => {
-            toggleOpen((prev) => !prev);
-            setPrevLayout(layout);
-          }}
-          variant="secondary"
-          icon={<PlusCircleIcon />}
-        >
-          Add widgets
-        </Button>
-      </ToolbarItem>
-    </ToolbarGroup>
+      </ToolbarGroup>
+    </>
   );
 };
 
