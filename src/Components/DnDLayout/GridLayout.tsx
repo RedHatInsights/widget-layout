@@ -331,7 +331,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         layouts={template}
         breakpoints={breakpoints}
         cols={{ xl: 4, lg: 3, md: 2, sm: 1 }}
-        rowHeight={88}
+        rowHeight={56}
         //width={1200}
         isDraggable={!isLayoutLocked}
         isResizable={!isLayoutLocked}
