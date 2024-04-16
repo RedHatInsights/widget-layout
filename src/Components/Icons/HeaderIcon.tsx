@@ -7,6 +7,7 @@ import AnsibleIcon from './images/AnsibleIcon';
 import ACSIcon from './images/ACSIcon';
 import QuayIcon from './images/QuayIcon';
 import OpenShiftAiIcon from './images/OpenShiftAIIcon';
+import HeadsetIcon from './images/HeadsetIcon';
 
 const PlaceholderIcon = CogsIcon;
 
@@ -23,6 +24,7 @@ export enum WidgetIcons {
   QuayIcon = 'QuayIcon',
   ACSIcon = 'ACSIcon',
   OpenShiftAiIcon = 'OpenShiftAiIcon',
+  HeadsetIcon = 'HeadsetIcon',
 }
 
 const iconEnum: { [key in WidgetIcons]: React.ComponentType } = {
@@ -38,6 +40,7 @@ const iconEnum: { [key in WidgetIcons]: React.ComponentType } = {
   QuayIcon,
   ACSIcon,
   OpenShiftAiIcon,
+  HeadsetIcon,
 };
 
 const HeaderIcon = ({ icon }: { icon?: string }) => {
