@@ -19,6 +19,7 @@ import {
   getDashboardTemplates,
   getDefaultTemplate,
   getWidgetIdentifier,
+  isOrgAdminWidgetPermissionRequired,
   mapPartialExtendedTemplateConfigToPartialTemplateConfig,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplate,
@@ -78,7 +79,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
   const [activeItem, setActiveItem] = useAtom(activeItemAtom);
   const layoutRef = useRef<HTMLDivElement>(null);
-  const { currentToken } = useCurrentUser();
+  const { currentToken, currentUser } = useCurrentUser();
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const dispatch = useDispatch();
 
@@ -348,10 +349,14 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         onLayoutChange={onLayoutChange}
         onBreakpointChange={onBreakpointChange}
       >
-        {
+        {activeLayout
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          activeLayout.map(({ widgetType, title, ...rest }, index) => {
+          .map(({ widgetType, title, ...rest }, index) => {
             const { config } = getWidget(widgetMapping, widgetType);
+            const requiresOrgAdmin = isOrgAdminWidgetPermissionRequired(config);
+            if (requiresOrgAdmin && !currentUser?.is_org_admin) {
+              return null;
+            }
             return (
               <div
                 key={rest.i}
@@ -378,7 +383,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
               </div>
             );
           })
-        }
+          .filter((layoutItem) => layoutItem !== null)}
       </ResponsiveGridLayout>
     </div>
   );
