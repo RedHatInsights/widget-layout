@@ -31,19 +31,20 @@ import {
   ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CheckIcon, ExclamationCircleIcon, PlusCircleIcon, TimesIcon } from '@patternfly/react-icons';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-import { activeItemAtom, initialLayout, isDefaultLayout, layoutAtom, layoutVariantAtom } from '../../state/layoutAtom';
+import { activeItemAtom, isDefaultLayout, layoutAtom, layoutVariantAtom } from '../../state/layoutAtom';
 import useCurrentUser from '../../hooks/useCurrentUser';
-import { DashboardTemplate, decodeCustomLayout, encodeCustomLayout, mapTemplateConfigToExtendedTemplateConfig } from '../../api/dashboard-templates';
+import { decodeCustomLayout, encodeCustomLayout, mapTemplateConfigToExtendedTemplateConfig } from '../../api/dashboard-templates';
 import { templateAtom, templateIdAtom } from '../../state/templateAtom';
 
 import { resetDashboardTemplate } from '../../api/dashboard-templates';
 import { WarningModal } from '@patternfly/react-component-groups';
 
 const Controls = () => {
+  type Validate = 'default' | 'error' | 'success';
   const [isOpen, setIsOpen] = React.useState(false);
   const [isCustomMenuOpen, setIsCustomMenuOpen] = React.useState(false);
   const [customValue, setCustomValue] = React.useState('');
@@ -54,6 +55,7 @@ const Controls = () => {
   const CONSOLE_DEFAULT = 'console-default';
   const CUSTOM = 'custom';
   const [checked, setChecked] = React.useState(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+  const [customLayoutValidated, setCustomLayoutValidated] = React.useState<Validate>('default');
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
   const [activeItem, setActiveItem] = useAtom(activeItemAtom);
@@ -90,6 +92,7 @@ const Controls = () => {
   const onCustomConfigSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (!customValue) {
+      setCustomLayoutValidated('error');
       setCustomValueValidationError('Input value is required.');
       return;
     }
@@ -105,23 +108,30 @@ const Controls = () => {
       setCustomValue('');
     } catch (e) {
       console.error(e);
+      setCustomLayoutValidated('error');
       setCustomValueValidationError('Invalid input value.');
       return;
     }
-  };
-
-  const onDefaultConfigSubmit = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setChecked(CONSOLE_DEFAULT);
-    setLayout(initialLayout);
-    setIsCustomMenuOpen(false);
-    setCustomValue('');
   };
 
   const onCopyEncodedString = async () => {
     const encodedString = await encodeLayout();
     navigator.clipboard.writeText(encodedString);
   };
+
+  const isCustomLayoutValid = (name: string) => {
+    if (name === undefined || name.trim() === '') {
+      setCustomLayoutValidated('default');
+    } else if (!/^\S*$/.test(name.trim())) {
+      setCustomLayoutValidated('error');
+    } else {
+      setCustomLayoutValidated('success');
+    }
+  };
+
+  useEffect(() => {
+    isCustomLayoutValid(customValue);
+  }, [customValue]);
 
   return (
     <>
@@ -206,7 +216,9 @@ const Controls = () => {
                               onToggleClick();
                               setCustomValueValidationError('');
                               setChecked(CONSOLE_DEFAULT);
-                              onDefaultConfigSubmit(e);
+                              resetDashboardTemplate('landingPage', currentToken).then(() => {
+                                setTemplateId(NaN);
+                              });
                             }}
                             checked={checked === CONSOLE_DEFAULT}
                           ></Radio>
@@ -233,6 +245,7 @@ const Controls = () => {
                             onChange={(_event, value) => {
                               setCustomValue(value);
                             }}
+                            validated={customLayoutValidated}
                           ></TextArea>
                           <FormHelperText>
                             <HelperText>
@@ -245,7 +258,12 @@ const Controls = () => {
                             </HelperText>
                           </FormHelperText>
                           <div hidden={checked !== CUSTOM}>
-                            <Button variant="plain" type={ButtonType.submit} onClick={onCustomConfigSubmit}>
+                            <Button
+                              variant="link"
+                              type={ButtonType.submit}
+                              onClick={onCustomConfigSubmit}
+                              isDisabled={customLayoutValidated != 'success'}
+                            >
                               <CheckIcon />
                             </Button>
                             <Button
@@ -254,6 +272,7 @@ const Controls = () => {
                               onClick={() => {
                                 setIsCustomMenuOpen(false);
                                 setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+                                setCustomLayoutValidated('default');
                                 setCustomValueValidationError('');
                               }}
                             >
