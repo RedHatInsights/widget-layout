@@ -66,10 +66,7 @@ const Controls = () => {
   };
 
   const encodeLayout = async () => {
-    console.log(layout);
-    console.log(templateId);
     const encodedString = await encodeCustomLayout(templateId, currentToken).then((encodedLayout) => {
-      console.log(encodedLayout);
       if (!encodedLayout) {
         throw new Error('Error encoding string');
       }
@@ -83,7 +80,6 @@ const Controls = () => {
       if (!layout) {
         throw new Error('Error decoding layout string');
       }
-      console.log(layout);
       return layout;
     });
     return decodedLayout;
