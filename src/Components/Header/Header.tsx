@@ -209,12 +209,10 @@ const Controls = () => {
                             label={CONSOLE_DEFAULT}
                             value={CONSOLE_DEFAULT}
                             onClick={(e) => {
+                              setIsOpen(true);
                               onToggleClick();
                               setCustomValueValidationError('');
                               setChecked(CONSOLE_DEFAULT);
-                              resetDashboardTemplate('landingPage', currentToken).then(() => {
-                                setTemplateId(NaN);
-                              });
                             }}
                             checked={checked === CONSOLE_DEFAULT}
                           ></Radio>
