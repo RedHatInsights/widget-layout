@@ -5,7 +5,7 @@ import ResizeHandleIcon from './resize-handle.svg';
 import GridTile, { SetWidgetAttribute } from './GridTile';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isWidgetType } from '../Widgets/widgetTypes';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { activeItemAtom, layoutAtom, layoutVariantAtom } from '../../state/layoutAtom';
@@ -30,6 +30,7 @@ import { addNotification } from '@redhat-cloud-services/frontend-components-noti
 import { EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStateVariant, PageSection } from '@patternfly/react-core';
 import { GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
+import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 
 export const dropping_elem_id = '__dropping-elem__';
 
@@ -46,6 +47,12 @@ const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement
 };
 
 const LayoutEmptyState = () => {
+  const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
+
+  useEffect(() => {
+    setDrawerExpanded(true);
+  }, []);
+
   return (
     <PageSection className="empty-layout pf-v5-u-p-0">
       <EmptyState variant={EmptyStateVariant.lg} className="pf-v5-u-p-sm">
