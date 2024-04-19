@@ -31,8 +31,7 @@ import { EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStat
 import { GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-
-export const dropping_elem_id = '__dropping-elem__';
+import { dropping_elem_id } from '../../consts';
 
 export const breakpoints = { xl: 1100, lg: 996, md: 768, sm: 480 };
 

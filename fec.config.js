@@ -2,7 +2,7 @@ const path = require('path');
 const dependencies = require('./package.json').dependencies;
 
 module.exports = {
-  appUrl: ['/staging/starter'],
+  appUrl: ['/staging/widget-layout'],
   sassPrefix: '.widgetLayout, .landing',
   debug: true,
   useProxy: true,

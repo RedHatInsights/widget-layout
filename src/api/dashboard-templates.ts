@@ -1,6 +1,6 @@
 import { Layout } from 'react-grid-layout';
-import { dropping_elem_id } from '../Components/DnDLayout/GridLayout';
 import { ScalprumComponentProps } from '@scalprum/react-core';
+import { dropping_elem_id } from '../consts';
 
 const getRequestHeaders = (token: string) => ({
   Accept: 'application/json',
