@@ -1,5 +1,5 @@
 import React from 'react';
-import { BellIcon, CogsIcon, HistoryIcon, OutlinedBookmarkIcon, RocketIcon, StarIcon } from '@patternfly/react-icons';
+import { BellIcon, CogsIcon, HeadsetIcon, HistoryIcon, OutlinedBookmarkIcon, RocketIcon, StarIcon } from '@patternfly/react-icons';
 import RhelIcon from './images/RhelIcon';
 import OpenShiftIcon from './images/OpenShiftIcon';
 import EdgeIcon from './images/EdgeIcon';
@@ -7,7 +7,6 @@ import AnsibleIcon from './images/AnsibleIcon';
 import ACSIcon from './images/ACSIcon';
 import QuayIcon from './images/QuayIcon';
 import OpenShiftAiIcon from './images/OpenShiftAIIcon';
-import HeadsetIcon from './images/HeadsetIcon';
 
 const PlaceholderIcon = CogsIcon;
 
