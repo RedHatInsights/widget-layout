@@ -1,6 +1,11 @@
 // Importing Global Variables
 @import "~@redhat-cloud-services/frontend-components-utilities/styles/_all";
 
+.widgetLayout {
+  height: 100%;
+  overflow: hidden;
+}
+
 .widg-l-flex--header,
 .widg-l-split--add-widget,
 .widg-l-gallery,
@@ -10,8 +15,13 @@
   margin: auto auto;
   max-width: 1550px;
 }
-.pf-v5-c-page__main-section {
+.widg-c-page__main-section--header,
+.widg-c-page__main-section--drawer {
   border-bottom: 1px solid var(--pf-v5-global--disabled-color--200);
+}
+.widg-c-page__main-section--grid {
+  border-bottom: 0;
+  height: 100%;
 }
 
 /* stylelint-disable */

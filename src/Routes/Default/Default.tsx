@@ -32,7 +32,7 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
     <div className="widgetLayout">
       <Header />
       <AddWidgetDrawer dismissible={false}>
-        <PageSection className="pf-v5-u-p-md pf-v5-u-p-lg-on-sm">
+        <PageSection className="widg-c-page__main-section--grid pf-v5-u-p-md pf-v5-u-p-lg-on-sm">
           <GridLayout isLayoutLocked={isLayoutLocked} {...props} />
         </PageSection>
       </AddWidgetDrawer>
