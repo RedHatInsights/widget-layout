@@ -21,23 +21,16 @@
     "static": "BETA=true PROXY=true fec static"
   },
   "dependencies": {
-    "@patternfly/react-core": "^5.0.0",
-    "@patternfly/react-table": "^5.0.0",
     "@patternfly/react-component-groups": "^5.2.0-prerelease.1",
-    "@redhat-cloud-services/frontend-components": "^4.2.3",
+    "@patternfly/react-core": "^5.0.0",
+    "@redhat-cloud-services/frontend-components": "^4.2.7",
     "@redhat-cloud-services/frontend-components-notifications": "^4.1.0",
-    "@redhat-cloud-services/frontend-components-utilities": "^4.0.2",
     "awesome-debounce-promise": "^2.1.0",
     "classnames": "^2.3.1",
     "jotai": "^2.6.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-grid-layout": "^1.4.4",
-    "react-redux": "7.2.9",
-    "react-router-dom": "6.16.0",
-    "redux": "4.2.0",
-    "redux-logger": "3.0.6",
-    "redux-promise-middleware": "6.1.2"
+    "react-grid-layout": "^1.4.4"
   },
   "devDependencies": {
     "@babel/core": "7.14.0",
@@ -55,7 +48,6 @@
     "@types/react-dom": "^18.0.5",
     "@types/react-grid-layout": "^1.3.5",
     "@types/react-router-dom": "^5.3.3",
-    "@types/redux-logger": "3.0.9",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
     "babel-jest": "27.0.5",
@@ -64,7 +56,6 @@
     "identity-obj-proxy": "3.0.0",
     "jest": "27.0.5",
     "npm-run-all": "4.1.5",
-    "prop-types": "15.7.2",
     "rimraf": "^3.0.2",
     "stylelint": "13.13.1",
     "stylelint-config-recommended-scss": "4.2.0",
