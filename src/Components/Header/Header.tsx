@@ -2,32 +2,132 @@ import './Header.scss';
 
 import {
   Button,
+  ButtonType,
   ButtonVariant,
+  ClipboardCopy,
+  Dropdown,
+  DropdownGroup,
+  DropdownItem,
+  DropdownList,
   Flex,
   FlexItem,
+  Form,
+  FormGroup,
+  FormHelperText,
+  HelperText,
+  HelperTextItem,
+  MenuToggle,
+  MenuToggleElement,
   PageSection,
   PageSectionVariants,
+  Radio,
+  Stack,
+  StackItem,
   Text,
+  TextArea,
   TextContent,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
-import React from 'react';
-import { PlusCircleIcon } from '@patternfly/react-icons';
+import React, { useEffect } from 'react';
+import { CheckIcon, ExclamationCircleIcon, PlusCircleIcon, TimesIcon } from '@patternfly/react-icons';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-import { templateIdAtom } from '../../state/templateAtom';
-import { resetDashboardTemplate } from '../../api/dashboard-templates';
+import { activeItemAtom, isDefaultLayout, layoutAtom, layoutVariantAtom } from '../../state/layoutAtom';
 import useCurrentUser from '../../hooks/useCurrentUser';
+import { decodeCustomLayout, encodeCustomLayout, mapTemplateConfigToExtendedTemplateConfig } from '../../api/dashboard-templates';
+import { templateAtom, templateIdAtom } from '../../state/templateAtom';
+
+import { resetDashboardTemplate } from '../../api/dashboard-templates';
 import { WarningModal } from '@patternfly/react-component-groups';
 
 const Controls = () => {
+  type Validate = 'default' | 'error' | 'success';
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isCustomMenuOpen, setIsCustomMenuOpen] = React.useState(false);
+  const [customValue, setCustomValue] = React.useState('');
+  const [customValueValidationError, setCustomValueValidationError] = React.useState('');
   const toggleOpen = useSetAtom(drawerExpandedAtom);
-  const [, setTemplateId] = useAtom(templateIdAtom);
+  const [layout, setLayout] = useAtom(layoutAtom);
+  const [layoutVariant, setLayoutVariant] = useAtom(layoutVariantAtom);
+  const CONSOLE_DEFAULT = 'console-default';
+  const CUSTOM = 'custom';
+  const [checked, setChecked] = React.useState(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+  const [customLayoutValidated, setCustomLayoutValidated] = React.useState<Validate>('default');
+  const [template, setTemplate] = useAtom(templateAtom);
+  const [templateId, setTemplateId] = useAtom(templateIdAtom);
+  const [activeItem, setActiveItem] = useAtom(activeItemAtom);
   const { currentToken } = useCurrentUser();
+
+  const onToggleClick = () => {
+    setIsCustomMenuOpen(!isCustomMenuOpen);
+  };
+
+  const encodeLayout = async () => {
+    const encodedString = await encodeCustomLayout(templateId, currentToken).then((encodedLayout) => {
+      if (!encodedLayout) {
+        throw new Error('Error encoding string');
+      }
+      return encodedLayout;
+    });
+    return encodedString;
+  };
+
+  const decodeLayout = async (encodedString: string) => {
+    const decodedLayout = await decodeCustomLayout(encodedString, currentToken).then((layout) => {
+      if (!layout) {
+        throw new Error('Error decoding layout string');
+      }
+      return layout;
+    });
+    return decodedLayout;
+  };
+
+  const onCustomConfigSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    if (!customValue) {
+      setCustomLayoutValidated('error');
+      setCustomValueValidationError('Input value is required.');
+      return;
+    }
+    try {
+      const newLayout = await decodeLayout(customValue);
+      const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(newLayout.templateConfig);
+      setTemplate(extendedTemplateConfig);
+      setLayout(extendedTemplateConfig[layoutVariant]);
+      setIsCustomMenuOpen(false);
+      if (isDefaultLayout(layout)) {
+        setChecked(CONSOLE_DEFAULT);
+      }
+      setCustomValue('');
+    } catch (e) {
+      console.error(e);
+      setCustomLayoutValidated('error');
+      setCustomValueValidationError('Invalid input value.');
+      return;
+    }
+  };
+
+  const onCopyEncodedString = async () => {
+    const encodedString = await encodeLayout();
+    navigator.clipboard.writeText(encodedString);
+  };
+
+  const isCustomLayoutValid = (name: string) => {
+    if (name === undefined || name.trim() === '') {
+      setCustomLayoutValidated('default');
+    } else if (!/^\S*$/.test(name.trim())) {
+      setCustomLayoutValidated('error');
+    } else {
+      setCustomLayoutValidated('success');
+    }
+  };
+
+  useEffect(() => {
+    isCustomLayoutValid(customValue);
+  }, [customValue]);
 
   return (
     <>
@@ -69,6 +169,118 @@ const Controls = () => {
           >
             Add widgets
           </Button>
+        </ToolbarItem>
+        <ToolbarItem spacer={{ default: 'spacerNone' }}>
+          <ClipboardCopy
+            isCode
+            hoverTip="Copy current configuration string"
+            position="left"
+            clickTip="Configuration string copied to clipboard"
+            onCopy={onCopyEncodedString}
+          >
+            {JSON.stringify(layout)}
+          </ClipboardCopy>
+        </ToolbarItem>
+        <ToolbarItem spacer={{ default: 'spacerSm' }}>
+          <Stack>
+            <StackItem>
+              <Dropdown
+                isOpen={isCustomMenuOpen}
+                activeItemId={0}
+                onOpenChange={(isOpen: boolean) => {
+                  setIsCustomMenuOpen(isOpen);
+                  setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+                  setCustomValueValidationError('');
+                }}
+                toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                  <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen}>
+                    Config view: {checked}
+                  </MenuToggle>
+                )}
+              >
+                <DropdownGroup label="Dashboard configuration" labelHeadingLevel="h3">
+                  <DropdownList className="pf-v5-u-pb-0">
+                    <Form>
+                      <FormGroup>
+                        <DropdownItem>
+                          <Radio
+                            name="config"
+                            id={CONSOLE_DEFAULT}
+                            label={CONSOLE_DEFAULT}
+                            value={CONSOLE_DEFAULT}
+                            onClick={(e) => {
+                              setIsOpen(true);
+                              onToggleClick();
+                              setCustomValueValidationError('');
+                              setChecked(CONSOLE_DEFAULT);
+                            }}
+                            checked={checked === CONSOLE_DEFAULT}
+                          ></Radio>
+                        </DropdownItem>
+                        <DropdownItem>
+                          <Radio
+                            name="config"
+                            id={CUSTOM}
+                            label="Custom configuration"
+                            value={CUSTOM}
+                            onClick={() => {
+                              setChecked(CUSTOM);
+                            }}
+                            checked={checked === CUSTOM}
+                          ></Radio>
+                          <TextArea
+                            className="pf-v5-u-mt-sm"
+                            rows={1}
+                            placeholder="Paste custom string"
+                            required
+                            onClick={() => {
+                              setChecked(CUSTOM);
+                            }}
+                            onChange={(_event, value) => {
+                              setCustomValue(value);
+                            }}
+                            validated={customLayoutValidated}
+                          ></TextArea>
+                          <FormHelperText>
+                            <HelperText>
+                              <HelperTextItem
+                                variant={customValueValidationError ? 'error' : 'default'}
+                                {...(customValueValidationError && { icon: <ExclamationCircleIcon /> })}
+                              >
+                                {customValueValidationError}
+                              </HelperTextItem>
+                            </HelperText>
+                          </FormHelperText>
+                          <div hidden={checked !== CUSTOM}>
+                            <Button
+                              variant="link"
+                              type={ButtonType.submit}
+                              onClick={onCustomConfigSubmit}
+                              isDisabled={customLayoutValidated != 'success'}
+                            >
+                              <CheckIcon />
+                            </Button>
+                            <Button
+                              variant="plain"
+                              type={ButtonType.reset}
+                              onClick={() => {
+                                setIsCustomMenuOpen(false);
+                                setChecked(isDefaultLayout(layout) ? CONSOLE_DEFAULT : CUSTOM);
+                                setCustomLayoutValidated('default');
+                                setCustomValueValidationError('');
+                              }}
+                            >
+                              <TimesIcon />
+                            </Button>
+                          </div>
+                        </DropdownItem>
+                      </FormGroup>
+                    </Form>
+                  </DropdownList>
+                </DropdownGroup>
+              </Dropdown>
+            </StackItem>
+          </Stack>
         </ToolbarItem>
       </ToolbarGroup>
     </>
