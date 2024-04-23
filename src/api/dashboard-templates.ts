@@ -2,9 +2,8 @@ import { Layout } from 'react-grid-layout';
 import { ScalprumComponentProps } from '@scalprum/react-core';
 import { dropping_elem_id } from '../consts';
 
-const getRequestHeaders = (token: string) => ({
+const getRequestHeaders = () => ({
   Accept: 'application/json',
-  Authorization: `Bearer ${token}`,
   'Content-Type': 'application/json',
 });
 
@@ -121,12 +120,12 @@ export const getWidgetIdentifier = (widgetType: string, uniqueId: string = crypt
   return `${widgetType}${widgetIdSeparator}${uniqueId}`;
 };
 
-export async function getBaseDashboardTemplate(token: string): Promise<BaseTemplate[]>;
-export async function getBaseDashboardTemplate(token: string, type: LayoutTypes): Promise<BaseTemplate>;
-export async function getBaseDashboardTemplate(token: string, type?: LayoutTypes): Promise<BaseTemplate | BaseTemplate[]> {
+export async function getBaseDashboardTemplate(): Promise<BaseTemplate[]>;
+export async function getBaseDashboardTemplate(type: LayoutTypes): Promise<BaseTemplate>;
+export async function getBaseDashboardTemplate(type?: LayoutTypes): Promise<BaseTemplate | BaseTemplate[]> {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/base-template${type ? `?dashboard=${type}` : ''}`, {
     method: 'GET',
-    headers: getRequestHeaders(token),
+    headers: getRequestHeaders(),
   });
   handleErrors(resp);
   const json = await resp.json();
@@ -134,32 +133,32 @@ export async function getBaseDashboardTemplate(token: string, type?: LayoutTypes
 }
 
 // Returns multiple templates for a user (user can have multiple template copies) - we will render the one marked default: true by default
-export async function getDashboardTemplates(token: string): Promise<DashboardTemplate[]>;
-export async function getDashboardTemplates(token: string, type: LayoutTypes): Promise<DashboardTemplate[]>;
-export async function getDashboardTemplates(token: string, type?: LayoutTypes): Promise<DashboardTemplate | DashboardTemplate[]> {
+export async function getDashboardTemplates(): Promise<DashboardTemplate[]>;
+export async function getDashboardTemplates(type: LayoutTypes): Promise<DashboardTemplate[]>;
+export async function getDashboardTemplates(type?: LayoutTypes): Promise<DashboardTemplate | DashboardTemplate[]> {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates${type ? `?dashboard=${type}` : ''}`, {
     method: 'GET',
-    headers: getRequestHeaders(token),
+    headers: getRequestHeaders(),
   });
   handleErrors(resp);
   const json = await resp.json();
   return json.data;
 }
 
-export async function getWidgetMapping(token: string): Promise<WidgetMapping> {
+export async function getWidgetMapping(): Promise<WidgetMapping> {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/widget-mapping`, {
     method: 'GET',
-    headers: getRequestHeaders(token),
+    headers: getRequestHeaders(),
   });
   handleErrors(resp);
   const json = await resp.json();
   return json.data;
 }
 
-export const resetDashboardTemplate = async (type: LayoutTypes, token: string): Promise<DashboardTemplate> => {
+export const resetDashboardTemplate = async (type: LayoutTypes): Promise<DashboardTemplate> => {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/base-template/fork${type ? `?dashboard=${type}` : ''}`, {
     method: 'GET',
-    headers: getRequestHeaders(token),
+    headers: getRequestHeaders(),
   });
   handleErrors(resp);
   const json = await resp.json();
@@ -168,12 +167,11 @@ export const resetDashboardTemplate = async (type: LayoutTypes, token: string): 
 
 export const patchDashboardTemplate = async (
   templateId: DashboardTemplate['id'],
-  data: { templateConfig: PartialTemplateConfig },
-  token: string
+  data: { templateConfig: PartialTemplateConfig }
 ): Promise<DashboardTemplate> => {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}`, {
     method: 'PATCH',
-    headers: getRequestHeaders(token),
+    headers: getRequestHeaders(),
     body: JSON.stringify(data),
   });
   handleErrors(resp);
@@ -181,10 +179,10 @@ export const patchDashboardTemplate = async (
   return json.data;
 };
 
-export const deleteDashboardTemplate = async (templateId: DashboardTemplate['id'], token: string): Promise<boolean> => {
+export const deleteDashboardTemplate = async (templateId: DashboardTemplate['id']): Promise<boolean> => {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}`, {
     method: 'DELETE',
-    headers: getRequestHeaders(token),
+    headers: getRequestHeaders(),
   });
   handleErrors(resp);
   return resp.status === 204;

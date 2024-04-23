@@ -13,20 +13,20 @@ import '../../App.scss';
 const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
   const setWidgetMapping = useSetAtom(widgetMappingAtom);
-  const { currentToken } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
 
   useEffect(() => {
-    if (!currentToken) {
+    if (!currentUser) {
       return;
     }
     const getWidgetMap = async () => {
-      const mapping = await getWidgetMapping(currentToken);
+      const mapping = await getWidgetMapping();
       if (mapping) {
         setWidgetMapping(mapping);
       }
     };
     getWidgetMap();
-  }, [currentToken]);
+  }, [currentUser]);
 
   return (
     <div className="widgetLayout">
