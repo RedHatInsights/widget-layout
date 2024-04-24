@@ -84,7 +84,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
     >
       <Split className="widg-l-split--add-widget">
         <SplitItem isFilled>
-          <Title headingLevel="h2" size="md">
+          <Title headingLevel="h2" size="md" className="pf-v5-u-pb-sm">
             Add new and previously removed widgets by clicking the <GripVerticalIcon /> icon, then drag and drop to a new location. Drag the corners
             of the cards to resize widgets.
           </Title>
