@@ -5,7 +5,6 @@ import { ChromeUser } from '@redhat-cloud-services/types';
 
 const useCurrentUser = () => {
   const [currentUser, setCurrentUser] = useState<ChromeUser['identity']['user']>(undefined);
-  const [currentToken, setCurrentToken] = useState<string>('');
   const chrome = useChrome();
 
   const isLoaded = useLoaded(async () => {
@@ -13,16 +12,11 @@ const useCurrentUser = () => {
     if (user) {
       setCurrentUser(user.identity.user);
     }
-    const token = await chrome.auth.getToken();
-    if (token) {
-      setCurrentToken(token);
-    }
   });
 
   return {
     isLoaded,
     currentUser,
-    currentToken,
   };
 };
 

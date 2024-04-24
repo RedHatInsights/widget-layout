@@ -85,7 +85,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
   const [activeItem, setActiveItem] = useAtom(activeItemAtom);
   const layoutRef = useRef<HTMLDivElement>(null);
-  const { currentToken, currentUser } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const dispatch = useDispatch();
 
@@ -166,7 +166,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: currentLayout });
 
     try {
-      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data }, currentToken);
+      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data });
       if (!template) {
         return;
       }
@@ -214,7 +214,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: layout });
 
     try {
-      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data }, currentToken);
+      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data });
       const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
       setTemplate(extendedTemplateConfig);
       setLayout(extendedTemplateConfig[layoutVariant]);
@@ -272,7 +272,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         });
       }
     },
-    [activeItem, layout, isLayoutLocked, templateId, layoutVariant, currentDropInItem, currentToken, dispatch]
+    [activeItem, layout, isLayoutLocked, templateId, layoutVariant, currentDropInItem, dispatch]
   );
 
   useEffect(() => {
@@ -285,11 +285,11 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   }, [activeItem]);
 
   useEffect(() => {
-    if (!currentToken || templateId >= 0) {
+    if (!currentUser || templateId >= 0) {
       return;
     }
     // TODO template type should be pulled from app config for reusability
-    getDashboardTemplates(currentToken, layoutType)
+    getDashboardTemplates(layoutType)
       .then((templates) => {
         const customDefaultTemplate = getDefaultTemplate(templates);
         if (!customDefaultTemplate) {
@@ -325,7 +325,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       .finally(() => {
         setIsLoaded(true);
       });
-  }, [currentToken, templateId]);
+  }, [currentUser, templateId]);
 
   return (
     // {/* relative position is required for the grid layout to properly calculate

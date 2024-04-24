@@ -27,7 +27,6 @@ const Controls = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const toggleOpen = useSetAtom(drawerExpandedAtom);
   const [, setTemplateId] = useAtom(templateIdAtom);
-  const { currentToken } = useCurrentUser();
 
   return (
     <>
@@ -41,7 +40,7 @@ const Controls = () => {
         onClose={() => setIsOpen(false)}
         onConfirm={() => {
           setIsOpen(false);
-          resetDashboardTemplate('landingPage', currentToken).then(() => {
+          resetDashboardTemplate('landingPage').then(() => {
             setTemplateId(NaN);
           });
         }}
