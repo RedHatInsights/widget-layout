@@ -25,13 +25,12 @@ import {
   patchDashboardTemplate,
 } from '../../api/dashboard-templates';
 import useCurrentUser from '../../hooks/useCurrentUser';
-import { useDispatch } from 'react-redux';
-import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
 import { EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStateVariant, PageSection } from '@patternfly/react-core';
 import { GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { dropping_elem_id } from '../../consts';
+import { useAddNotification } from '../../state/notificationsAtom';
 
 export const breakpoints = { xl: 1100, lg: 996, md: 768, sm: 480 };
 
@@ -87,7 +86,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const layoutRef = useRef<HTMLDivElement>(null);
   const { currentUser } = useCurrentUser();
   const widgetMapping = useAtomValue(widgetMappingAtom);
-  const dispatch = useDispatch();
+  const addNotification = useAddNotification();
 
   const [currentDropInItem, setCurrentDropInItem] = useAtom(currentDropInItemAtom);
   const droppingItemTemplate: ReactGridLayoutProps['droppingItem'] = useMemo(() => {
@@ -176,13 +175,11 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       setLayout(extendedTemplateConfig[layoutVariant]);
     } catch (error) {
       console.error(error);
-      dispatch(
-        addNotification({
-          variant: 'danger',
-          title: 'Failed to patch dashboard configuration',
-          description: 'Your dashboard changes were unable to be saved.',
-        })
-      );
+      addNotification({
+        variant: 'danger',
+        title: 'Failed to patch dashboard configuration',
+        description: 'Your dashboard changes were unable to be saved.',
+      });
     }
   };
 
@@ -220,13 +217,11 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       setLayout(extendedTemplateConfig[layoutVariant]);
     } catch (error) {
       console.error(error);
-      dispatch(
-        addNotification({
-          variant: 'danger',
-          title: 'Failed to patch dashboard configuration',
-          description: 'Your dashboard changes were unable to be saved.',
-        })
-      );
+      addNotification({
+        variant: 'danger',
+        title: 'Failed to patch dashboard configuration',
+        description: 'Your dashboard changes were unable to be saved.',
+      });
     }
   };
 
@@ -272,7 +267,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         });
       }
     },
-    [activeItem, layout, isLayoutLocked, templateId, layoutVariant, currentDropInItem, dispatch]
+    [activeItem, layout, isLayoutLocked, templateId, layoutVariant, currentDropInItem]
   );
 
   useEffect(() => {
@@ -314,13 +309,11 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       })
       .catch((err) => {
         console.error(err);
-        dispatch(
-          addNotification({
-            variant: 'danger',
-            title: 'Failed to fetch dashboard template',
-            description: 'Try reloading the page.',
-          })
-        );
+        addNotification({
+          variant: 'danger',
+          title: 'Failed to fetch dashboard template',
+          description: 'Try reloading the page.',
+        });
       })
       .finally(() => {
         setIsLoaded(true);
