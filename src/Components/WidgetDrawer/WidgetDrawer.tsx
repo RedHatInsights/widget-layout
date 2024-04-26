@@ -21,8 +21,7 @@ import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { getWidget } from '../Widgets/widgetDefaults';
 import HeaderIcon from '../Icons/HeaderIcon';
-import { WidgetConfiguration, isOrgAdminWidgetPermissionRequired } from '../../api/dashboard-templates';
-import useCurrentUser from '../../hooks/useCurrentUser';
+import { WidgetConfiguration } from '../../api/dashboard-templates';
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
@@ -73,7 +72,6 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
 const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
   const [isOpen, toggleOpen] = useAtom(drawerExpandedAtom);
   const widgetMapping = useAtomValue(widgetMappingAtom);
-  const { currentUser } = useCurrentUser();
 
   const panelContent = (
     <PageSection
@@ -102,10 +100,6 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
       </Split>
       <Gallery className="widg-l-gallery pf-v5-u-pt-sm" hasGutter>
         {Object.entries(widgetMapping).map(([type, { config }], i) => {
-          const requiresOrgAdmin = isOrgAdminWidgetPermissionRequired(config);
-          if (requiresOrgAdmin && !currentUser?.is_org_admin) {
-            return null;
-          }
           return (
             <GalleryItem key={i}>
               <WidgetWrapper widgetType={type} config={config}>

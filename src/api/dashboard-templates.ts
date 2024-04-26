@@ -89,7 +89,7 @@ export type WidgetHeaderLink = {
 export type WidgetPermission = {
   method?: string;
   apps?: string[];
-  args?: unknown[];
+  args?: string[];
 };
 
 export const orgAdminWidgetPermission: WidgetPermission = {
@@ -233,9 +233,4 @@ export const mapPartialExtendedTemplateConfigToPartialTemplateConfig = (
     result[key] = extendedTemplateConfig[key]?.map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== dropping_elem_id);
   });
   return result;
-};
-
-export const isOrgAdminWidgetPermissionRequired = (config: WidgetConfiguration | undefined): boolean => {
-  const orgAdminPermissionIndex = config?.permissions?.findIndex((permission) => permission?.method === orgAdminWidgetPermission.method);
-  return orgAdminPermissionIndex !== undefined && orgAdminPermissionIndex > -1;
 };

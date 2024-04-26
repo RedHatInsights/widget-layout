@@ -54,9 +54,15 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
   const { headerLink } = widgetConfig.config || {};
   const hasHeader = headerLink && headerLink.href && headerLink.title;
 
-  const { node, module, scope } = useMemo(() => {
+  const widgetData = useMemo(() => {
     return getWidget(widgetMapping, widgetType, () => setIsLoaded(true));
   }, [widgetMapping, widgetType]);
+
+  if (!widgetData) {
+    return null;
+  }
+
+  const { node, module, scope } = widgetData;
 
   const dropdownItems = useMemo(() => {
     const isMaximized = widgetConfig.h === widgetConfig.maxH;
