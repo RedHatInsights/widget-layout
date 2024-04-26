@@ -8,7 +8,7 @@ import { isWidgetType } from '../Widgets/widgetTypes';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
-import { activeItemAtom, layoutAtom, layoutVariantAtom } from '../../state/layoutAtom';
+import { activeItemAtom, layoutVariantAtom } from '../../state/layoutAtom';
 import { templateAtom, templateIdAtom } from '../../state/templateAtom';
 import DebouncePromise from 'awesome-debounce-promise';
 import React from 'react';
@@ -29,7 +29,7 @@ import { EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStat
 import { GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-import { dropping_elem_id } from '../../consts';
+import { columns, dropping_elem_id } from '../../consts';
 import { useAddNotification } from '../../state/notificationsAtom';
 
 export const breakpoints = { xl: 1100, lg: 996, md: 768, sm: 480 };
@@ -78,7 +78,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const [isDragging, setIsDragging] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [layout, setLayout] = useAtom(layoutAtom);
   const [layoutVariant, setLayoutVariant] = useAtom(layoutVariantAtom);
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
@@ -101,44 +100,64 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     }
   }, [currentDropInItem]);
 
-  const setWidgetAttribute: SetWidgetAttribute = (id, attributeName, value) => {
-    setLayout((prev) => prev.map((item) => (item.i === id ? { ...item, [attributeName]: value } : item)));
-  };
+  const setWidgetAttribute: SetWidgetAttribute = (id, attributeName, value) =>
+    setTemplate((prev) =>
+      Object.entries(prev).reduce(
+        (acc, [size, layout]) => ({
+          ...acc,
+          [size]: layout.map((widget) => (widget.i === id ? { ...widget, [attributeName]: value } : widget)),
+        }),
+        prev
+      )
+    );
 
-  const removeWidget = (id: string) => {
-    setLayout((prev) => prev.filter((item) => item.i !== id));
-  };
+  const removeWidget = (id: string) =>
+    setTemplate((prev) =>
+      Object.entries(prev).reduce(
+        (acc, [size, layout]) => ({
+          ...acc,
+          [size]: layout.filter((widget) => widget.i !== id),
+        }),
+        prev
+      )
+    );
 
   const onDrop: ReactGridLayoutProps['onDrop'] = (_layout: ExtendedLayoutItem[], layoutItem: ExtendedLayoutItem, event: DragEvent) => {
     const data = event.dataTransfer?.getData('text') || '';
     // fix placement order
     if (isWidgetType(widgetMapping, data)) {
-      const newWidget = {
-        ...layoutItem,
-        ...widgetMapping[data].defaults,
-        // w: layoutItem.x + layoutItem.w > 3 ? 1 : 3,
-        // x: 4 % layoutItem.w,
-        // x: layoutItem.x + layoutItem.w > 3 ? 3 : 0,
-        widgetType: data,
-        i: getWidgetIdentifier(data),
-        title: 'New title',
-        config: widgetMapping[data].config,
-      };
       setCurrentDropInItem(undefined);
-      setLayout((prev) =>
-        prev.reduce<ExtendedLayoutItem[]>(
-          (acc, curr) => {
-            if (curr.x + curr.w > newWidget.x && curr.y + curr.h <= newWidget.y) {
-              acc.push(curr);
-            } else {
-              // Wee need to push the current items down on the Y axis if they are supposed to be below the new widget
-              acc.push({ ...curr, y: curr.y + curr.h });
-            }
+      setTemplate((prev) =>
+        Object.entries(prev).reduce((acc, [size, layout]) => {
+          const newWidget = {
+            ...layoutItem,
+            ...widgetMapping[data].defaults,
+            w: size === layoutVariant ? layoutItem.w : Math.min(widgetMapping[data].defaults.w, columns[size as Variants]),
+            // w: layoutItem.x + layoutItem.w > 3 ? 1 : 3,
+            // x: 4 % layoutItem.w,
+            // x: layoutItem.x + layoutItem.w > 3 ? 3 : 0,
+            widgetType: data,
+            i: getWidgetIdentifier(data),
+            title: 'New title',
+            config: widgetMapping[data].config,
+          };
+          return {
+            ...acc,
+            [size]: layout.reduce<ExtendedLayoutItem[]>(
+              (acc, curr) => {
+                if (curr.x + curr.w > newWidget.x && curr.y + curr.h <= newWidget.y) {
+                  acc.push(curr); // x a šířka nesmí být vyšší než limit
+                } else {
+                  // Wee need to push the current items down on the Y axis if they are supposed to be below the new widget
+                  acc.push({ ...curr, y: curr.y + curr.h });
+                }
 
-            return acc;
-          },
-          [newWidget]
-        )
+                return acc;
+              },
+              [newWidget]
+            ),
+          };
+        }, prev)
       );
     }
     event.preventDefault();
@@ -146,11 +165,11 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
 
   const activeLayout = useMemo(
     () =>
-      layout.map((item) => ({
+      template[layoutVariant].map((item) => ({
         ...item,
         locked: isLayoutLocked ? isLayoutLocked : item.locked,
       })),
-    [isLayoutLocked, layout]
+    [isLayoutLocked, template]
   );
 
   const onLayoutChange: ResponsiveProps['onLayoutChange'] = async (currentLayout: Layout[]) => {
@@ -162,7 +181,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       return;
     }
 
-    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: currentLayout });
+    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ ...template, [layoutVariant]: currentLayout });
 
     try {
       const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data });
@@ -172,7 +191,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
 
       const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
       setTemplate(extendedTemplateConfig);
-      setLayout(extendedTemplateConfig[layoutVariant]);
     } catch (error) {
       console.error(error);
       addNotification({
@@ -183,10 +201,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     }
   };
 
-  const onBreakpointChange: ResponsiveProps['onBreakpointChange'] = (newBreakpoint: Variants) => {
-    setLayoutVariant(newBreakpoint);
-    setLayout(template[newBreakpoint]);
-  };
+  const onBreakpointChange: ResponsiveProps['onBreakpointChange'] = (newBreakpoint: Variants) => setLayoutVariant(newBreakpoint);
 
   const onKeyUp = (event: KeyboardEvent<HTMLDivElement>, id: string) => {
     if (event.code === 'Enter') {
@@ -202,19 +217,26 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   };
 
   const updateLayout = async (updatedItem: ExtendedLayoutItem) => {
-    setLayout((prev) => prev.map((layoutItem) => (layoutItem.i === activeItem ? updatedItem : layoutItem)));
+    setTemplate((prev) =>
+      Object.entries(prev).reduce(
+        (acc, [size, layout]) => ({
+          ...acc,
+          [size]: size === layoutVariant ? layout.map((layoutItem) => (layoutItem.i === activeItem ? updatedItem : layoutItem)) : layout,
+        }),
+        prev
+      )
+    );
 
     if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
       return;
     }
 
-    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: layout });
+    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: template[layoutVariant] });
 
     try {
       const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data });
       const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
       setTemplate(extendedTemplateConfig);
-      setLayout(extendedTemplateConfig[layoutVariant]);
     } catch (error) {
       console.error(error);
       addNotification({
@@ -231,7 +253,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         return;
       }
 
-      const item = layout.find(({ i }) => i === activeItem);
+      const item = template[layoutVariant].find(({ i }) => i === activeItem);
       if (!item) {
         return;
       }
@@ -267,7 +289,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         });
       }
     },
-    [activeItem, layout, isLayoutLocked, templateId, layoutVariant, currentDropInItem]
+    [activeItem, template, isLayoutLocked, templateId, layoutVariant, currentDropInItem]
   );
 
   useEffect(() => {
@@ -304,7 +326,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         }
         setTemplate(extendedTemplateConfig);
         setTemplateId(customDefaultTemplate.id);
-        setLayout(extendedTemplateConfig[targetVariant]);
         setLayoutVariant(targetVariant);
       })
       .catch((err) => {
@@ -330,7 +351,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         draggableHandle=".drag-handle"
         layouts={template}
         breakpoints={breakpoints}
-        cols={{ xl: 4, lg: 3, md: 2, sm: 1 }}
+        cols={columns}
         rowHeight={56}
         //width={1200}
         isDraggable={!isLayoutLocked}
