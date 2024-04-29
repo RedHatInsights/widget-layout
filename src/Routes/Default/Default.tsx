@@ -22,22 +22,18 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   const { visibilityFunctions } = useChrome();
 
   const checkPermissions = async (permissions: WidgetPermission[]): Promise<boolean> => {
-    console.log('Checking permissions: ', permissions);
-    for (const permission of permissions) {
-      if (permission.method === 'permissions' && permission.args && !(await visibilityFunctions.hasPermissions(permission.args))) {
-        return false;
+    return permissions.every(async (permission) => {
+      const { method, args } = permission;
+      if (visibilityFunctions[method]) {
+        const visibilityFunction = visibilityFunctions[method];
+
+        if (typeof visibilityFunction === 'function') {
+          return await (visibilityFunction as (...args: unknown[]) => Promise<boolean>)(...(args || []));
+        }
       }
 
-      if (permission.method === 'loosePermissions' && permission.args && !(await visibilityFunctions.loosePermissions(permission.args))) {
-        return false;
-      }
-
-      if (permission.method === 'isOrgAdmin' && !(await visibilityFunctions.isOrgAdmin())) {
-        return false;
-      }
-    }
-
-    return true;
+      return true;
+    });
   };
 
   useEffect(() => {
@@ -45,31 +41,25 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
       return;
     }
 
-    (async () => {
-      const getWidgetMap = async () => {
-        const mapping = await getWidgetMapping();
-        if (mapping) {
-          const filteredMapping = await Object.entries(mapping).reduce<Promise<Record<string, (typeof mapping)[string]>>>(
-            async (acc, [key, value]) => {
-              const widgetConfig = value.config;
-              const isVisible = !(
-                widgetConfig &&
-                widgetConfig.permissions &&
-                !(await checkPermissions(widgetConfig.permissions as WidgetPermission[]))
-              );
-              if (isVisible) {
-                (await acc)[key] = value;
-              }
-              return acc;
-            },
-            Promise.resolve({})
-          );
-          setWidgetMapping(filteredMapping);
-        }
-      };
+    const getWidgetMap = async () => {
+      const mapping = await getWidgetMapping();
 
-      await getWidgetMap();
-    })();
+      if (mapping) {
+        const checkedMapping = await Object.entries(mapping).reduce(async (acc, [key, value]) => {
+          const resolvedAcc = await acc;
+          const widgetConfig = value.config;
+          const hasPermissions = !(widgetConfig && widgetConfig.permissions && (await checkPermissions(widgetConfig.permissions)));
+          if (hasPermissions) {
+            resolvedAcc[key] = value;
+          }
+          return acc;
+        }, Promise.resolve({} as Record<string, (typeof mapping)[string]>));
+
+        setWidgetMapping(checkedMapping);
+      }
+    };
+
+    getWidgetMap();
   }, [currentUser]);
 
   return (
