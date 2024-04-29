@@ -124,7 +124,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
 
   const onDrop: ReactGridLayoutProps['onDrop'] = (_layout: ExtendedLayoutItem[], layoutItem: ExtendedLayoutItem, event: DragEvent) => {
     const data = event.dataTransfer?.getData('text') || '';
-    // fix placement order
     if (isWidgetType(widgetMapping, data)) {
       setCurrentDropInItem(undefined);
       setTemplate((prev) =>
@@ -132,10 +131,9 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
           const newWidget = {
             ...layoutItem,
             ...widgetMapping[data].defaults,
+            // make sure the configuration is valid for all layout sizes
             w: size === layoutVariant ? layoutItem.w : Math.min(widgetMapping[data].defaults.w, columns[size as Variants]),
-            // w: layoutItem.x + layoutItem.w > 3 ? 1 : 3,
-            // x: 4 % layoutItem.w,
-            // x: layoutItem.x + layoutItem.w > 3 ? 3 : 0,
+            x: size === layoutVariant ? layoutItem.x : Math.min(layoutItem.x, columns[size as Variants]),
             widgetType: data,
             i: getWidgetIdentifier(data),
             title: 'New title',
@@ -146,9 +144,9 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
             [size]: layout.reduce<ExtendedLayoutItem[]>(
               (acc, curr) => {
                 if (curr.x + curr.w > newWidget.x && curr.y + curr.h <= newWidget.y) {
-                  acc.push(curr); // x a šířka nesmí být vyšší než limit
+                  acc.push(curr);
                 } else {
-                  // Wee need to push the current items down on the Y axis if they are supposed to be below the new widget
+                  // push the current items down on the Y axis if they are supposed to be below the new widget
                   acc.push({ ...curr, y: curr.y + curr.h });
                 }
 
