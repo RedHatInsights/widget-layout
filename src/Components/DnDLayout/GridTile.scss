@@ -21,8 +21,16 @@
       &:first-child {
         padding-top: var(--pf-v5-global--spacer--md);
       }
-      .pf-v5-c-icon {
-        --pf-v5-c-icon__content--m-custom--Color: var(--pf-v5-global--primary-color--100);
+      .widg-c-icon--header {
+        .service-icon {
+          height: 28px;
+          width: 28px;
+        }
+        .pf-v5-svg {
+          color: var(--pf-v5-global--primary-color--100);
+          height: 22px;
+          width: 22px;     
+        }
       }
     }
   }

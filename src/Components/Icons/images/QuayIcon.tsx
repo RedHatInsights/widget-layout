@@ -2,7 +2,7 @@ import React from 'react';
 
 const QuayIcon = () => {
   return (
-    <svg width="20" height="20" viewBox="0 0 38 38">
+    <svg className="service-icon" viewBox="0 0 38 38">
       <g id="Symbols" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
         <g id="Technology_icon-Red_Hat-Quay-Standard-RGB" fillRule="nonzero">
           <g id="uuid-16df5206-ca64-41dd-b57e-55c66370cb99" fill="#000000">
