@@ -49,13 +49,22 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
       const getWidgetMap = async () => {
         const mapping = await getWidgetMapping();
         if (mapping) {
-          for (const key of Object.keys(mapping)) {
-            const widgetConfig = mapping[key].config;
-            if (widgetConfig && widgetConfig.permissions && !(await checkPermissions(widgetConfig.permissions as WidgetPermission[]))) {
-              delete mapping[key]; // remove widget from mapping if user does not have permissions for it
-            }
-          }
-          setWidgetMapping(mapping);
+          const filteredMapping = await Object.entries(mapping).reduce<Promise<Record<string, (typeof mapping)[string]>>>(
+            async (acc, [key, value]) => {
+              const widgetConfig = value.config;
+              const isVisible = !(
+                widgetConfig &&
+                widgetConfig.permissions &&
+                !(await checkPermissions(widgetConfig.permissions as WidgetPermission[]))
+              );
+              if (isVisible) {
+                (await acc)[key] = value;
+              }
+              return acc;
+            },
+            Promise.resolve({})
+          );
+          setWidgetMapping(filteredMapping);
         }
       };
 
