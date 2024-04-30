@@ -60,10 +60,10 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
     >
       <CardHeader className="pf-v5-u-py-md" actions={{ actions: headerActions }}>
         <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
-          <Icon status="custom" className="pf-v5-u-mr-sm">
+          <div className="pf-v5-u-align-self-flex-start widg-c-icon--header pf-v5-u-mr-sm">
             <HeaderIcon icon={config?.icon} />
-          </Icon>
-          <CardTitle>{config?.title || widgetType}</CardTitle>
+          </div>
+          <CardTitle className="pf-v5-u-align-self-flex-start">{config?.title || widgetType}</CardTitle>
         </Flex>
       </CardHeader>
     </Card>
