@@ -22,14 +22,17 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   const { visibilityFunctions } = useChrome();
 
   const checkPermissions = async (permissions: WidgetPermission[]): Promise<boolean> => {
-    return permissions.every(async (permission) => {
-      const { method, args } = permission;
-      if (visibilityFunctions[method] && typeof visibilityFunctions[method] === 'function') {
-        return await (visibilityFunctions[method] as (...args: unknown[]) => Promise<boolean>)(...(args || []));
-      }
-
-      return true;
-    });
+    const permissionResults = await Promise.all(
+      permissions.map(async (permission) => {
+        const { method, args } = permission;
+        if (visibilityFunctions[method] && typeof visibilityFunctions[method] === 'function') {
+          const permissionGranted = await (visibilityFunctions[method] as (...args: unknown[]) => Promise<boolean>)(...(args || []));
+          return permissionGranted;
+        }
+        return true;
+      })
+    );
+    return permissionResults.every(Boolean);
   };
 
   useEffect(() => {
@@ -44,7 +47,7 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
         const checkedMapping = await Object.entries(mapping).reduce(async (acc, [key, value]) => {
           const resolvedAcc = await acc;
           const widgetConfig = value.config;
-          const hasPermissions = !(widgetConfig && widgetConfig.permissions && (await checkPermissions(widgetConfig.permissions)));
+          const hasPermissions = widgetConfig && widgetConfig.permissions ? await checkPermissions(widgetConfig.permissions) : true;
           if (hasPermissions) {
             resolvedAcc[key] = value;
           }
