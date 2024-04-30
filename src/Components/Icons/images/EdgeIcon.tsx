@@ -2,7 +2,7 @@ import React from 'react';
 
 const EdgeIcon = () => {
   return (
-    <svg width="20" height="20" viewBox="0 0 42 42">
+    <svg className="service-icon" viewBox="0 0 42 42">
       <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
         <g id="Group-8" fillRule="nonzero">
           <path

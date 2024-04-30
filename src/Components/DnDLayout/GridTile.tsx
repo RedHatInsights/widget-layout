@@ -164,15 +164,15 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
       <CardHeader actions={{ actions: headerActions }}>
         <Flex>
           <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
-            <Icon status="custom" className="pf-v5-u-mr-sm">
+            <div className="pf-v5-u-align-self-flex-start widg-c-icon--header pf-v5-u-mr-sm">
               {isLoaded ? <HeaderIcon icon={widgetConfig?.config?.icon} /> : <Skeleton shape="circle" width="25px" height="25px" />}
-            </Icon>
+            </div>
             {isLoaded ? (
               <CardTitle
                 style={{
                   userSelect: isDragging ? 'none' : 'auto',
                 }}
-                className="pf-v5-u-flex-wrap pf-v5-u-text-break-word"
+                className="pf-v5-u-align-self-flex-start"
               >
                 {widgetConfig?.config?.title || widgetType}
               </CardTitle>
@@ -180,6 +180,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
               <Skeleton width="50%" />
             )}
           </Flex>
+
           {hasHeader && isLoaded && (
             <FlexItem>
               <Button className="widget-header-link pf-v5-u-pl-lg pf-v5-u-p-0" variant="link" onClick={() => window.open(headerLink.href, '_blank')}>
