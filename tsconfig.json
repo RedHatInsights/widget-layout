@@ -21,7 +21,7 @@
   "include": [
     "./src/**/*.ts",
     "./src/**/*.tsx"
-  ],
+, "cypress/component/GridLayout.cy.ts"  ],
   "exclude": [
     "./src/entry.ts",
     "./*.js",
