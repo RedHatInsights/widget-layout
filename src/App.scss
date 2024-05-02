@@ -38,7 +38,7 @@
 }
 
 // non-scrollable widgets using flex
-.landing-edge, .landing-rhel, .landing-ansible, .landing-openshift, .landing-quay, .landing-openshift-ai, .landing-acs {    
+.landing-edge, .landing-rhel, .landing-ansible, .landing-openshift, .landing-quay, .landing-openshiftAi, .landing-acs {    
   display: flex; 
   overflow: hidden;
 }
