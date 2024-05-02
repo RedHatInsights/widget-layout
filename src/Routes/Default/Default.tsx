@@ -24,12 +24,17 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   const checkPermissions = async (permissions: WidgetPermission[]): Promise<boolean> => {
     const permissionResults = await Promise.all(
       permissions.map(async (permission) => {
-        const { method, args } = permission;
-        if (visibilityFunctions[method] && typeof visibilityFunctions[method] === 'function') {
-          const permissionGranted = await (visibilityFunctions[method] as (...args: unknown[]) => Promise<boolean>)(...(args || []));
-          return permissionGranted;
+        try {
+          const { method, args } = permission;
+          if (visibilityFunctions[method] && typeof visibilityFunctions[method] === 'function') {
+            const permissionGranted = await (visibilityFunctions[method] as (...args: unknown[]) => Promise<boolean>)(...(args || []));
+            return permissionGranted;
+          }
+          return true;
+        } catch (error) {
+          console.error('Error checking permissions', error);
+          return false;
         }
-        return true;
       })
     );
     return permissionResults.every(Boolean);
