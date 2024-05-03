@@ -1,6 +1,7 @@
 import { Layout } from 'react-grid-layout';
 import { ScalprumComponentProps } from '@scalprum/react-core';
 import { dropping_elem_id } from '../consts';
+import { VisibilityFunctions } from '@redhat-cloud-services/types';
 
 const getRequestHeaders = () => ({
   Accept: 'application/json',
@@ -86,14 +87,11 @@ export type WidgetHeaderLink = {
   href?: string;
 };
 
-export type WidgetPermission = {
-  method?: string;
-  apps?: string[];
-  args?: unknown[];
-};
+type VisibilityFunctionKeys = keyof VisibilityFunctions;
 
-export const orgAdminWidgetPermission: WidgetPermission = {
-  method: 'isOrgAdmin',
+export type WidgetPermission = {
+  method: VisibilityFunctionKeys;
+  args?: Parameters<VisibilityFunctions[VisibilityFunctionKeys]>;
 };
 
 export type WidgetConfiguration = {
@@ -233,9 +231,4 @@ export const mapPartialExtendedTemplateConfigToPartialTemplateConfig = (
     result[key] = extendedTemplateConfig[key]?.map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== dropping_elem_id);
   });
   return result;
-};
-
-export const isOrgAdminWidgetPermissionRequired = (config: WidgetConfiguration | undefined): boolean => {
-  const orgAdminPermissionIndex = config?.permissions?.findIndex((permission) => permission?.method === orgAdminWidgetPermission.method);
-  return orgAdminPermissionIndex !== undefined && orgAdminPermissionIndex > -1;
 };

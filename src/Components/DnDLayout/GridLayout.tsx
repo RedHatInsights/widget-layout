@@ -19,7 +19,6 @@ import {
   getDashboardTemplates,
   getDefaultTemplate,
   getWidgetIdentifier,
-  isOrgAdminWidgetPermissionRequired,
   mapPartialExtendedTemplateConfigToPartialTemplateConfig,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplate,
@@ -370,11 +369,11 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         {activeLayout
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .map(({ widgetType, title, ...rest }, index) => {
-            const { config } = getWidget(widgetMapping, widgetType);
-            const requiresOrgAdmin = isOrgAdminWidgetPermissionRequired(config);
-            if (requiresOrgAdmin && !currentUser?.is_org_admin) {
+            const widget = getWidget(widgetMapping, widgetType);
+            if (!widget) {
               return null;
             }
+            const config = widgetMapping[widgetType]?.config;
             return (
               <div
                 key={rest.i}

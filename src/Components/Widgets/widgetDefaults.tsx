@@ -17,6 +17,9 @@ const LoadingComponent = ({ onFinishedLoading }: { onFinishedLoading?: () => voi
 
 export const getWidget = (widgetMapping: WidgetMapping, type: string, onFinishedLoading?: () => void) => {
   const mappedWidget = widgetMapping[type];
+  if (!mappedWidget) {
+    return null;
+  }
   return {
     node: mappedWidget ? <ScalprumComponent fallback={<LoadingComponent onFinishedLoading={onFinishedLoading} />} {...mappedWidget} /> : <Fragment />,
     scope: mappedWidget?.scope,
