@@ -21,17 +21,6 @@
   height: 100%;
 }
 
-/* stylelint-disable */
-.landing-exploreCapabilities {
-  container-type: inline-size; 
-  @container (width < 1000px) { 
-    .pf-v5-l-split__item img {
-      display: none;
-    }
-  }
-}
-/* stylelint-enable */
-
 // scrollable widgets
 .chrome-favoriteServices, .learningResources-learningResources, .notifications-notificationsEvents, .landing-recentlyVisited {
   overflow-y: auto;
