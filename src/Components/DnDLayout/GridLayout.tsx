@@ -30,6 +30,7 @@ import { getWidget } from '../Widgets/widgetDefaults';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { columns, dropping_elem_id } from '../../consts';
 import { useAddNotification } from '../../state/notificationsAtom';
+import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
 
 export const breakpoints = { xl: 1100, lg: 996, md: 768, sm: 480 };
 
@@ -85,6 +86,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const { currentUser } = useCurrentUser();
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const addNotification = useAddNotification();
+  const setCurrentlyUsedWidgets = useSetAtom(currentlyUsedWidgetsAtom);
 
   const [currentDropInItem, setCurrentDropInItem] = useAtom(currentDropInItemAtom);
   const droppingItemTemplate: ReactGridLayoutProps['droppingItem'] = useMemo(() => {
@@ -172,6 +174,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const onLayoutChange: ResponsiveProps['onLayoutChange'] = async (currentLayout: Layout[]) => {
     if (isInitialRender) {
       setIsInitialRender(false);
+      setCurrentlyUsedWidgets(activeLayout.map((item) => item.widgetType));
       return;
     }
     if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
@@ -179,6 +182,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     }
 
     const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ ...template, [layoutVariant]: currentLayout });
+    setCurrentlyUsedWidgets(activeLayout.map((item) => item.widgetType));
 
     try {
       const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data });

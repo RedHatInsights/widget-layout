@@ -22,6 +22,7 @@ import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { getWidget } from '../Widgets/widgetDefaults';
 import HeaderIcon from '../Icons/HeaderIcon';
 import { WidgetConfiguration } from '../../api/dashboard-templates';
+import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
@@ -72,6 +73,9 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
 const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
   const [isOpen, toggleOpen] = useAtom(drawerExpandedAtom);
   const widgetMapping = useAtomValue(widgetMappingAtom);
+  const currentlyUsedWidgets = useAtomValue(currentlyUsedWidgetsAtom);
+
+  const filteredWidgetMapping = Object.entries(widgetMapping).filter(([type]) => !currentlyUsedWidgets.includes(type));
 
   const panelContent = (
     <PageSection
@@ -99,7 +103,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         </SplitItem>
       </Split>
       <Gallery className="widg-l-gallery pf-v5-u-pt-sm" hasGutter>
-        {Object.entries(widgetMapping).map(([type, { config }], i) => {
+        {filteredWidgetMapping.map(([type, { config }], i) => {
           return (
             <GalleryItem key={i}>
               <WidgetWrapper widgetType={type} config={config}>
