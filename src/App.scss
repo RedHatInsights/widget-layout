@@ -22,13 +22,6 @@
 }
 
 // scrollable widgets
-.chrome-favoriteServices, .learningResources-learningResources, .notifications-notificationsEvents, .landing-recentlyVisited {
+.chrome-favoriteServices, .learningResources-learningResources, .notifications-notificationsEvents {
   overflow-y: auto;
 }
-
-// non-scrollable widgets using flex
-.landing-edge, .landing-rhel, .landing-ansible, .landing-openshift, .landing-quay, .landing-openshiftAi, .landing-acs {    
-  display: flex; 
-  overflow: hidden;
-}
-
