@@ -18,6 +18,7 @@
   }
   .pf-v5-c-card {
     &__header {
+      background: var(--pf-v5-global--BackgroundColor--150);
       &:first-child {
         padding-top: var(--pf-v5-global--spacer--md);
       }
@@ -32,6 +33,13 @@
           width: 22px;     
         }
       }
+      .widg-card-header-text {
+        gap: 0;
+        line-height: 0;
+      }
+    }
+    &__actions {
+      padding-left: var(--pf-v5-global--spacer--xs);
     }
   }
 }
