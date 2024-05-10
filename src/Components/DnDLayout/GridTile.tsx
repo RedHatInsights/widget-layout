@@ -186,13 +186,17 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
               ) : (
                 <Skeleton width="50%" />
               )}
-                {hasHeader && isLoaded && (
-                  <FlexItem>
-                    <Button className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" variant="link" onClick={() => window.open(headerLink.href, '_blank')}>
-                      {headerLink.title}
-                    </Button>
-                  </FlexItem>
-                )}
+              {hasHeader && isLoaded && (
+                <FlexItem>
+                  <Button
+                    className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0"
+                    variant="link"
+                    onClick={() => window.open(headerLink.href, '_blank')}
+                  >
+                    {headerLink.title}
+                  </Button>
+                </FlexItem>
+              )}
             </Flex>
           </Flex>
         </Flex>
