@@ -170,7 +170,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
       <CardHeader actions={{ actions: headerActions }}>
         <Flex>
           <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
-            <div className="test pf-v5-u-align-self-flex-start widg-c-icon--header pf-v5-u-mr-sm">
+            <div className="pf-v5-u-align-self-flex-start widg-c-icon--header pf-v5-u-mr-sm">
               {isLoaded ? <HeaderIcon icon={widgetConfig?.config?.icon} /> : <Skeleton shape="circle" width="25px" height="25px" />}
             </div>
             <Flex className="pf-v5-u-flex-direction-row widg-card-header-text">
