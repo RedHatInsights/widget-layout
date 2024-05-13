@@ -1,4 +1,5 @@
 .grid-tile {
+  background: var(--pf-v5-global--BackgroundColor--150);
   position: relative;
   height: 100%;
   overflow: hidden;
@@ -19,9 +20,6 @@
   .pf-v5-c-card {
     &__header {
       background: var(--pf-v5-global--BackgroundColor--150);
-      &:first-child {
-        padding-top: var(--pf-v5-global--spacer--md);
-      }
       .widg-c-icon--header {
         .service-icon {
           height: 28px;
@@ -37,9 +35,16 @@
         gap: 0;
         line-height: 0;
       }
+      .pf-v5-c-menu-toggle {
+        padding-left: 0;
+        padding-right: 0;
+      }
     }
     &__actions {
       padding-left: var(--pf-v5-global--spacer--xs);
+    }
+    &__body {
+      background: var(--pf-v5-global--BackgroundColor--100);
     }
   }
 }
