@@ -28,7 +28,8 @@
         .pf-v5-svg {
           color: var(--pf-v5-global--primary-color--100);
           height: 22px;
-          width: 22px;     
+          width: 22px;
+          margin-bottom: var(--pf-v5-global--spacer--sm);
         }
       }
       .widg-card-header-text {
