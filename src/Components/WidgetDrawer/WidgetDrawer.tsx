@@ -33,7 +33,7 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
   const headerActions = (
     <Tooltip content={<p>Move widget</p>}>
       <Icon className="pf-v5-u-pt-md">
-        <GripVerticalIcon style={{ fill: '#6a6e73' }} />
+        <GripVerticalIcon style={{ fill: 'var(--pf-v5-global--Color--200)' }} />
       </Icon>
     </Tooltip>
   );
@@ -81,7 +81,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
     <PageSection
       className="widg-c-page__main-section--drawer pf-v5-u-p-md pf-v5-u-p-lg-on-sm"
       style={{
-        backgroundColor: '#E7F1FA',
+        backgroundColor: 'var(--pf-v5-global--palette--blue-50)',
       }}
     >
       <Split className="widg-l-split--add-widget">

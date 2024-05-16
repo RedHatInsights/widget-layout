@@ -154,7 +154,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
             dragging: isDragging,
           })}
         >
-          <GripVerticalIcon style={{ fill: '#6a6e73' }} />
+          <GripVerticalIcon style={{ fill: 'var(--pf-v5-global--Color--200)' }} />
         </Icon>
       </Tooltip>
     </>
