@@ -23,6 +23,7 @@ import { getWidget } from '../Widgets/widgetDefaults';
 import HeaderIcon from '../Icons/HeaderIcon';
 import { WidgetConfiguration } from '../../api/dashboard-templates';
 import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
+import './WidgetDrawer.scss';
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
@@ -32,7 +33,7 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
   const setDropInItem = useSetAtom(currentDropInItemAtom);
   const headerActions = (
     <Tooltip content={<p>Move widget</p>}>
-      <Icon className="pf-v5-u-pt-md">
+      <Icon className="pf-v5-u-pt-md widg-c-drawer__drag-handle">
         <GripVerticalIcon style={{ fill: 'var(--pf-v5-global--Color--200)' }} />
       </Icon>
     </Tooltip>
@@ -58,7 +59,7 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
       draggable={true}
       className="grid-tile"
     >
-      <CardHeader className="pf-v5-u-py-md" actions={{ actions: headerActions }}>
+      <CardHeader className="pf-v5-u-py-md widg-c-drawer__header" actions={{ actions: headerActions }}>
         <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
           <div className="pf-v5-u-align-self-flex-start widg-c-icon--header pf-v5-u-mr-sm">
             <HeaderIcon icon={config?.icon} />

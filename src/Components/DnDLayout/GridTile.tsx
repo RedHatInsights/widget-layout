@@ -19,7 +19,7 @@ import {
   Tooltip,
 } from '@patternfly/react-core';
 import { CompressIcon, EllipsisVIcon, ExpandIcon, GripVerticalIcon, LockIcon, MinusCircleIcon, UnlockIcon } from '@patternfly/react-icons';
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import clsx from 'clsx';
 
 import './GridTile.scss';
