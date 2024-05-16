@@ -19,7 +19,7 @@ import {
   Tooltip,
 } from '@patternfly/react-core';
 import { CompressIcon, EllipsisVIcon, ExpandIcon, GripVerticalIcon, LockIcon, MinusCircleIcon, UnlockIcon } from '@patternfly/react-icons';
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import clsx from 'clsx';
 
 import './GridTile.scss';
@@ -154,7 +154,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
             dragging: isDragging,
           })}
         >
-          <GripVerticalIcon style={{ fill: '#6a6e73' }} />
+          <GripVerticalIcon style={{ fill: 'var(--pf-v5-global--Color--200)' }} />
         </Icon>
       </Tooltip>
     </>
