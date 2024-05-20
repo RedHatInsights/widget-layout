@@ -1,6 +1,6 @@
 import 'react-grid-layout/css/styles.css';
 import './GridLayout.scss';
-import { Layout, ReactGridLayoutProps, Responsive, ResponsiveProps, WidthProvider } from 'react-grid-layout';
+import ReactGridLayout, { Layout, ReactGridLayoutProps } from 'react-grid-layout';
 import ResizeHandleIcon from './resize-handle.svg';
 import GridTile, { SetWidgetAttribute } from './GridTile';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -32,9 +32,9 @@ import { columns, dropping_elem_id } from '../../consts';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
 
-export const breakpoints = { xl: 1100, lg: 996, md: 768, sm: 480 };
-
-const ResponsiveGridLayout = WidthProvider(Responsive);
+export const breakpoints: {
+  [key in Variants]: number;
+} = { xl: 1100, lg: 996, md: 768, sm: 480 };
 
 const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => {
   return (
@@ -70,7 +70,7 @@ const LayoutEmptyState = () => {
   );
 };
 
-const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplate, 2500, {
+const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplate, 1500, {
   onlyResolvesLast: true,
 });
 
@@ -82,6 +82,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
   const [activeItem, setActiveItem] = useAtom(activeItemAtom);
+  const [layoutWidth, setLayoutWidth] = useState<number>(1200);
   const layoutRef = useRef<HTMLDivElement>(null);
   const { currentUser } = useCurrentUser();
   const widgetMapping = useAtomValue(widgetMappingAtom);
@@ -171,7 +172,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     [isLayoutLocked, template]
   );
 
-  const onLayoutChange: ResponsiveProps['onLayoutChange'] = async (currentLayout: Layout[]) => {
+  const onLayoutChange = async (currentLayout: Layout[]) => {
     if (isInitialRender) {
       setIsInitialRender(false);
       setCurrentlyUsedWidgets(activeLayout.map((item) => item.widgetType));
@@ -185,13 +186,9 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     setCurrentlyUsedWidgets(activeLayout.map((item) => item.widgetType));
 
     try {
-      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data });
-      if (!template) {
-        return;
-      }
-
-      const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
+      const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template);
       setTemplate(extendedTemplateConfig);
+      await debouncedPatchDashboardTemplate(templateId, { templateConfig: data });
     } catch (error) {
       console.error(error);
       addNotification({
@@ -201,8 +198,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       });
     }
   };
-
-  const onBreakpointChange: ResponsiveProps['onBreakpointChange'] = (newBreakpoint: Variants) => setLayoutVariant(newBreakpoint);
 
   const onKeyUp = (event: KeyboardEvent<HTMLDivElement>, id: string) => {
     if (event.code === 'Enter') {
@@ -218,24 +213,21 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   };
 
   const updateLayout = async (updatedItem: ExtendedLayoutItem) => {
-    setTemplate((prev) =>
-      Object.entries(prev).reduce(
-        (acc, [size, layout]) => ({
-          ...acc,
-          [size]: size === layoutVariant ? layout.map((layoutItem) => (layoutItem.i === activeItem ? updatedItem : layoutItem)) : layout,
-        }),
-        prev
-      )
+    const updatedTemplate = Object.entries(template).reduce(
+      (acc, [size, layout]) => ({
+        ...acc,
+        [size]: size === layoutVariant ? layout.map((layoutItem) => (layoutItem.i === activeItem ? updatedItem : layoutItem)) : layout,
+      }),
+      template
     );
+    setTemplate(updatedTemplate);
 
     if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
       return;
     }
 
-    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ [layoutVariant]: template[layoutVariant] });
-
     try {
-      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: data });
+      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: updatedTemplate });
       const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
       setTemplate(extendedTemplateConfig);
     } catch (error) {
@@ -342,24 +334,56 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       });
   }, [currentUser, templateId]);
 
+  function getGridDimensions(currentWidth: number) {
+    let variant: Variants = 'xl';
+    Object.entries(breakpoints).forEach(([breakpoint, value]) => {
+      if (value >= currentWidth) {
+        variant = breakpoint as Variants;
+      }
+    });
+    return variant;
+  }
+
+  useEffect(() => {
+    const currentWidth = layoutRef.current?.getBoundingClientRect().width ?? 1200;
+    const variant: Variants = getGridDimensions(currentWidth);
+    setLayoutVariant(variant);
+    setLayoutWidth(currentWidth);
+    const observer = new ResizeObserver((entries) => {
+      if (!entries[0]) return;
+
+      const currentWidth = entries[0].contentRect.width;
+
+      const variant: Variants = getGridDimensions(currentWidth);
+      setLayoutVariant(variant);
+      setLayoutWidth(currentWidth);
+    });
+    if (layoutRef.current) {
+      observer.observe(layoutRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     // {/* relative position is required for the grid layout to properly calculate
     // child translation while dragging is in progress */}
-    <div style={{ position: 'relative' }} ref={layoutRef}>
+    <div id="widget-layout-container" style={{ position: 'relative' }} ref={layoutRef}>
       {activeLayout.length === 0 && !currentDropInItem && isLoaded && <LayoutEmptyState />}
-      <ResponsiveGridLayout
+      <ReactGridLayout
+        // Critical key, we need to reset the grid when layout variant changes
+        key={'grid-' + layoutVariant}
         className="layout"
         draggableHandle=".drag-handle"
-        layouts={template}
-        breakpoints={breakpoints}
-        cols={columns}
+        layout={template[layoutVariant]}
+        cols={columns[layoutVariant]}
         rowHeight={56}
-        //width={1200}
+        width={layoutWidth}
         isDraggable={!isLayoutLocked}
         isResizable={!isLayoutLocked}
         resizeHandle={getResizeHandle}
-        containerPadding={{ xl: [0, 0], lg: [0, 0], md: [0, 0], sm: [0, 0] }}
-        margin={{ xl: [16, 16], lg: [16, 16], md: [16, 16], sm: [16, 16] }}
         resizeHandles={['sw', 'nw', 'se', 'ne']}
         // add droppping item default based on dragged template
         droppingItem={droppingItemTemplate}
@@ -368,7 +392,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         useCSSTransforms
         verticalCompact
         onLayoutChange={onLayoutChange}
-        onBreakpointChange={onBreakpointChange}
       >
         {activeLayout
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -405,7 +428,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
             );
           })
           .filter((layoutItem) => layoutItem !== null)}
-      </ResponsiveGridLayout>
+      </ReactGridLayout>
     </div>
   );
 };

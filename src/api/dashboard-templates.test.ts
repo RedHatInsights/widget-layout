@@ -1,4 +1,4 @@
-import { ExtendedLayoutItem, LayoutWithTitle, mapExtendedLayoutToLayoutWithTitle } from './dashboard-templates';
+import { ExtendedLayoutItem, LayoutWithTitle } from './dashboard-templates';
 
 describe('mapExtendedLayoutToLayoutWithTitle', function () {
   let layoutWithTitle: LayoutWithTitle;
@@ -17,8 +17,5 @@ describe('mapExtendedLayoutToLayoutWithTitle', function () {
       y: 0,
     };
     extendedLayoutItem = { ...layoutWithTitle, widgetType: 'foobar' };
-  });
-  test('handles ExtendedLayoutItem type objects', function () {
-    expect(mapExtendedLayoutToLayoutWithTitle(extendedLayoutItem)).toEqual(layoutWithTitle);
   });
 });

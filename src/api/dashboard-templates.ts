@@ -210,25 +210,18 @@ export const mapTemplateConfigToExtendedTemplateConfig = (templateConfig: Templa
   return result;
 };
 
-export const mapExtendedLayoutToLayoutWithTitle = (extendedLayoutItem: ExtendedLayoutItem): LayoutWithTitle => {
-  const { x, y, h, i, w, title, maxH, minH, static: isStatic } = extendedLayoutItem;
-  return { x, y, h, i, w, title, maxH, minH, static: isStatic };
-};
-
 export const mapExtendedTemplateConfigToTemplateConfig = (extendedTemplateConfig: ExtendedTemplateConfig): TemplateConfig => {
   const result: TemplateConfig = { sm: [], md: [], lg: [], xl: [] };
   (Object.keys(extendedTemplateConfig) as Variants[]).forEach((key) => {
-    result[key] = extendedTemplateConfig[key].map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== dropping_elem_id);
+    result[key] = extendedTemplateConfig[key].filter(({ i }) => i !== dropping_elem_id);
   });
   return result;
 };
 
-export const mapPartialExtendedTemplateConfigToPartialTemplateConfig = (
-  extendedTemplateConfig: PartialExtendedTemplateConfig
-): PartialTemplateConfig => {
-  const result: PartialTemplateConfig = {};
+export const mapPartialExtendedTemplateConfigToPartialTemplateConfig = (extendedTemplateConfig: ExtendedTemplateConfig): ExtendedTemplateConfig => {
+  const result: ExtendedTemplateConfig = { sm: [], md: [], lg: [], xl: [] };
   (Object.keys(extendedTemplateConfig) as Variants[]).forEach((key) => {
-    result[key] = extendedTemplateConfig[key]?.map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== dropping_elem_id);
+    result[key] = extendedTemplateConfig[key].filter(({ i }) => i !== dropping_elem_id);
   });
   return result;
 };
