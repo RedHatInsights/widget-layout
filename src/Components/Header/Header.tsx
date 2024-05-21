@@ -65,6 +65,7 @@ const Controls = () => {
             }}
             variant="secondary"
             icon={<PlusCircleIcon />}
+            ouiaId="add-widget-button"
           >
             Add widgets
           </Button>
