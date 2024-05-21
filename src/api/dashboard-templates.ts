@@ -195,17 +195,16 @@ export const mapWidgetDefaults = (id: string): [string, string] => {
   return [widgetType, i];
 };
 
-export const mapLayoutWithTitleToExtendedLayout = (layoutWithTitle: LayoutWithTitle): ExtendedLayoutItem => {
-  return {
-    ...layoutWithTitle,
-    widgetType: mapWidgetDefaults(layoutWithTitle.i)[0],
-  };
-};
-
+// Returns template enhanced with widgetTypes
 export const mapTemplateConfigToExtendedTemplateConfig = (templateConfig: TemplateConfig): ExtendedTemplateConfig => {
   const result: ExtendedTemplateConfig = { sm: [], md: [], lg: [], xl: [] };
   (Object.keys(templateConfig) as Variants[]).forEach((key) => {
-    result[key] = templateConfig[key].map(mapLayoutWithTitleToExtendedLayout);
+    result[key] = templateConfig[key].map(
+      (layoutWithTitle: LayoutWithTitle): ExtendedLayoutItem => ({
+        ...layoutWithTitle,
+        widgetType: mapWidgetDefaults(layoutWithTitle.i)[0],
+      })
+    );
   });
   return result;
 };
