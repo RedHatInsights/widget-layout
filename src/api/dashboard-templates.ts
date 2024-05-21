@@ -209,18 +209,15 @@ export const mapTemplateConfigToExtendedTemplateConfig = (templateConfig: Templa
   return result;
 };
 
-export const mapExtendedTemplateConfigToTemplateConfig = (extendedTemplateConfig: ExtendedTemplateConfig): TemplateConfig => {
-  const result: TemplateConfig = { sm: [], md: [], lg: [], xl: [] };
-  (Object.keys(extendedTemplateConfig) as Variants[]).forEach((key) => {
-    result[key] = extendedTemplateConfig[key].filter(({ i }) => i !== dropping_elem_id);
-  });
-  return result;
-};
-
-export const mapPartialExtendedTemplateConfigToPartialTemplateConfig = (extendedTemplateConfig: ExtendedTemplateConfig): ExtendedTemplateConfig => {
+export const extendLayout = (extendedTemplateConfig: ExtendedTemplateConfig): ExtendedTemplateConfig => {
   const result: ExtendedTemplateConfig = { sm: [], md: [], lg: [], xl: [] };
   (Object.keys(extendedTemplateConfig) as Variants[]).forEach((key) => {
-    result[key] = extendedTemplateConfig[key].filter(({ i }) => i !== dropping_elem_id);
+    result[key] = extendedTemplateConfig[key]
+      .filter(({ i }) => i !== dropping_elem_id)
+      .map((item) => ({
+        ...item,
+        widgetType: mapWidgetDefaults(item.i)[0],
+      }));
   });
   return result;
 };

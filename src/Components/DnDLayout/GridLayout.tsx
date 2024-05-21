@@ -3,12 +3,12 @@ import './GridLayout.scss';
 import ReactGridLayout, { Layout, ReactGridLayoutProps } from 'react-grid-layout';
 import ResizeHandleIcon from './resize-handle.svg';
 import GridTile, { SetWidgetAttribute } from './GridTile';
-import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { isWidgetType } from '../Widgets/widgetTypes';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
-import { activeItemAtom, layoutVariantAtom } from '../../state/layoutAtom';
+import { layoutVariantAtom } from '../../state/layoutAtom';
 import { templateAtom, templateIdAtom } from '../../state/templateAtom';
 import DebouncePromise from 'awesome-debounce-promise';
 import React from 'react';
@@ -16,10 +16,10 @@ import {
   ExtendedLayoutItem,
   LayoutTypes,
   Variants,
+  extendLayout,
   getDashboardTemplates,
   getDefaultTemplate,
   getWidgetIdentifier,
-  mapPartialExtendedTemplateConfigToPartialTemplateConfig,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplate,
 } from '../../api/dashboard-templates';
@@ -81,7 +81,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const [layoutVariant, setLayoutVariant] = useAtom(layoutVariantAtom);
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
-  const [activeItem, setActiveItem] = useAtom(activeItemAtom);
   const [layoutWidth, setLayoutWidth] = useState<number>(1200);
   const layoutRef = useRef<HTMLDivElement>(null);
   const { currentUser } = useCurrentUser();
@@ -163,15 +162,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     event.preventDefault();
   };
 
-  const activeLayout = useMemo(
-    () =>
-      template[layoutVariant].map((item) => ({
-        ...item,
-        locked: isLayoutLocked ? isLayoutLocked : item.locked,
-      })),
-    [isLayoutLocked, template]
-  );
-
   const onLayoutChange = async (currentLayout: Layout[]) => {
     if (isInitialRender) {
       setIsInitialRender(false);
@@ -182,12 +172,11 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       return;
     }
 
-    const data = mapPartialExtendedTemplateConfigToPartialTemplateConfig({ ...template, [layoutVariant]: currentLayout });
+    const data = extendLayout({ ...template, [layoutVariant]: currentLayout });
     setCurrentlyUsedWidgets(activeLayout.map((item) => item.widgetType));
+    setTemplate(data);
 
     try {
-      const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template);
-      setTemplate(extendedTemplateConfig);
       await debouncedPatchDashboardTemplate(templateId, { templateConfig: data });
     } catch (error) {
       console.error(error);
@@ -198,101 +187,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       });
     }
   };
-
-  const onKeyUp = (event: KeyboardEvent<HTMLDivElement>, id: string) => {
-    if (event.code === 'Enter') {
-      event.preventDefault();
-      event.stopPropagation();
-      setActiveItem((prev) => {
-        if (prev === id) {
-          return undefined;
-        }
-        return id;
-      });
-    }
-  };
-
-  const updateLayout = async (updatedItem: ExtendedLayoutItem) => {
-    const updatedTemplate = Object.entries(template).reduce(
-      (acc, [size, layout]) => ({
-        ...acc,
-        [size]: size === layoutVariant ? layout.map((layoutItem) => (layoutItem.i === activeItem ? updatedItem : layoutItem)) : layout,
-      }),
-      template
-    );
-    setTemplate(updatedTemplate);
-
-    if (isLayoutLocked || templateId < 0 || !layoutVariant || currentDropInItem) {
-      return;
-    }
-
-    try {
-      const template = await debouncedPatchDashboardTemplate(templateId, { templateConfig: updatedTemplate });
-      const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(template.templateConfig);
-      setTemplate(extendedTemplateConfig);
-    } catch (error) {
-      console.error(error);
-      addNotification({
-        variant: 'danger',
-        title: 'Failed to patch dashboard configuration',
-        description: 'Your dashboard changes were unable to be saved.',
-      });
-    }
-  };
-
-  const handleArrows = useCallback(
-    (e: globalThis.KeyboardEvent) => {
-      if (!activeItem) {
-        return;
-      }
-
-      const item = template[layoutVariant].find(({ i }) => i === activeItem);
-      if (!item) {
-        return;
-      }
-
-      e.stopPropagation();
-      e.preventDefault();
-
-      if (e.code === 'ArrowUp') {
-        updateLayout({
-          ...item,
-          y: Math.max(item.y - 1, 0),
-        });
-      }
-
-      if (e.code === 'ArrowDown') {
-        updateLayout({
-          ...item,
-          y: item.y + 1,
-        });
-      }
-
-      if (e.code === 'ArrowLeft') {
-        updateLayout({
-          ...item,
-          x: Math.max(item.x - 1, 0),
-        });
-      }
-
-      if (e.code === 'ArrowRight') {
-        updateLayout({
-          ...item,
-          x: item.x + 1,
-        });
-      }
-    },
-    [activeItem, template, isLayoutLocked, templateId, layoutVariant, currentDropInItem]
-  );
-
-  useEffect(() => {
-    if (activeItem && layoutRef.current) {
-      layoutRef.current.addEventListener('keydown', handleArrows);
-    }
-    return () => {
-      layoutRef.current?.removeEventListener('keydown', handleArrows);
-    };
-  }, [activeItem]);
 
   useEffect(() => {
     if (!currentUser || templateId >= 0) {
@@ -367,6 +261,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
     };
   }, []);
 
+  const activeLayout = template[layoutVariant] || [];
   return (
     // {/* relative position is required for the grid layout to properly calculate
     // child translation while dragging is in progress */}
@@ -401,17 +296,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
             }
             const config = widgetMapping[widgetType]?.config;
             return (
-              <div
-                key={rest.i}
-                data-grid={rest}
-                onKeyUp={(e) => onKeyUp(e, rest.i)}
-                tabIndex={index}
-                style={{
-                  boxShadow: activeItem === rest.i ? '0 0 2px 2px #2684FF' : 'none',
-                  ...(activeItem === rest.i ? { outline: 'none' } : {}),
-                }}
-                className={`widget-columns-${rest.w} widget-rows-${rest.h}`}
-              >
+              <div key={rest.i} data-grid={rest} tabIndex={index} className={`widget-columns-${rest.w} widget-rows-${rest.h}`}>
                 <GridTile
                   isDragging={isDragging}
                   setIsDragging={setIsDragging}
