@@ -375,7 +375,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       <ReactGridLayout
         // Critical key, we need to reset the grid when layout variant changes
         key={'grid-' + layoutVariant}
-        className="layout"
         draggableHandle=".drag-handle"
         layout={template[layoutVariant]}
         cols={columns[layoutVariant]}
