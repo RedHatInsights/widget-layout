@@ -162,6 +162,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
 
   return (
     <Card
+      ouiaId={`${scope}-${widgetType}-widget`}
       className={clsx('grid-tile', {
         static: widgetConfig.static,
         [scope]: scope && module,
