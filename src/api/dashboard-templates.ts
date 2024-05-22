@@ -195,40 +195,29 @@ export const mapWidgetDefaults = (id: string): [string, string] => {
   return [widgetType, i];
 };
 
-export const mapLayoutWithTitleToExtendedLayout = (layoutWithTitle: LayoutWithTitle): ExtendedLayoutItem => {
-  return {
-    ...layoutWithTitle,
-    widgetType: mapWidgetDefaults(layoutWithTitle.i)[0],
-  };
-};
-
+// Returns template enhanced with widgetTypes
 export const mapTemplateConfigToExtendedTemplateConfig = (templateConfig: TemplateConfig): ExtendedTemplateConfig => {
   const result: ExtendedTemplateConfig = { sm: [], md: [], lg: [], xl: [] };
   (Object.keys(templateConfig) as Variants[]).forEach((key) => {
-    result[key] = templateConfig[key].map(mapLayoutWithTitleToExtendedLayout);
+    result[key] = templateConfig[key].map(
+      (layoutWithTitle: LayoutWithTitle): ExtendedLayoutItem => ({
+        ...layoutWithTitle,
+        widgetType: mapWidgetDefaults(layoutWithTitle.i)[0],
+      })
+    );
   });
   return result;
 };
 
-export const mapExtendedLayoutToLayoutWithTitle = (extendedLayoutItem: ExtendedLayoutItem): LayoutWithTitle => {
-  const { x, y, h, i, w, title, maxH, minH, static: isStatic } = extendedLayoutItem;
-  return { x, y, h, i, w, title, maxH, minH, static: isStatic };
-};
-
-export const mapExtendedTemplateConfigToTemplateConfig = (extendedTemplateConfig: ExtendedTemplateConfig): TemplateConfig => {
-  const result: TemplateConfig = { sm: [], md: [], lg: [], xl: [] };
+export const extendLayout = (extendedTemplateConfig: ExtendedTemplateConfig): ExtendedTemplateConfig => {
+  const result: ExtendedTemplateConfig = { sm: [], md: [], lg: [], xl: [] };
   (Object.keys(extendedTemplateConfig) as Variants[]).forEach((key) => {
-    result[key] = extendedTemplateConfig[key].map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== dropping_elem_id);
-  });
-  return result;
-};
-
-export const mapPartialExtendedTemplateConfigToPartialTemplateConfig = (
-  extendedTemplateConfig: PartialExtendedTemplateConfig
-): PartialTemplateConfig => {
-  const result: PartialTemplateConfig = {};
-  (Object.keys(extendedTemplateConfig) as Variants[]).forEach((key) => {
-    result[key] = extendedTemplateConfig[key]?.map(mapExtendedLayoutToLayoutWithTitle).filter(({ i }) => i !== dropping_elem_id);
+    result[key] = extendedTemplateConfig[key]
+      .filter(({ i }) => i !== dropping_elem_id)
+      .map((item) => ({
+        ...item,
+        widgetType: mapWidgetDefaults(item.i)[0],
+      }));
   });
   return result;
 };
