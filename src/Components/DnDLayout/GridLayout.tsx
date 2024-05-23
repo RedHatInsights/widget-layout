@@ -34,7 +34,7 @@ import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
 
 export const breakpoints: {
   [key in Variants]: number;
-} = { xl: 1100, lg: 996, md: 768, sm: 480 };
+} = { xl: 1550, lg: 1400, md: 1100, sm: 800 };
 
 const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => {
   return (
