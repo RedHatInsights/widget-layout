@@ -71,7 +71,7 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
       <Portal notifications={notifications} removeNotification={removeNotification} />
       <Header />
       <AddWidgetDrawer dismissible={false}>
-        <PageSection className="widg-c-page__main-section--grid pf-v5-u-p-md pf-v5-u-p-lg-on-sm">
+        <PageSection className="widg-c-page__main-section--grid pf-v5-u-p-md-on-sm">
           <GridLayout isLayoutLocked={isLayoutLocked} {...props} />
         </PageSection>
       </AddWidgetDrawer>
