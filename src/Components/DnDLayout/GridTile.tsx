@@ -70,6 +70,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
     return (
       <>
         <DropdownItem
+          ouiaId={`${scope}-${widgetType}-widget`}
           onClick={() => {
             setIsOpen(false);
             setWidgetAttribute(widgetConfig.i, 'static', !widgetConfig.static);
@@ -79,6 +80,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           {widgetConfig.static ? 'Unlock location and size' : 'Lock location and size'}
         </DropdownItem>
         <DropdownItem
+          ouiaId={`${scope}-${widgetType}-widget`}
           isDisabled={isMaximized || widgetConfig.static}
           onClick={() => {
             setWidgetAttribute(widgetConfig.i, 'h', widgetConfig.maxH ?? widgetConfig.h);
@@ -89,6 +91,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           Autosize height to content
         </DropdownItem>
         <DropdownItem
+          ouiaId={`${scope}-${widgetType}-widget`}
           onClick={() => {
             setWidgetAttribute(widgetConfig.i, 'h', widgetConfig.minH ?? widgetConfig.h);
             setIsOpen(false);
@@ -99,6 +102,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           Minimize height
         </DropdownItem>
         <DropdownItem
+          ouiaId={`${scope}-${widgetType}-widget`}
           onClick={() => {
             removeWidget(widgetConfig.i);
           }}
@@ -124,6 +128,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
     <>
       <Tooltip content={<p>Actions</p>}>
         <Dropdown
+          ouiaId={`${scope}-${widgetType}-widget`}
           popperProps={{
             appendTo: document.body,
             maxWidth: '300px',
@@ -135,7 +140,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
               isExpanded={isOpen}
               onClick={() => setIsOpen((prev) => !prev)}
               variant="plain"
-              aria-label="Card title inline with images and actions example kebab toggle"
+              aria-label="widget actions menu toggle"
             >
               <EllipsisVIcon aria-hidden="true" />
             </MenuToggle>
@@ -146,7 +151,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           <DropdownList>{dropdownItems}</DropdownList>
         </Dropdown>
       </Tooltip>
-      <Tooltip content={<p>{widgetConfig.static ? 'Widget locked' : 'Move'}</p>}>
+      <Tooltip aria-label="Move widget" content={<p>{widgetConfig.static ? 'Widget locked' : 'Move'}</p>}>
         <Icon
           onMouseDown={() => setIsDragging(true)}
           onMouseUp={() => setIsDragging(false)}
