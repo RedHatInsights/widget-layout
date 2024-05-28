@@ -30,6 +30,7 @@ import { getWidget } from '../Widgets/widgetDefaults';
 import { useAtomValue } from 'jotai';
 import classNames from 'classnames';
 import HeaderIcon from '../Icons/HeaderIcon';
+import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
@@ -53,6 +54,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const { headerLink } = widgetConfig.config || {};
   const hasHeader = headerLink && headerLink.href && headerLink.title;
+  const chrome = useChrome();
 
   const widgetData = useMemo(() => {
     return getWidget(widgetMapping, widgetType, () => setIsLoaded(true));
@@ -61,6 +63,14 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
   if (!widgetData) {
     return null;
   }
+
+  const widgetLink = (href: string) => {
+    if (href.includes('https://')) {
+      return href;
+    } else {
+      return `${window.location.origin}${chrome.isBeta() ? '/preview' : ''}${href}`;
+    }
+  };
 
   const { node, module, scope } = widgetData;
 
@@ -192,7 +202,8 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
                   <Button
                     className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0"
                     variant="link"
-                    onClick={() => window.open(headerLink.href, '_blank')}
+                    component="a"
+                    href={headerLink.href ? widgetLink(headerLink.href) : undefined}
                   >
                     {headerLink.title}
                   </Button>
