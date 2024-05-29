@@ -21,6 +21,7 @@ import {
 import { CompressIcon, EllipsisVIcon, ExpandIcon, GripVerticalIcon, LockIcon, MinusCircleIcon, UnlockIcon } from '@patternfly/react-icons';
 import React, { useMemo, useState } from 'react';
 import clsx from 'clsx';
+import { Link } from 'react-router-dom';
 
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
@@ -199,14 +200,11 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
               )}
               {hasHeader && isLoaded && (
                 <FlexItem>
-                  <Button
-                    className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0"
-                    variant="link"
-                    component="a"
-                    href={headerLink.href ? widgetLink(headerLink.href) : undefined}
-                  >
-                    {headerLink.title}
-                  </Button>
+                  {headerLink.href && (
+                    <Link className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" to={widgetLink(headerLink.href)}>
+                      {headerLink.title}
+                    </Link>
+                  )}
                 </FlexItem>
               )}
             </Flex>
