@@ -19,6 +19,8 @@
   }
   .pf-v5-c-card {
     &__header {
+      padding: var(--pf-v5-global--spacer--md);
+      padding-bottom: var(--pf-v5-global--spacer--sm);
       background: var(--pf-v5-global--BackgroundColor--150);
       .widg-c-icon--header {
         .service-icon {
@@ -35,6 +37,7 @@
       .widg-card-header-text {
         gap: 0;
         line-height: 0;
+        padding-top: 2px;
       }
       .pf-v5-c-menu-toggle {
         padding-left: 0;
