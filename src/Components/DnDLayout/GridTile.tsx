@@ -70,7 +70,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
     return (
       <>
         <DropdownItem
-          ouiaId={`${scope}-${widgetType}-widget`}
+          ouiaId={widgetConfig.static ? 'unlock-widget' : 'lock-widget'}
           onClick={() => {
             setIsOpen(false);
             setWidgetAttribute(widgetConfig.i, 'static', !widgetConfig.static);
@@ -80,7 +80,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           {widgetConfig.static ? 'Unlock location and size' : 'Lock location and size'}
         </DropdownItem>
         <DropdownItem
-          ouiaId={`${scope}-${widgetType}-widget`}
+          ouiaId="autosize-widget"
           isDisabled={isMaximized || widgetConfig.static}
           onClick={() => {
             setWidgetAttribute(widgetConfig.i, 'h', widgetConfig.maxH ?? widgetConfig.h);
@@ -91,7 +91,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           Autosize height to content
         </DropdownItem>
         <DropdownItem
-          ouiaId={`${scope}-${widgetType}-widget`}
+          ouiaId="minimize-widget"
           onClick={() => {
             setWidgetAttribute(widgetConfig.i, 'h', widgetConfig.minH ?? widgetConfig.h);
             setIsOpen(false);
@@ -102,7 +102,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           Minimize height
         </DropdownItem>
         <DropdownItem
-          ouiaId={`${scope}-${widgetType}-widget`}
+          ouiaId="remove-widget"
           onClick={() => {
             removeWidget(widgetConfig.i);
           }}
