@@ -201,8 +201,10 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
               {hasHeader && isLoaded && (
                 <FlexItem>
                   {headerLink.href && (
-                    <Link className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" to={widgetLink(headerLink.href)}>
-                      {headerLink.title}
+                    <Link to={widgetLink(headerLink.href)}>
+                      <Button className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" variant="link">
+                        {headerLink.title}
+                      </Button>
                     </Link>
                   )}
                 </FlexItem>
