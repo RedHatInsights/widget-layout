@@ -26,7 +26,7 @@ import { WarningModal } from '@patternfly/react-component-groups';
 const Controls = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const toggleOpen = useSetAtom(drawerExpandedAtom);
-  const [, setTemplateId] = useAtom(templateIdAtom);
+  const [templateId, setTemplateId] = useAtom(templateIdAtom);
 
   return (
     <>
@@ -40,9 +40,11 @@ const Controls = () => {
         onClose={() => setIsOpen(false)}
         onConfirm={() => {
           setIsOpen(false);
-          resetDashboardTemplate('landingPage').then(() => {
-            setTemplateId(NaN);
-          });
+          if (templateId > 0) {
+            resetDashboardTemplate(templateId).then(() => {
+              setTemplateId(NaN);
+            });
+          }
         }}
       >
         All your widget customizations will be discarded.
