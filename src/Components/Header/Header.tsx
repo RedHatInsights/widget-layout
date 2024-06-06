@@ -52,6 +52,7 @@ const Controls = () => {
       <ToolbarGroup className="pf-v5-u-flex-direction-column-reverse pf-v5-u-flex-direction-row-reverse-on-md pf-v5-u-flex-direction-row-on-lg">
         <ToolbarItem>
           <Button
+            ouiaId="widget-layout-reset-button"
             onClick={() => {
               setIsOpen(true);
             }}
