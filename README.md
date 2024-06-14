@@ -1,4 +1,4 @@
-# widget-layout
+# widget-layout foo
 Reusable drag and drop UI layout for frontends
 
 ## Initial etc/hosts setup
