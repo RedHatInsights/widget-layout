@@ -19,3 +19,12 @@
 .widg-c-page__main-section--grid {
   border-bottom: 0;
 }
+
+// bundle-specific styling for widget card body only
+
+.subscriptionInventory-subscriptions {    
+  display: grid; 
+  overflow: hidden;
+  container-type: inline-size;
+}
+
