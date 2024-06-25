@@ -25,6 +25,5 @@
 .subscriptionInventory-subscriptions {    
   display: grid; 
   overflow: hidden;
-  // eslint-disable-next-line
-  container-type: inline-size;
+  container-type: inline-size;  /* stylelint-disable-line */
 }
