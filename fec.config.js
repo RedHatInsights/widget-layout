@@ -32,15 +32,10 @@ module.exports = {
       './RootApp': path.resolve(__dirname, './src/AppEntry.tsx'),
       './WidgetLayout': path.resolve(__dirname, './src/Routes/Default/Default.tsx'),
     },
-    exclude: ['@patternfly/react-core', 'jotai', 'react', 'react-dom', 'react-redux', 'react-router-dom'],
+    exclude: ['react-router-dom'],
     shared: [
       {
-        '@patternfly/react-core': { singleton: true, requiredVersion: dependencies['@patternfly/react-core'] },
-        jotai: { singleton: true, requiredVersion: '*' },
-        react: { singleton: true, requiredVersion: dependencies.react },
-        'react-dom': { singleton: true, requiredVersion: dependencies['react-dom'] },
-        'react-redux': { singleton: true, requiredVersion: dependencies['react-redux'] },
-        'react-router-dom': { singleton: true, requiredVersion: dependencies['react-router-dom'] },
+        'react-router-dom': { singleton: true, version: dependencies['react-router-dom'], requiredVersion: '*' },
       },
     ],
   },

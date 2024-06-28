@@ -24,5 +24,6 @@ module.exports = {
         ignoreDeclarationSort: true,
       },
     ],
+    'rulesdir/forbid-pf-relative-imports': 'off',
   },
 };
