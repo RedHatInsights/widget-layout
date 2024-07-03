@@ -65,11 +65,21 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
     return null;
   }
 
-  const widgetLink = (href: string) => {
+  const widgetLink = (href: string, linkTitle: string | undefined) => {
     if (href.includes('https://')) {
-      return href;
+      return (
+        <Button component="a" href={href} className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" variant="link">
+          {linkTitle}
+        </Button>
+      );
     } else {
-      return `${window.location.origin}${chrome.isBeta() ? '/preview' : ''}${href}`;
+      return (
+        <Link to={href}>
+          <Button className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" variant="link">
+            {linkTitle}
+          </Button>
+        </Link>
+      );
     }
   };
 
@@ -198,17 +208,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
               ) : (
                 <Skeleton width="50%" />
               )}
-              {hasHeader && isLoaded && (
-                <FlexItem>
-                  {headerLink.href && (
-                    <Link to={widgetLink(headerLink.href)}>
-                      <Button className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" variant="link">
-                        {headerLink.title}
-                      </Button>
-                    </Link>
-                  )}
-                </FlexItem>
-              )}
+              {hasHeader && isLoaded && <FlexItem>{headerLink.href && widgetLink(headerLink.href, headerLink.title)}</FlexItem>}
             </Flex>
           </Flex>
         </Flex>
