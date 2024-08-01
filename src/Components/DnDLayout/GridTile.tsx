@@ -21,6 +21,7 @@ import {
 import { CompressIcon, EllipsisVIcon, ExpandIcon, GripVerticalIcon, LockIcon, MinusCircleIcon, UnlockIcon } from '@patternfly/react-icons';
 import React, { useMemo, useState } from 'react';
 import clsx from 'clsx';
+import { Link } from 'react-router-dom';
 
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
@@ -30,6 +31,7 @@ import { getWidget } from '../Widgets/widgetDefaults';
 import { useAtomValue } from 'jotai';
 import classNames from 'classnames';
 import HeaderIcon from '../Icons/HeaderIcon';
+import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
@@ -53,6 +55,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const { headerLink } = widgetConfig.config || {};
   const hasHeader = headerLink && headerLink.href && headerLink.title;
+  const chrome = useChrome();
 
   const widgetData = useMemo(() => {
     return getWidget(widgetMapping, widgetType, () => setIsLoaded(true));
@@ -61,6 +64,24 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
   if (!widgetData) {
     return null;
   }
+
+  const widgetLink = (href: string, linkTitle: string | undefined) => {
+    if (href.includes('https://')) {
+      return (
+        <Button component="a" href={href} className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" variant="link">
+          {linkTitle}
+        </Button>
+      );
+    } else {
+      return (
+        <Link to={href}>
+          <Button className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" variant="link">
+            {linkTitle}
+          </Button>
+        </Link>
+      );
+    }
+  };
 
   const { node, module, scope } = widgetData;
 
@@ -192,17 +213,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
               ) : (
                 <Skeleton width="50%" />
               )}
-              {hasHeader && isLoaded && (
-                <FlexItem>
-                  <Button
-                    className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0"
-                    variant="link"
-                    onClick={() => window.open(headerLink.href, '_blank')}
-                  >
-                    {headerLink.title}
-                  </Button>
-                </FlexItem>
-              )}
+              {hasHeader && isLoaded && <FlexItem>{headerLink.href && widgetLink(headerLink.href, headerLink.title)}</FlexItem>}
             </Flex>
           </Flex>
         </Flex>
