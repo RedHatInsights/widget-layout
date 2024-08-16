@@ -24,8 +24,17 @@ import {
   patchDashboardTemplate,
 } from '../../api/dashboard-templates';
 import useCurrentUser from '../../hooks/useCurrentUser';
-import { EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStateVariant, PageSection } from '@patternfly/react-core';
-import { GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
+import {
+  Button,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateBody,
+  EmptyStateHeader,
+  EmptyStateIcon,
+  EmptyStateVariant,
+  PageSection,
+} from '@patternfly/react-core';
+import { ExternalLinkAltIcon, GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { getWidget } from '../Widgets/widgetDefaults';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { columns, dropping_elem_id } from '../../consts';
@@ -35,6 +44,9 @@ import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
 export const breakpoints: {
   [key in Variants]: number;
 } = { xl: 1550, lg: 1400, md: 1100, sm: 800 };
+
+const documentationLink =
+  'https://access.redhat.com/documentation/en-us/red_hat_hybrid_cloud_console/1-latest/html-single/getting_started_with_the_red_hat_hybrid_cloud_console/index#customizing-main-page_navigating-the-console';
 
 const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => {
   return (
@@ -59,12 +71,11 @@ const LayoutEmptyState = () => {
           You don’t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to this
           dashboard body here.
         </EmptyStateBody>
-        {/* TODO: Add link to documentation once available [HCCDOC-2108]
         <EmptyStateActions>
-          <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end" component="a" href={`#`}>
+          <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end" component="a" href={documentationLink}>
             Learn about your widget dashboard
           </Button>
-        </EmptyStateActions> */}
+        </EmptyStateActions>
       </EmptyState>
     </PageSection>
   );
