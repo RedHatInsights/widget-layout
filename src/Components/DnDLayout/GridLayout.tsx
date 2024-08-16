@@ -45,6 +45,9 @@ export const breakpoints: {
   [key in Variants]: number;
 } = { xl: 1550, lg: 1400, md: 1100, sm: 800 };
 
+const documentationLink =
+  'https://access.redhat.com/documentation/en-us/red_hat_hybrid_cloud_console/1-latest/html-single/getting_started_with_the_red_hat_hybrid_cloud_console/index#customizing-main-page_navigating-the-console';
+
 const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => {
   return (
     <div ref={ref} className={`react-resizable-handle react-resizable-handle-${resizeHandleAxis}`}>
@@ -55,9 +58,6 @@ const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement
 
 const LayoutEmptyState = () => {
   const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
-
-  const documentationLink =
-    'https://access.redhat.com/documentation/en-us/red_hat_hybrid_cloud_console/1-latest/html-single/getting_started_with_the_red_hat_hybrid_cloud_console/index#customizing-main-page_navigating-the-console';
 
   useEffect(() => {
     setDrawerExpanded(true);
