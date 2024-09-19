@@ -1,4 +1,4 @@
-# widget-layout
+# widget-layout - foobar
 
 Reusable drag and drop UI layout for frontends
 
