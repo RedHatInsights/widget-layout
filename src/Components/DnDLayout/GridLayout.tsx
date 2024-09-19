@@ -35,6 +35,7 @@ import {
   PageSection,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
+import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { getWidget } from '../Widgets/widgetDefaults';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { columns, dropping_elem_id } from '../../consts';
@@ -98,6 +99,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const addNotification = useAddNotification();
   const setCurrentlyUsedWidgets = useSetAtom(currentlyUsedWidgetsAtom);
+  const { analytics } = useChrome();
 
   const [currentDropInItem, setCurrentDropInItem] = useAtom(currentDropInItemAtom);
   const droppingItemTemplate: ReactGridLayoutProps['droppingItem'] = useMemo(() => {
@@ -169,6 +171,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
           };
         }, prev)
       );
+      analytics.track('widget-layout.widget-add', { data });
     }
     event.preventDefault();
   };

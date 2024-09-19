@@ -21,6 +21,7 @@ import {
 import { CompressIcon, EllipsisVIcon, ExpandIcon, GripVerticalIcon, LockIcon, MinusCircleIcon, UnlockIcon } from '@patternfly/react-icons';
 import React, { useMemo, useState } from 'react';
 import clsx from 'clsx';
+import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
@@ -53,6 +54,8 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const { headerLink } = widgetConfig.config || {};
   const hasHeader = headerLink && headerLink.href && headerLink.title;
+
+  const { analytics } = useChrome();
 
   const widgetData = useMemo(() => {
     return getWidget(widgetMapping, widgetType, () => setIsLoaded(true));
@@ -105,6 +108,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           ouiaId="remove-widget"
           onClick={() => {
             removeWidget(widgetConfig.i);
+            analytics.track('widget-layout.widget-remove', { widgetType });
           }}
           icon={
             <Icon className="pf-v5-u-pb-2xl" status={widgetConfig.static ? undefined : 'danger'}>
@@ -153,7 +157,10 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
       </Tooltip>
       <Tooltip aria-label="Move widget" content={<p>{widgetConfig.static ? 'Widget locked' : 'Move'}</p>}>
         <Icon
-          onMouseDown={() => setIsDragging(true)}
+          onMouseDown={() => {
+            setIsDragging(true);
+            analytics.track('widget-layout.widget-move', { widgetType });
+          }}
           onMouseUp={() => setIsDragging(false)}
           className={clsx('drag-handle', {
             dragging: isDragging,
