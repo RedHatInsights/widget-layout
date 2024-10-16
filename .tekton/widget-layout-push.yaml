@@ -328,6 +328,13 @@ spec:
             - image: registry.access.redhat.com/ubi8/nodejs-20
               workingDir: /var/workdir
               name: unit-tests
+              computeResources:
+                requests:
+                  memory: 4Gi
+                  cpu: 2000m
+                limits:
+                  memory: 4Gi
+                  cpu: 2000m
               securityContext:
                 runAsUser: 0
               script: |
@@ -335,6 +342,7 @@ spec:
                 set -ex
                 
                 npm install
+                npm run lint
                 npm test
       - name: build-container
         params:
