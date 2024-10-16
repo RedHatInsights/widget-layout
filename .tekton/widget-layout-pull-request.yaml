@@ -337,6 +337,7 @@ spec:
                 #!/bin/bash
                 set -ex
                 
+                npm run lint
                 npm install
                 npm test
       - name: build-container
