@@ -10,7 +10,7 @@ const getRequestHeaders = () => ({
 
 export const widgetIdSeparator = '#';
 
-export type LayoutTypes = 'landingPage';
+export type LayoutTypes = 'landingPage' | 'landingPageItless';
 
 export type Variants = 'sm' | 'md' | 'lg' | 'xl';
 
