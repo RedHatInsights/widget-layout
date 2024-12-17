@@ -41,6 +41,7 @@ import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { columns, dropping_elem_id } from '../../consts';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
+import { useFlag } from '@unleash/proxy-client-react';
 
 export const breakpoints: {
   [key in Variants]: number;
@@ -100,6 +101,12 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const addNotification = useAddNotification();
   const setCurrentlyUsedWidgets = useSetAtom(currentlyUsedWidgetsAtom);
   const { analytics } = useChrome();
+  const isITLess = useFlag('platform.widget-layout.itless');
+  let targetLayout = layoutType;
+
+  if (layoutType === 'landingPage' && isITLess) {
+    targetLayout = 'landingPageItless';
+  }
 
   const [currentDropInItem, setCurrentDropInItem] = useAtom(currentDropInItemAtom);
   const droppingItemTemplate: ReactGridLayoutProps['droppingItem'] = useMemo(() => {
@@ -207,7 +214,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
       return;
     }
     // TODO template type should be pulled from app config for reusability
-    getDashboardTemplates(layoutType)
+    getDashboardTemplates(targetLayout)
       .then((templates) => {
         const customDefaultTemplate = getDefaultTemplate(templates);
         if (!customDefaultTemplate) {
