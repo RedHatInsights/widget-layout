@@ -58,6 +58,7 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
       unselectable="on"
       draggable={true}
       className="grid-tile"
+      ouiaId={`add-widget-card-${config?.title || widgetType}`}
     >
       <CardHeader className="pf-v5-u-py-md widg-c-drawer__header" actions={{ actions: headerActions }}>
         <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
