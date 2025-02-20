@@ -44,13 +44,20 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const nodeRect = e.target.getBoundingClientRect();
-        e.dataTransfer.setDragImage(
-          e.target as HTMLDivElement,
-          // mess with this to set the drag image and proper mouse position
-          e.clientX - nodeRect.left,
-          e.clientY - nodeRect.top
-        );
-        e.dataTransfer.setData('text', widgetType);
+
+        if (e.dataTransfer) {
+          e.dataTransfer.setDragImage(
+            e.target as HTMLDivElement,
+            // mess with this to set the drag image and proper mouse position
+            e.clientX - nodeRect.left,
+            e.clientY - nodeRect.top
+          );
+        }
+
+        if (e.dataTransfer) {
+          e.dataTransfer.setData('text', widgetType);
+        }
+
         setDropInItem(widgetType);
       }}
       onDragEnd={() => setDropInItem(undefined)}
