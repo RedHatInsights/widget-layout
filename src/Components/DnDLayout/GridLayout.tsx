@@ -24,16 +24,7 @@ import {
   patchDashboardTemplate,
 } from '../../api/dashboard-templates';
 import useCurrentUser from '../../hooks/useCurrentUser';
-import {
-  Button,
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateBody,
-  EmptyStateHeader,
-  EmptyStateIcon,
-  EmptyStateVariant,
-  PageSection,
-} from '@patternfly/react-core';
+import { Button, EmptyState, EmptyStateActions, EmptyStateBody, EmptyStateVariant, PageSection } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { getWidget } from '../Widgets/widgetDefaults';
@@ -65,9 +56,8 @@ const LayoutEmptyState = () => {
   }, []);
 
   return (
-    <PageSection className="empty-layout pf-v5-u-p-0">
-      <EmptyState variant={EmptyStateVariant.lg} className="pf-v5-u-p-sm">
-        <EmptyStateHeader titleText="No dashboard content" headingLevel="h2" icon={<EmptyStateIcon icon={PlusCircleIcon} />} />
+    <PageSection hasBodyWrapper={false} className="empty-layout pf-v6-u-p-0">
+      <EmptyState headingLevel="h2" icon={PlusCircleIcon} titleText="No dashboard content" variant={EmptyStateVariant.lg} className="pf-v6-u-p-sm">
         <EmptyStateBody>
           You don’t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to this
           dashboard body here.
@@ -291,7 +281,8 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
         width={layoutWidth}
         isDraggable={!isLayoutLocked}
         isResizable={!isLayoutLocked}
-        resizeHandle={getResizeHandle}
+        // The types package has outed types for this function
+        resizeHandle={getResizeHandle as unknown as ReactGridLayoutProps['resizeHandle']}
         resizeHandles={['sw', 'nw', 'se', 'ne']}
         // add droppping item default based on dragged template
         droppingItem={droppingItemTemplate}

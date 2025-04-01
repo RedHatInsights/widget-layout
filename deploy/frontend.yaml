@@ -18,10 +18,6 @@ objects:
         paths:
           - /apps/widget-layout
       image: ${IMAGE}:${IMAGE_TAG}
-      navItems: 
-      - appId: widget-layout
-        title: widget-layout
-        href: "/staging/widget-layout"
       module:
         manifestLocation: "/apps/widget-layout/fed-mods.json"
         modules:

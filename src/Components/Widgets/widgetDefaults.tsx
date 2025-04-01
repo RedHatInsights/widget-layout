@@ -12,7 +12,8 @@ const LoadingComponent = ({ onFinishedLoading }: { onFinishedLoading?: () => voi
     };
   }, []);
 
-  return <Skeleton width="100%" height="100%" />;
+  // Need to accommodate the width to show the border.
+  return <Skeleton style={{ borderRadius: 0 }} shape="square" width="100%" height="100%" />;
 };
 
 export const getWidget = (widgetMapping: WidgetMapping, type: string, onFinishedLoading?: () => void) => {

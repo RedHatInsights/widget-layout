@@ -111,7 +111,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
             analytics.track('widget-layout.widget-remove', { widgetType });
           }}
           icon={
-            <Icon className="pf-v5-u-pb-2xl" status={widgetConfig.static ? undefined : 'danger'}>
+            <Icon className="pf-v6-u-pb-2xl" status={widgetConfig.static ? undefined : 'danger'}>
               <MinusCircleIcon />
             </Icon>
           }
@@ -119,7 +119,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
         >
           Remove
           <HelperText>
-            <HelperTextItem className="pf-v5-u-text-wrap" variant="indeterminate">
+            <HelperTextItem className="pf-v6-u-text-wrap" variant="indeterminate">
               {"All 'removed' widgets can be added back by clicking the 'Add widgets' button."}
             </HelperTextItem>
           </HelperText>
@@ -166,7 +166,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
             dragging: isDragging,
           })}
         >
-          <GripVerticalIcon style={{ fill: 'var(--pf-v5-global--Color--200)' }} />
+          <GripVerticalIcon style={{ fill: 'var(--pf-t--global--icon--color--subtle)' }} />
         </Icon>
       </Tooltip>
     </>
@@ -182,17 +182,17 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
     >
       <CardHeader actions={{ actions: headerActions }}>
         <Flex>
-          <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
-            <div className="pf-v5-u-align-self-flex-start widg-c-icon--header pf-v5-u-mr-sm">
+          <Flex className="pf-v6-u-flex-direction-row pf-v6-u-flex-nowrap">
+            <div className="pf-v6-u-align-self-flex-start widg-c-icon--header pf-v6-u-mr-sm">
               {isLoaded ? <HeaderIcon icon={widgetConfig?.config?.icon} /> : <Skeleton shape="circle" width="25px" height="25px" />}
             </div>
-            <Flex className="pf-v5-u-flex-direction-row widg-card-header-text">
+            <Flex className="pf-v6-u-flex-direction-row widg-card-header-text">
               {isLoaded ? (
                 <CardTitle
                   style={{
                     userSelect: isDragging ? 'none' : 'auto',
                   }}
-                  className="pf-v5-u-align-self-flex-start"
+                  className="pf-v6-u-align-self-flex-start"
                 >
                   {widgetConfig?.config?.title || widgetType}
                 </CardTitle>
@@ -202,7 +202,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
               {hasHeader && isLoaded && (
                 <FlexItem>
                   <Button
-                    className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0"
+                    className="pf-v6-u-font-weight-bold pf-v6-u-font-size-xs pf-v6-u-p-0"
                     variant="link"
                     onClick={() => window.open(headerLink.href, '_blank')}
                   >
@@ -216,7 +216,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
       </CardHeader>
       <Divider />
       <CardBody
-        className={classNames('pf-v5-u-p-0', {
+        className={classNames('pf-v6-u-p-0', {
           [`${scope}-${widgetType}`]: scope && module,
         })}
       >
