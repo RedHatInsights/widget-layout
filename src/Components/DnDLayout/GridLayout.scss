@@ -20,7 +20,7 @@
   }
 
   &.react-grid-placeholder {
-    background-color: var(--pf-v5-global--palette--black-700);
+    background-color: var(--pf-t--color--gray--60);
     border-radius: 4px;
   }
 
@@ -35,5 +35,6 @@
 }
 
 #widget-layout-container {
+  width: 100%;
   min-height: 200px;
 }

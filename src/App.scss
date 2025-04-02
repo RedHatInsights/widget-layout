@@ -1,4 +1,8 @@
-.widg-l-flex--header,
+.widg-l-flex--header {
+  width: 100%;
+  max-width: 1566px;
+  margin: auto auto;
+}
 .widg-l-split--add-widget,
 .widg-l-gallery,
 .empty-layout
@@ -6,15 +10,17 @@
   margin: auto auto;
   max-width: 1550px;
 }
-#widget-layout-container,
-{
+#widget-layout-container{
   margin: auto auto;
   max-width: 1566px;
 }
 
 .widg-c-page__main-section--header,
 .widg-c-page__main-section--drawer {
-  border-bottom: 1px solid var(--pf-v5-global--disabled-color--200);
+  border-bottom: 1px solid var(--pf-t--global--color--disabled--100);
+}
+.widg-c-page__main-section--drawer {
+  background-color: var(--pf-t--color--blue--10);
 }
 .widg-c-page__main-section--grid {
   border-bottom: 0;
