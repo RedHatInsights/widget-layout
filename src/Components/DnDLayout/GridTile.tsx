@@ -204,7 +204,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
                   <Button
                     className="pf-v6-u-font-weight-bold pf-v6-u-font-size-xs pf-v6-u-p-0"
                     variant="link"
-                    onClick={() => window.open(headerLink.href, '_blank')}
+                    onClick={() => window.open(headerLink.href, '_self')}
                   >
                     {headerLink.title}
                   </Button>
