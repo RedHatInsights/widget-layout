@@ -180,7 +180,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
         [scope]: scope && module,
       })}
     >
-      <CardHeader actions={{ actions: headerActions }}>
+      <CardHeader className="pf-v6-u-pr-lg" actions={{ actions: headerActions }}>
         <Flex>
           <Flex className="pf-v6-u-flex-direction-row pf-v6-u-flex-nowrap">
             <div className="pf-v6-u-align-self-flex-start widg-c-icon--header pf-v6-u-mr-sm">
