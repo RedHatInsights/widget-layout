@@ -1,25 +1,36 @@
 import './Header.scss';
 
 import {
+  AlertActionLink,
   Button,
   ButtonVariant,
   Content,
+  Dropdown,
   Flex,
   FlexItem,
+  MenuToggle,
+  MenuToggleElement,
+  NotificationDrawerList,
+  NotificationDrawerListItem,
+  NotificationDrawerListItemHeader,
   PageSection,
+  Split,
+  SplitItem,
+  Switch,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
 import React from 'react';
-import { PlusCircleIcon } from '@patternfly/react-icons';
+import { EllipsisVIcon, PlusCircleIcon, UsersIcon } from '@patternfly/react-icons';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { templateIdAtom } from '../../state/templateAtom';
 import { resetDashboardTemplate } from '../../api/dashboard-templates';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { WarningModal } from '@patternfly/react-component-groups';
+import { Alert } from '@patternfly/react-core';
 
 const Controls = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -79,6 +90,13 @@ const Controls = () => {
 const Header = () => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
+
+  const [isWizardOpen, setIsWizardOpen] = React.useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
+  const onToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
@@ -96,6 +114,51 @@ const Header = () => {
               <Controls />
             </ToolbarContent>
           </Toolbar>
+        </FlexItem>
+      </Flex>
+      <Flex direction={{ default: 'column' }}>
+        <FlexItem>
+          <Alert
+            title={
+              <>
+                <Split>
+                  <SplitItem>
+                    <h1>You are qualified to opt into the workspace user access model for your organization.</h1>
+                  </SplitItem>
+                  <SplitItem isFilled></SplitItem>
+                  <SplitItem>
+                    <Dropdown
+                      toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                        <MenuToggle ref={toggleRef} isExpanded={isDropdownOpen} onClick={onToggle} variant="plain" icon={<EllipsisVIcon />} />
+                      )}
+                    ></Dropdown>
+                  </SplitItem>
+                </Split>
+              </>
+            }
+            customIcon={<UsersIcon />}
+            ouiaId="CustomAlert"
+            className="enable-workspaces-alert"
+            actionLinks={
+              <Flex>
+                <FlexItem>
+                  <Switch
+                    className="pf-v6-u-mt-xs"
+                    isChecked={isWizardOpen}
+                    onChange={(_e, value) => setIsWizardOpen(value)}
+                    label="Enable workspaces"
+                    ouiaId="enable-workspaces-switch"
+                    id="enable-workspaces-switch"
+                  />
+                </FlexItem>
+                <FlexItem>
+                  <AlertActionLink component="a" href="/iam/user-access/workspaces">
+                    Workspace hierarchy
+                  </AlertActionLink>
+                </FlexItem>
+              </Flex>
+            }
+          ></Alert>
         </FlexItem>
       </Flex>
     </PageSection>
