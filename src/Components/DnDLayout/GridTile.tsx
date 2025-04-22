@@ -57,6 +57,8 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
   const hasHeader = headerLink && headerLink.href && headerLink.title;
   const chrome = useChrome();
 
+  const { analytics } = useChrome();
+
   const widgetData = useMemo(() => {
     return getWidget(widgetMapping, widgetType, () => setIsLoaded(true));
   }, [widgetMapping, widgetType]);
@@ -91,6 +93,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
     return (
       <>
         <DropdownItem
+          ouiaId={widgetConfig.static ? 'unlock-widget' : 'lock-widget'}
           onClick={() => {
             setIsOpen(false);
             setWidgetAttribute(widgetConfig.i, 'static', !widgetConfig.static);
@@ -100,6 +103,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           {widgetConfig.static ? 'Unlock location and size' : 'Lock location and size'}
         </DropdownItem>
         <DropdownItem
+          ouiaId="autosize-widget"
           isDisabled={isMaximized || widgetConfig.static}
           onClick={() => {
             setWidgetAttribute(widgetConfig.i, 'h', widgetConfig.maxH ?? widgetConfig.h);
@@ -110,6 +114,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           Autosize height to content
         </DropdownItem>
         <DropdownItem
+          ouiaId="minimize-widget"
           onClick={() => {
             setWidgetAttribute(widgetConfig.i, 'h', widgetConfig.minH ?? widgetConfig.h);
             setIsOpen(false);
@@ -120,11 +125,13 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           Minimize height
         </DropdownItem>
         <DropdownItem
+          ouiaId="remove-widget"
           onClick={() => {
             removeWidget(widgetConfig.i);
+            analytics.track('widget-layout.widget-remove', { widgetType });
           }}
           icon={
-            <Icon className="pf-v5-u-pb-2xl" status={widgetConfig.static ? undefined : 'danger'}>
+            <Icon className="pf-v6-u-pb-2xl" status={widgetConfig.static ? undefined : 'danger'}>
               <MinusCircleIcon />
             </Icon>
           }
@@ -132,7 +139,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
         >
           Remove
           <HelperText>
-            <HelperTextItem className="pf-v5-u-text-wrap" variant="indeterminate">
+            <HelperTextItem className="pf-v6-u-text-wrap" variant="indeterminate">
               {"All 'removed' widgets can be added back by clicking the 'Add widgets' button."}
             </HelperTextItem>
           </HelperText>
@@ -145,6 +152,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
     <>
       <Tooltip content={<p>Actions</p>}>
         <Dropdown
+          ouiaId={`${scope}-${widgetType}-widget`}
           popperProps={{
             appendTo: document.body,
             maxWidth: '300px',
@@ -156,7 +164,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
               isExpanded={isOpen}
               onClick={() => setIsOpen((prev) => !prev)}
               variant="plain"
-              aria-label="Card title inline with images and actions example kebab toggle"
+              aria-label="widget actions menu toggle"
             >
               <EllipsisVIcon aria-hidden="true" />
             </MenuToggle>
@@ -167,15 +175,18 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
           <DropdownList>{dropdownItems}</DropdownList>
         </Dropdown>
       </Tooltip>
-      <Tooltip content={<p>{widgetConfig.static ? 'Widget locked' : 'Move'}</p>}>
+      <Tooltip aria-label="Move widget" content={<p>{widgetConfig.static ? 'Widget locked' : 'Move'}</p>}>
         <Icon
-          onMouseDown={() => setIsDragging(true)}
+          onMouseDown={() => {
+            setIsDragging(true);
+            analytics.track('widget-layout.widget-move', { widgetType });
+          }}
           onMouseUp={() => setIsDragging(false)}
           className={clsx('drag-handle', {
             dragging: isDragging,
           })}
         >
-          <GripVerticalIcon style={{ fill: 'var(--pf-v5-global--Color--200)' }} />
+          <GripVerticalIcon style={{ fill: 'var(--pf-t--global--icon--color--subtle)' }} />
         </Icon>
       </Tooltip>
     </>
@@ -189,33 +200,43 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
         [scope]: scope && module,
       })}
     >
-      <CardHeader actions={{ actions: headerActions }}>
+      <CardHeader className="pf-v6-u-pr-lg" actions={{ actions: headerActions }}>
         <Flex>
-          <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
-            <div className="pf-v5-u-align-self-flex-start widg-c-icon--header pf-v5-u-mr-sm">
+          <Flex className="pf-v6-u-flex-direction-row pf-v6-u-flex-nowrap">
+            <div className="pf-v6-u-align-self-flex-start widg-c-icon--header pf-v6-u-mr-sm">
               {isLoaded ? <HeaderIcon icon={widgetConfig?.config?.icon} /> : <Skeleton shape="circle" width="25px" height="25px" />}
             </div>
-            <Flex className="pf-v5-u-flex-direction-row widg-card-header-text">
+            <Flex className="pf-v6-u-flex-direction-row widg-card-header-text">
               {isLoaded ? (
                 <CardTitle
                   style={{
                     userSelect: isDragging ? 'none' : 'auto',
                   }}
-                  className="pf-v5-u-align-self-flex-start"
+                  className="pf-v6-u-align-self-flex-start"
                 >
                   {widgetConfig?.config?.title || widgetType}
                 </CardTitle>
               ) : (
                 <Skeleton width="50%" />
               )}
-              {hasHeader && isLoaded && <FlexItem>{headerLink.href && widgetLink(headerLink.href, headerLink.title)}</FlexItem>}
+              {hasHeader && isLoaded && (
+                <FlexItem>
+                  <Button
+                    className="pf-v6-u-font-weight-bold pf-v6-u-font-size-xs pf-v6-u-p-0"
+                    variant="link"
+                    onClick={() => window.open(headerLink.href, '_blank')}
+                  >
+                    {headerLink.title}
+                  </Button>
+                </FlexItem>
+              )}
             </Flex>
           </Flex>
         </Flex>
       </CardHeader>
       <Divider />
       <CardBody
-        className={classNames('pf-v5-u-p-0', {
+        className={classNames('pf-v6-u-p-0', {
           [`${scope}-${widgetType}`]: scope && module,
         })}
       >

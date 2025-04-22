@@ -33,8 +33,8 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
   const setDropInItem = useSetAtom(currentDropInItemAtom);
   const headerActions = (
     <Tooltip content={<p>Move widget</p>}>
-      <Icon className="pf-v5-u-pt-md widg-c-drawer__drag-handle">
-        <GripVerticalIcon style={{ fill: 'var(--pf-v5-global--Color--200)' }} />
+      <Icon className="pf-v6-u-pt-md widg-c-drawer__drag-handle">
+        <GripVerticalIcon style={{ fill: 'var(--pf-t--global--icon--color--subtle)' }} />
       </Icon>
     </Tooltip>
   );
@@ -44,13 +44,20 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const nodeRect = e.target.getBoundingClientRect();
-        e.dataTransfer.setDragImage(
-          e.target as HTMLDivElement,
-          // mess with this to set the drag image and proper mouse position
-          e.clientX - nodeRect.left,
-          e.clientY - nodeRect.top
-        );
-        e.dataTransfer.setData('text', widgetType);
+
+        if (e.dataTransfer) {
+          e.dataTransfer.setDragImage(
+            e.target as HTMLDivElement,
+            // mess with this to set the drag image and proper mouse position
+            e.clientX - nodeRect.left,
+            e.clientY - nodeRect.top
+          );
+        }
+
+        if (e.dataTransfer) {
+          e.dataTransfer.setData('text', widgetType);
+        }
+
         setDropInItem(widgetType);
       }}
       onDragEnd={() => setDropInItem(undefined)}
@@ -58,13 +65,14 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
       unselectable="on"
       draggable={true}
       className="grid-tile"
+      ouiaId={`add-widget-card-${config?.title || widgetType}`}
     >
-      <CardHeader className="pf-v5-u-py-md widg-c-drawer__header" actions={{ actions: headerActions }}>
-        <Flex className="pf-v5-u-flex-direction-row pf-v5-u-flex-nowrap">
-          <div className="pf-v5-u-align-self-flex-start widg-c-icon--header pf-v5-u-mr-sm">
+      <CardHeader className="pf-v6-u-py-md widg-c-drawer__header" actions={{ actions: headerActions }}>
+        <Flex className="pf-v6-u-flex-direction-row pf-v6-u-flex-nowrap">
+          <div className="pf-v6-u-align-self-flex-start widg-c-icon--header pf-v6-u-mr-sm">
             <HeaderIcon icon={config?.icon} />
           </div>
-          <CardTitle className="pf-v5-u-align-self-flex-start">{config?.title || widgetType}</CardTitle>
+          <CardTitle className="pf-v6-u-align-self-flex-start">{config?.title || widgetType}</CardTitle>
         </Flex>
       </CardHeader>
     </Card>
@@ -80,14 +88,15 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
 
   const panelContent = (
     <PageSection
-      className="widg-c-page__main-section--drawer pf-v5-u-p-md pf-v5-u-p-lg-on-sm"
+      hasBodyWrapper={false}
+      className="widg-c-page__main-section--drawer pf-v6-u-p-md pf-v6-u-p-lg-on-sm"
       style={{
-        backgroundColor: 'var(--pf-v5-global--palette--blue-50)',
+        backgroundColor: 'var(pf-t--global--icon--color--brand--default)',
       }}
     >
       <Split className="widg-l-split--add-widget">
         <SplitItem isFilled>
-          <Title headingLevel="h2" size="md" className="pf-v5-u-pb-sm">
+          <Title headingLevel="h2" size="md" className="pf-v6-u-pb-sm">
             Add new and previously removed widgets by clicking the <GripVerticalIcon /> icon, then drag and drop to a new location. Drag the corners
             of the cards to resize widgets.
           </Title>
@@ -95,7 +104,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
         <SplitItem>
           <Button
             variant="plain"
-            className="pf-v5-u-pt-0 pf-v5-u-pr-0"
+            className="pf-v6-u-pt-0 pf-v6-u-pr-0"
             onClick={() => {
               toggleOpen((prev) => !prev);
             }}
@@ -103,13 +112,12 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
           />
         </SplitItem>
       </Split>
-      <Gallery className="widg-l-gallery pf-v5-u-pt-sm" hasGutter>
+      <Gallery className="widg-l-gallery pf-v6-u-pt-sm" hasGutter>
         {filteredWidgetMapping.map(([type, { config }], i) => {
           return (
             <GalleryItem key={i}>
-              <WidgetWrapper widgetType={type} config={config}>
-                {getWidget(widgetMapping, type)}
-              </WidgetWrapper>
+              <WidgetWrapper widgetType={type} config={config} />
+              {/* </WidgetWrapper> */}
             </GalleryItem>
           );
         })}
