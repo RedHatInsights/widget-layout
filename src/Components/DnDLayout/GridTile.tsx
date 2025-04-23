@@ -55,7 +55,6 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
   const widgetMapping = useAtomValue(widgetMappingAtom);
   const { headerLink } = widgetConfig.config || {};
   const hasHeader = headerLink && headerLink.href && headerLink.title;
-  const chrome = useChrome();
 
   const { analytics } = useChrome();
 
@@ -67,23 +66,18 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
     return null;
   }
 
-  const widgetLink = (href: string, linkTitle: string | undefined) => {
-    if (href.includes('https://')) {
-      return (
-        <Button component="a" href={href} className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" variant="link">
-          {linkTitle}
-        </Button>
-      );
-    } else {
-      return (
-        <Link to={href}>
-          <Button className="pf-v5-u-font-weight-bold pf-v5-u-font-size-xs pf-v5-u-p-0" variant="link">
-            {linkTitle}
-          </Button>
-        </Link>
-      );
+  const [linkHref, linkTarget] = useMemo(() => {
+    if (!headerLink?.href) {
+      return [];
     }
-  };
+
+    try {
+      const url = new URL(headerLink.href);
+      return url.origin === window.location.origin ? [url.pathname, undefined] : [headerLink.href, '_blank'];
+    } catch {
+      return [headerLink.href];
+    }
+  }, [headerLink?.href]);
 
   const { node, module, scope } = widgetData;
 
@@ -224,7 +218,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
                   <Button
                     className="pf-v6-u-font-weight-bold pf-v6-u-font-size-xs pf-v6-u-p-0"
                     variant="link"
-                    onClick={() => window.open(headerLink.href, '_blank')}
+                    component={(props) => <Link {...props} to={linkHref} target={linkTarget} />}
                   >
                     {headerLink.title}
                   </Button>
