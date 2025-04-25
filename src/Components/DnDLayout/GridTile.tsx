@@ -21,7 +21,7 @@ import {
 import { CompressIcon, EllipsisVIcon, ExpandIcon, GripVerticalIcon, LockIcon, MinusCircleIcon, UnlockIcon } from '@patternfly/react-icons';
 import React, { useMemo, useState } from 'react';
 import clsx from 'clsx';
-import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
+import { Link } from 'react-router-dom';
 
 import './GridTile.scss';
 import { Layout } from 'react-grid-layout';
@@ -31,6 +31,7 @@ import { getWidget } from '../Widgets/widgetDefaults';
 import { useAtomValue } from 'jotai';
 import classNames from 'classnames';
 import HeaderIcon from '../Icons/HeaderIcon';
+import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 
 export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
 
@@ -64,6 +65,19 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
   if (!widgetData) {
     return null;
   }
+
+  const [linkHref, linkTarget] = useMemo(() => {
+    if (!headerLink?.href) {
+      return [];
+    }
+
+    try {
+      const url = new URL(headerLink.href);
+      return url.origin === window.location.origin ? [url.pathname, undefined] : [headerLink.href, '_blank'];
+    } catch {
+      return [headerLink.href];
+    }
+  }, [headerLink?.href]);
 
   const { node, module, scope } = widgetData;
 
@@ -204,7 +218,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
                   <Button
                     className="pf-v6-u-font-weight-bold pf-v6-u-font-size-xs pf-v6-u-p-0"
                     variant="link"
-                    onClick={() => window.open(headerLink.href, '_blank')}
+                    component={(props) => <Link {...props} to={linkHref} target={linkTarget} />}
                   >
                     {headerLink.title}
                   </Button>
