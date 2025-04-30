@@ -31,6 +31,7 @@ import { resetDashboardTemplate } from '../../api/dashboard-templates';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { WarningModal } from '@patternfly/react-component-groups';
 import { Alert } from '@patternfly/react-core';
+import AsyncComponent from '@redhat-cloud-services/frontend-components/AsyncComponent';
 
 const Controls = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -92,6 +93,7 @@ const Header = () => {
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
 
   const [isWizardOpen, setIsWizardOpen] = React.useState<boolean>(false);
+  const [isConfirmed, setIsConfirmed] = React.useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
   const onToggle = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -137,7 +139,7 @@ const Header = () => {
               </>
             }
             customIcon={<UsersIcon />}
-            ouiaId="CustomAlert"
+            ouiaId="enable-workspaces-alert"
             className="enable-workspaces-alert"
             actionLinks={
               <Flex>
@@ -159,6 +161,15 @@ const Header = () => {
               </Flex>
             }
           ></Alert>
+          {isWizardOpen && (
+            <AsyncComponent
+              appName="rbac"
+              module="./CreateWorkspaceWizardModule"
+              scope="rbac"
+              onCancel={() => setIsWizardOpen(!isWizardOpen)}
+              afterSubmit={() => setIsConfirmed(true)}
+            />
+          )}
         </FlexItem>
       </Flex>
     </PageSection>
