@@ -10,11 +10,21 @@
   margin: auto auto;
   max-width: 1550px;
 }
+.widg-l-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  .grid-tile {
+    min-width: 380px;
+    .pf-v6-c-icon__content {
+      padding-right: var(--pf-t--global--spacer--md);
+      padding-top: var(--pf-t--global--spacer--sm);
+    }
+  }
+}
 #widget-layout-container{
   margin: auto auto;
   max-width: 1566px;
 }
-
 .widg-c-page__main-section--header,
 .widg-c-page__main-section--drawer {
   border-bottom: 1px solid var(--pf-t--global--color--disabled--100);
