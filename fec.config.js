@@ -4,6 +4,7 @@ const dependencies = require('./package.json').dependencies;
 module.exports = {
   appUrl: ['/staging/widget-layout'],
   sassPrefix: '.widgetLayout, .landing',
+  frontendCRDPath: path.resolve(__dirname, './deploy/frontend.yaml'),
   debug: true,
   useProxy: true,
   proxyVerbose: true,
