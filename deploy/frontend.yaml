@@ -12,6 +12,7 @@ objects:
     spec:
       envName: ${ENV_NAME}
       title: widget-layout
+      feoConfigEnabled: true
       deploymentRepo: https://github.com/RedHatInsights/widget-layout
       API:
         versions:
@@ -21,12 +22,12 @@ objects:
           - /apps/widget-layout
       image: ${IMAGE}:${IMAGE_TAG}
       module:
-        manifestLocation: "/apps/widget-layout/fed-mods.json"
+        manifestLocation: /apps/widget-layout/fed-mods.json
         modules:
-          - id: "widgetLayout"
-            module: "./RootApp"
+          - id: widgetLayout
+            module: ./RootApp
             routes: 
-            - pathname: "/staging/widget-layout"
+            - pathname: /staging/widget-layout
 
 parameters:
   - name: ENV_NAME
