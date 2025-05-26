@@ -570,7 +570,8 @@ spec:
         optional: true
       - name: netrc
         optional: true
-  taskRunTemplate: {}
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-widget-layout
   workspaces:
     - name: workspace
       volumeClaimTemplate:
