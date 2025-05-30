@@ -133,7 +133,7 @@ const GridTile = ({ widgetType, isDragging, setIsDragging, setWidgetAttribute, w
         >
           Remove
           <HelperText>
-            <HelperTextItem className="pf-v6-u-text-wrap" variant="indeterminate">
+            <HelperTextItem className="pf-v6-u-text-wrap">
               {"All 'removed' widgets can be added back by clicking the 'Add widgets' button."}
             </HelperTextItem>
           </HelperText>
