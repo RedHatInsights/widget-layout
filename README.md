@@ -2,6 +2,14 @@
 
 Reusable drag and drop UI layout for frontends
 
+## Documentation
+
+- [Widget Layout Component Interface](docs/components/widget-layout.md) - Complete interface documentation for the WidgetLayout federated module
+- [GridLayout Component](docs/components/grid-layout.md) - Core layout engine with drag-and-drop, responsive grid system, and template persistence
+- [Creating Custom Widgets](docs/components/custom-widgets.md) - Guide for creating custom widgets that integrate with the grid layout system
+- [Layout Data Format](docs/layout-data-format.md) - Comprehensive documentation of the layout data structures, API endpoints, and data flow
+- [AI Agent Guidelines](docs/ai-agent-guidelines.md) - Guidelines for AI agents generating code documentation
+
 ## Initial etc/hosts setup
 
 In order to access the https://[env].foo.redhat.com in your browser, you have to add entries to your `/etc/hosts` file. This is a **one-time** setup that has to be done only once (unless you modify hosts) on each machine.
