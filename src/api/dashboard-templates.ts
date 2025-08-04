@@ -10,7 +10,7 @@ const getRequestHeaders = () => ({
 
 export const widgetIdSeparator = '#';
 
-export type LayoutTypes = 'landingPage';
+export type LayoutTypes = 'landingPage' | 'landing-landingPage';
 
 export type Variants = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -118,33 +118,27 @@ export const getWidgetIdentifier = (widgetType: string, uniqueId: string = crypt
   return `${widgetType}${widgetIdSeparator}${uniqueId}`;
 };
 
-export async function getBaseDashboardTemplate(): Promise<BaseTemplate[]>;
-export async function getBaseDashboardTemplate(type: LayoutTypes): Promise<BaseTemplate>;
-export async function getBaseDashboardTemplate(type?: LayoutTypes): Promise<BaseTemplate | BaseTemplate[]> {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/base-template${type ? `?dashboard=${type}` : ''}`, {
-    method: 'GET',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json.data;
-}
-
 // Returns multiple templates for a user (user can have multiple template copies) - we will render the one marked default: true by default
 export async function getDashboardTemplates(): Promise<DashboardTemplate[]>;
 export async function getDashboardTemplates(type: LayoutTypes): Promise<DashboardTemplate[]>;
 export async function getDashboardTemplates(type?: LayoutTypes): Promise<DashboardTemplate | DashboardTemplate[]> {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates${type ? `?dashboard=${type}` : ''}`, {
+  const searchParams = new URLSearchParams();
+  if (type) {
+    searchParams.append('dashboardType', type);
+  }
+  const url = new URL(`/api/widget-layout/v1/`, window.location.origin);
+  url.search = searchParams.toString();
+  const resp = await fetch(url.toString(), {
     method: 'GET',
     headers: getRequestHeaders(),
   });
-  handleErrors(resp);
   const json = await resp.json();
+  console.log({ json });
   return json.data;
 }
 
 export async function getWidgetMapping(): Promise<WidgetMapping> {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/widget-mapping`, {
+  const resp = await fetch(`/api/widget-layout/v1/widget-mapping`, {
     method: 'GET',
     headers: getRequestHeaders(),
   });
@@ -154,7 +148,7 @@ export async function getWidgetMapping(): Promise<WidgetMapping> {
 }
 
 export const resetDashboardTemplate = async (templateId: number): Promise<DashboardTemplate> => {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}/reset`, {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}/reset`, {
     method: 'POST',
     headers: getRequestHeaders(),
   });
@@ -167,7 +161,7 @@ export const patchDashboardTemplate = async (
   templateId: DashboardTemplate['id'],
   data: { templateConfig: PartialTemplateConfig }
 ): Promise<DashboardTemplate> => {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}`, {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}`, {
     method: 'PATCH',
     headers: getRequestHeaders(),
     body: JSON.stringify(data),
@@ -175,15 +169,6 @@ export const patchDashboardTemplate = async (
   handleErrors(resp);
   const json = await resp.json();
   return json.data;
-};
-
-export const deleteDashboardTemplate = async (templateId: DashboardTemplate['id']): Promise<boolean> => {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}`, {
-    method: 'DELETE',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  return resp.status === 204;
 };
 
 export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTemplate | undefined => {
