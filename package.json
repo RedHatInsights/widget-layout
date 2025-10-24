@@ -24,7 +24,7 @@
     "@patternfly/react-component-groups": "^6.1.0",
     "@patternfly/react-core": "^6.1.0",
     "@redhat-cloud-services/frontend-components": "^6.0.2",
-    "@redhat-cloud-services/frontend-components-notifications": "^5.0.2",
+    "@redhat-cloud-services/frontend-components-notifications": "^6.0.0",
     "awesome-debounce-promise": "^2.1.0",
     "classnames": "^2.5.1",
     "jotai": "^2.8.4",
