@@ -19,11 +19,8 @@ module.exports = {
   _unstableHotReload: process.env.HOT === 'true',
   routes: {
     ...(process.env.CONFIG_PORT && {
-      '/api/chrome-service/v1/static': {
-        host: `http://localhost:${process.env.CONFIG_PORT}`,
-      },
-      '/api/chrome-service/v1/dashboard-templates': {
-        host: `http://localhost:${process.env.CONFIG_PORT}`,
+      '/api/widget-layout': {
+        target: 'http://localhost:8000',
       },
     }),
   },
