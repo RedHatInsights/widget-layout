@@ -10,7 +10,7 @@ Custom widgets are React components that integrate with the Widget Layout system
 
 Widgets are loaded through a multi-step process:
 
-1. **Widget Mapping**: The backend provides widget configuration via `/api/chrome-service/v1/dashboard-templates/widget-mapping`
+1. **Widget Mapping**: The backend provides widget configuration via `/api/widget-layout/v1/widget-mapping`
 2. **Module Federation**: Widgets are loaded as federated modules using ScalprumComponent (configured via `fec.config.js`)
 3. **Grid Integration**: Each widget is wrapped in a GridTile that provides layout and interaction capabilities
 
@@ -129,7 +129,7 @@ npm run build
 
 ### Step 3: Configure Widget Mapping
 
-The widget mapping must be provided by the backend API at `/api/chrome-service/v1/dashboard-templates/widget-mapping`. Example configuration:
+The widget mapping must be provided by the backend API at `/api/widget-layout/v1/widget-mapping`. Example configuration:
 
 ```json
 {
@@ -388,7 +388,7 @@ Ensure your widget is properly registered by checking the widget mapping:
 
 ```tsx
 // Test if widget is available
-const widgetMapping = await fetch('/api/chrome-service/v1/dashboard-templates/widget-mapping')
+const widgetMapping = await fetch('/api/widget-layout/v1/widget-mapping')
   .then(res => res.json());
   
 console.log('Available widgets:', Object.keys(widgetMapping.data));
