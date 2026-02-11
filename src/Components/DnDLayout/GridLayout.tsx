@@ -43,7 +43,7 @@ const documentationLink =
 const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => {
   return (
     <div ref={ref} className={`react-resizable-handle react-resizable-handle-${resizeHandleAxis}`}>
-      <img src={ResizeHandleIcon} alt='' />
+      <img src={ResizeHandleIcon} alt="" />
     </div>
   );
 };
