@@ -1,6 +1,6 @@
 import './GridLayout.scss';
 import './GridTile.scss';
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { layoutVariantAtom } from '../../state/layoutAtom';
@@ -9,11 +9,11 @@ import DebouncePromise from 'awesome-debounce-promise';
 import React from 'react';
 import {
   LayoutTypes,
+  WidgetMapping as ScalprumWidgetMapping,
   getDashboardTemplates,
   getDefaultTemplate,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplate,
-  WidgetMapping as ScalprumWidgetMapping,
 } from '../../api/dashboard-templates';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { Button, EmptyState, EmptyStateActions, EmptyStateBody, EmptyStateVariant, PageSection, Skeleton } from '@patternfly/react-core';
@@ -22,7 +22,7 @@ import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
-import { GridLayout as PatternFlyGridLayout, WidgetMapping, ExtendedTemplateConfig, Variants } from '@patternfly/widgetized-dashboard';
+import { ExtendedTemplateConfig, GridLayout as PatternFlyGridLayout, Variants, WidgetMapping } from '@patternfly/widgetized-dashboard';
 import { ScalprumComponent } from '@scalprum/react-core';
 import HeaderIcon from '../Icons/HeaderIcon';
 
@@ -44,8 +44,8 @@ const LayoutEmptyState = () => {
     <PageSection hasBodyWrapper={false} className="empty-layout pf-v6-u-p-0">
       <EmptyState headingLevel="h2" icon={PlusCircleIcon} titleText="No dashboard content" variant={EmptyStateVariant.lg} className="pf-v6-u-p-sm">
         <EmptyStateBody>
-          You don't have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to this
-          dashboard body here.
+          You don&apos;t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to
+          this dashboard body here.
         </EmptyStateBody>
         <EmptyStateActions>
           <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end" component="a" href={documentationLink}>
@@ -76,7 +76,7 @@ const convertWidgetMapping = (scalprumMapping: ScalprumWidgetMapping): WidgetMap
         icon: scalprumWidget.config?.icon ? <HeaderIcon icon={scalprumWidget.config.icon} /> : undefined,
         headerLink: scalprumWidget.config?.headerLink,
         wrapperProps: { className: scalprumWidget.scope },
-        cardBodyProps: { className: scopedWidgetType }
+        cardBodyProps: { className: scopedWidgetType },
       },
       renderWidget: (_widgetId: string) => (
         <ScalprumComponent
