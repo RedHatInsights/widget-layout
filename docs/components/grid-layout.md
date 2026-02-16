@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `GridLayout` component (`src/Components/DnDLayout/GridLayout.tsx`) is the core layout engine that provides responsive, drag-and-drop functionality for widget positioning. It uses `react-grid-layout` under the hood and manages template persistence, responsive breakpoints, and widget interactions.
+The `GridLayout` component (`src/Components/DnDLayout/GridLayout.tsx`) is the core layout engine that provides responsive, drag-and-drop functionality for widget positioning. It uses `@patternfly/widgetized-dashboard` which internally uses `react-grid-layout` to manage template persistence, responsive breakpoints, and widget interactions.
 
 ## Component Interface
 
@@ -88,96 +88,56 @@ const setCurrentlyUsedWidgets = useSetAtom(currentlyUsedWidgetsAtom);
 - **`widgetMappingAtom`**: Available widget configurations
 - **`currentlyUsedWidgetsAtom`**: List of widget types currently in use
 
-## Drag and Drop System
+## PatternFly Grid Layout Integration
 
-### Widget Addition via Drop
+### Widget Management
+
+Widget addition, removal, drag-and-drop, and other layout operations are now handled by the `@patternfly/widgetized-dashboard` PatternFlyGridLayout component. The component provides callbacks for template changes and widget tracking:
 
 ```tsx
-// From src/Components/DnDLayout/GridLayout.tsx
-const onDrop: ReactGridLayoutProps['onDrop'] = (_layout: ExtendedLayoutItem[], layoutItem: ExtendedLayoutItem, event: DragEvent) => {
-  const data = event.dataTransfer?.getData('text') || '';
-  if (isWidgetType(widgetMapping, data)) {
-    setCurrentDropInItem(undefined);
-    setTemplate((prev) =>
-      Object.entries(prev).reduce((acc, [size, layout]) => {
-        const newWidget = {
-          ...layoutItem,
-          ...widgetMapping[data].defaults,
-          // make sure the configuration is valid for all layout sizes
-          w: size === layoutVariant ? layoutItem.w : Math.min(widgetMapping[data].defaults.w, columns[size as Variants]),
-          x: size === layoutVariant ? layoutItem.x : Math.min(layoutItem.x, columns[size as Variants]),
-          widgetType: data,
-          i: getWidgetIdentifier(data),
-          title: 'New title',
-          config: widgetMapping[data].config,
-        };
-        return {
-          ...acc,
-          [size]: layout.reduce<ExtendedLayoutItem[]>(
-            (acc, curr) => {
-              if (curr.x + curr.w > newWidget.x && curr.y + curr.h <= newWidget.y) {
-                acc.push(curr);
-              } else {
-                // push the current items down on the Y axis if they are supposed to be below the new widget
-                acc.push({ ...curr, y: curr.y + curr.h });
-              }
-
-              return acc;
-            },
-            [newWidget]
-          ),
-        };
-      }, prev)
-    );
-    analytics.track('widget-layout.widget-add', { data });
+// Template change handler
+const handleTemplateChange = async (newTemplate: ExtendedTemplateConfig) => {
+  if (isLayoutLocked || templateId < 0) {
+    return;
   }
-  event.preventDefault();
+
+  // Update local state
+  setTemplate(newTemplate as any);
+
+  // Update currently used widgets
+  const activeLayout = newTemplate[layoutVariant] || [];
+  setCurrentlyUsedWidgets(activeLayout.map((item) => item.widgetType));
+
+  try {
+    // Convert and persist to backend
+    const templateConfig: any = { sm: [], md: [], lg: [], xl: [] };
+    (Object.keys(newTemplate) as Variants[]).forEach((variant) => {
+      templateConfig[variant] = newTemplate[variant].map(({ widgetType, config, locked, ...item }) => ({
+        ...item,
+        title: item.title || 'Widget',
+      }));
+    });
+
+    await debouncedPatchDashboardTemplate(templateId, { templateConfig });
+  } catch (error) {
+    console.error(error);
+    addNotification({
+      variant: 'danger',
+      title: 'Failed to patch dashboard configuration',
+      description: 'Your dashboard changes were unable to be saved.',
+    });
+  }
 };
-```
 
-### Drop Preview
+// Active widgets tracking
+const handleActiveWidgetsChange = (widgetTypes: string[]) => {
+  setCurrentlyUsedWidgets(widgetTypes);
+};
 
-```tsx
-// Drop preview template
-const droppingItemTemplate: ReactGridLayoutProps['droppingItem'] = useMemo(() => {
-  if (currentDropInItem && isWidgetType(widgetMapping, currentDropInItem)) {
-    return {
-      ...widgetMapping[currentDropInItem].defaults,
-      i: dropping_elem_id,
-      widgetType: currentDropInItem,
-      title: 'New title',
-      config: widgetMapping[currentDropInItem].config,
-    };
-  }
-}, [currentDropInItem]);
-```
-
-### Widget Management Functions
-
-```tsx
-// Widget attribute modification
-const setWidgetAttribute: SetWidgetAttribute = (id, attributeName, value) =>
-  setTemplate((prev) =>
-    Object.entries(prev).reduce(
-      (acc, [size, layout]) => ({
-        ...acc,
-        [size]: layout.map((widget) => (widget.i === id ? { ...widget, [attributeName]: value } : widget)),
-      }),
-      prev
-    )
-  );
-
-// Widget removal
-const removeWidget = (id: string) =>
-  setTemplate((prev) =>
-    Object.entries(prev).reduce(
-      (acc, [size, layout]) => ({
-        ...acc,
-        [size]: layout.filter((widget) => widget.i !== id),
-      }),
-      prev
-    )
-  );
+// Drawer expand/collapse tracking
+const handleDrawerExpandChange = (expanded: boolean) => {
+  setDrawerExpanded(expanded);
+};
 ```
 
 ## Template Persistence
@@ -263,85 +223,63 @@ useEffect(() => {
 
 ## Responsive Behavior
 
-### Resize Observer
+Responsive breakpoint detection and layout adjustments are now handled automatically by the `@patternfly/widgetized-dashboard` PatternFlyGridLayout component. The component internally manages viewport width detection and automatically switches between responsive variants (xl, lg, md, sm) based on the defined breakpoints.
+
+## Widget Rendering with PatternFly Grid Layout
+
+The component now uses `@patternfly/widgetized-dashboard` for widget rendering and management. Widget cards, drag-and-drop functionality, and layout management are handled by the PatternFlyGridLayout component.
+
+### PatternFly Integration
 
 ```tsx
-// Automatic layout variant detection
-useEffect(() => {
-  const currentWidth = layoutRef.current?.getBoundingClientRect().width ?? 1200;
-  const variant: Variants = getGridDimensions(currentWidth);
-  setLayoutVariant(variant);
-  setLayoutWidth(currentWidth);
-  
-  const observer = new ResizeObserver((entries) => {
-    if (!entries[0]) return;
+// From src/Components/DnDLayout/GridLayout.tsx
+<PatternFlyGridLayout
+  widgetMapping={widgetMapping}
+  template={patternFlyTemplate}
+  onTemplateChange={handleTemplateChange}
+  isLayoutLocked={isLayoutLocked}
+  emptyStateComponent={<LayoutEmptyState />}
+  documentationLink={documentationLink}
+  analytics={analytics?.track ? (event, data) => analytics.track(event, data) : undefined}
+  showEmptyState={!isLoaded}
+  onDrawerExpandChange={handleDrawerExpandChange}
+  onActiveWidgetsChange={handleActiveWidgetsChange}
+/>
+```
 
-    const currentWidth = entries[0].contentRect.width;
-    const variant: Variants = getGridDimensions(currentWidth);
-    setLayoutVariant(variant);
-    setLayoutWidth(currentWidth);
+### Widget Mapping Conversion
+
+The component converts Scalprum widget mapping to PatternFly widget mapping format:
+
+```tsx
+const convertWidgetMapping = (scalprumMapping: ScalprumWidgetMapping): WidgetMapping => {
+  const result: WidgetMapping = {};
+
+  Object.keys(scalprumMapping).forEach((widgetType) => {
+    const scalprumWidget = scalprumMapping[widgetType];
+    const scopedWidgetType = `${scalprumWidget.scope}-${widgetType}`;
+    result[widgetType] = {
+      defaults: scalprumWidget.defaults,
+      config: {
+        title: scalprumWidget.config?.title,
+        icon: scalprumWidget.config?.icon ? <HeaderIcon icon={scalprumWidget.config.icon} /> : undefined,
+        headerLink: scalprumWidget.config?.headerLink,
+        wrapperProps: { className: scalprumWidget.scope },
+        cardBodyProps: { className: scopedWidgetType }
+      },
+      renderWidget: (_widgetId: string) => (
+        <ScalprumComponent
+          fallback={<Skeleton />}
+          scope={scalprumWidget.scope}
+          module={scalprumWidget.module}
+          importName={scalprumWidget.importName}
+        />
+      ),
+    };
   });
-  
-  if (layoutRef.current) {
-    observer.observe(layoutRef.current);
-  }
 
-  return () => {
-    observer.disconnect();
-  };
-}, []);
-```
-
-## Grid Tile Integration
-
-### Widget Rendering
-
-```tsx
-// How widgets are rendered within GridTiles
-{activeLayout
-  .map(({ widgetType, title, ...rest }, index) => {
-    const widget = getWidget(widgetMapping, widgetType);
-    if (!widget) {
-      return null;
-    }
-    const config = widgetMapping[widgetType]?.config;
-    return (
-      <div key={rest.i} data-grid={rest} tabIndex={index} className={`widget-columns-${rest.w} widget-rows-${rest.h}`}>
-        <GridTile
-          isDragging={isDragging}
-          setIsDragging={setIsDragging}
-          widgetType={widgetType}
-          widgetConfig={{ ...rest, colWidth: 1200 / 4, config }}
-          setWidgetAttribute={setWidgetAttribute}
-          removeWidget={removeWidget}
-        >
-          {rest.i}
-        </GridTile>
-      </div>
-    );
-  })
-  .filter((layoutItem) => layoutItem !== null)}
-```
-
-### GridTile Props Interface
-
-```tsx
-// From src/Components/DnDLayout/GridTile.tsx
-export type SetWidgetAttribute = <T extends string | number | boolean>(id: string, attributeName: keyof ExtendedLayoutItem, value: T) => void;
-
-export type GridTileProps = React.PropsWithChildren<{
-  widgetType: string;
-  icon?: React.ComponentClass;
-  setIsDragging: (isDragging: boolean) => void;
-  isDragging: boolean;
-  setWidgetAttribute: SetWidgetAttribute;
-  widgetConfig: Layout & {
-    colWidth: number;
-    locked?: boolean;
-    config?: WidgetConfiguration;
-  };
-  removeWidget: (id: string) => void;
-}>;
+  return result;
+};
 ```
 
 ## Empty State
@@ -382,45 +320,26 @@ const LayoutEmptyState = () => {
 {activeLayout.length === 0 && !currentDropInItem && isLoaded && <LayoutEmptyState />}
 ```
 
-## Resize Handles
+## Layout Configuration
 
-### Custom Resize Handle
-
-```tsx
-// From src/Components/DnDLayout/GridLayout.tsx
-const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => {
-  return (
-    <div ref={ref} className={`react-resizable-handle react-resizable-handle-${resizeHandleAxis}`}>
-      <img src={ResizeHandleIcon} />
-    </div>
-  );
-};
-```
-
-### ReactGridLayout Configuration
+The PatternFly GridLayout component is configured with the following props:
 
 ```tsx
-<ReactGridLayout
-  key={'grid-' + layoutVariant}
-  draggableHandle=".drag-handle"
-  layout={template[layoutVariant]}
-  cols={columns[layoutVariant]}
-  rowHeight={56}
-  width={layoutWidth}
-  isDraggable={!isLayoutLocked}
-  isResizable={!isLayoutLocked}
-  resizeHandle={getResizeHandle as unknown as ReactGridLayoutProps['resizeHandle']}
-  resizeHandles={['sw', 'nw', 'se', 'ne']}
-  droppingItem={droppingItemTemplate}
-  isDroppable={!isLayoutLocked}
-  onDrop={onDrop}
-  useCSSTransforms
-  verticalCompact
-  onLayoutChange={onLayoutChange}
->
-  {/* Widget content */}
-</ReactGridLayout>
+<PatternFlyGridLayout
+  widgetMapping={widgetMapping}           // Converted widget mapping
+  template={patternFlyTemplate}           // Template for all breakpoints
+  onTemplateChange={handleTemplateChange} // Template persistence handler
+  isLayoutLocked={isLayoutLocked}         // Lock/unlock layout editing
+  emptyStateComponent={<LayoutEmptyState />}
+  documentationLink={documentationLink}   // Link to documentation
+  analytics={analytics?.track}            // Analytics tracking function
+  showEmptyState={!isLoaded}              // Show empty state while loading
+  onDrawerExpandChange={handleDrawerExpandChange}
+  onActiveWidgetsChange={handleActiveWidgetsChange}
+/>
 ```
+
+Widget cards, resize handles, drag handles, and other UI elements are provided by the PatternFly component internally.
 
 ## Styling
 
@@ -471,16 +390,16 @@ className={`widget-columns-${rest.w} widget-rows-${rest.h}`}
 
 ### Event Tracking
 
+Analytics tracking is passed to the PatternFly GridLayout component:
+
 ```tsx
-// Widget addition tracking
-analytics.track('widget-layout.widget-add', { data });
-
-// Widget movement tracking (in GridTile)
-analytics.track('widget-layout.widget-move', { widgetType });
-
-// Widget removal tracking (in GridTile)
-analytics.track('widget-layout.widget-remove', { widgetType });
+<PatternFlyGridLayout
+  analytics={analytics?.track ? (event, data) => analytics.track(event, data) : undefined}
+  // ... other props
+/>
 ```
+
+The PatternFly component handles tracking of widget operations (add, move, remove, resize, etc.) internally.
 
 ## Error Handling
 
@@ -560,10 +479,11 @@ import GridLayout from './Components/DnDLayout/GridLayout';
 - `useChrome()` (from `@redhat-cloud-services/frontend-components/useChrome`)
 
 ### External Libraries
-- `react-grid-layout`: Core grid functionality
+- `@patternfly/widgetized-dashboard`: Core grid functionality and widget management
 - `awesome-debounce-promise`: Debounced API calls
 - `jotai`: State management
 - `@patternfly/react-core`: UI components
+- `@scalprum/react-core`: Federated module loading for widgets
 
 ---
 

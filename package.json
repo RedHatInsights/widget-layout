@@ -23,6 +23,7 @@
   "dependencies": {
     "@patternfly/react-component-groups": "^6.4.0",
     "@patternfly/react-core": "^6.4.0",
+    "@patternfly/widgetized-dashboard": "^1.0.0-prerelease.3",
     "@redhat-cloud-services/frontend-components": "^7.0.24",
     "@redhat-cloud-services/frontend-components-notifications": "^5.0.7",
     "awesome-debounce-promise": "^2.1.0",
