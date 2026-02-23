@@ -343,30 +343,22 @@ export type WidgetMapping = {
 
 ## API Endpoints
 
-### Base Templates
+**Note**: The API has been migrated from `/api/chrome-service/v1/dashboard-templates` to `/api/widget-layout/v1/`. The base template fetch functions have been removed, and the delete dashboard template functionality is no longer available. They were not used in this codebase.
+
+### Dashboard Templates
 
 ```bash
-GET /api/chrome-service/v1/dashboard-templates/base-template
-# Returns: BaseTemplate[]
-
-GET /api/chrome-service/v1/dashboard-templates/base-template?dashboard=landingPage
-# Returns: BaseTemplate
-```
-
-### User Templates
-
-```bash
-GET /api/chrome-service/v1/dashboard-templates
+GET /api/widget-layout/v1/
 # Returns: DashboardTemplate[]
 
-GET /api/chrome-service/v1/dashboard-templates?dashboard=landingPage
+GET /api/widget-layout/v1/?dashboardType=landingPage
 # Returns: DashboardTemplate[]
 ```
 
 ### Widget Mapping
 
 ```bash
-GET /api/chrome-service/v1/dashboard-templates/widget-mapping
+GET /api/widget-layout/v1/widget-mapping
 # Returns: WidgetMapping
 ```
 
@@ -374,7 +366,7 @@ GET /api/chrome-service/v1/dashboard-templates/widget-mapping
 
 ```bash
 # Update template configuration
-PATCH /api/chrome-service/v1/dashboard-templates/{templateId}
+PATCH /api/widget-layout/v1/{templateId}
 Content-Type: application/json
 
 {
@@ -387,10 +379,7 @@ Content-Type: application/json
 }
 
 # Reset template to base configuration
-POST /api/chrome-service/v1/dashboard-templates/{templateId}/reset
-
-# Delete template
-DELETE /api/chrome-service/v1/dashboard-templates/{templateId}
+POST /api/widget-layout/v1/{templateId}/reset
 ```
 
 ## Data Flow and Persistence

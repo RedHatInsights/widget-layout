@@ -54,6 +54,8 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
           const widgetConfig = value.config;
           const hasPermissions = widgetConfig && widgetConfig.permissions ? await checkPermissions(widgetConfig.permissions) : true;
           if (hasPermissions) {
+            // this key is composed on the backend side to ensure unique widget names when collect from FEO
+            // '<scope>-<moduleName>(-<importName>?)'
             resolvedAcc[key] = value;
           }
           return acc;

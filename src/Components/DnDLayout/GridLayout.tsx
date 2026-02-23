@@ -76,7 +76,7 @@ const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplate, 
   onlyResolvesLast: true,
 });
 
-const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { isLayoutLocked?: boolean; layoutType?: LayoutTypes }) => {
+const GridLayout = ({ isLayoutLocked = false, layoutType = 'landing-landingPage' }: { isLayoutLocked?: boolean; layoutType?: LayoutTypes }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -296,6 +296,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .map(({ widgetType, title, ...rest }, index) => {
             const widget = getWidget(widgetMapping, widgetType);
+            console.log({ widgetType, widgetMapping, widget });
             if (!widget) {
               return null;
             }
