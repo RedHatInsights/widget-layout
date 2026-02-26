@@ -8,6 +8,7 @@ import ResizeHandleSVG from './resize-handle.svg';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { layoutVariantAtom } from '../../state/layoutAtom';
 import { templateAtom, templateIdAtom } from '../../state/templateAtom';
+import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import DebouncePromise from 'awesome-debounce-promise';
 import {
   LayoutTypes,
@@ -76,6 +77,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const addNotification = useAddNotification();
   const setCurrentlyUsedWidgets = useSetAtom(currentlyUsedWidgetsAtom);
   const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
+  const currentDropInItem = useAtomValue(currentDropInItemAtom);
   const { analytics } = useChrome();
 
   // Convert Scalprum mapping to PatternFly mapping
@@ -199,6 +201,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
           showEmptyState={!isLoaded}
           onDrawerExpandChange={handleDrawerExpandChange}
           onActiveWidgetsChange={handleActiveWidgetsChange}
+          droppingWidgetType={currentDropInItem}
         />
       )}
     </div>
