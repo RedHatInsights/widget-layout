@@ -5,6 +5,7 @@ import { WidgetMapping } from '@patternfly/widgetized-dashboard';
 import { ScalprumComponent } from '@scalprum/react-core';
 import { WidgetMapping as ScalprumWidgetMapping } from '../../api/dashboard-templates';
 import HeaderIcon from '../Icons/HeaderIcon';
+import './WidgetSkeleton.scss';
 
 /**
  * Adapter to convert Scalprum WidgetMapping to PatternFly WidgetMapping.
@@ -28,7 +29,7 @@ const convertWidgetMapping = (scalprumMapping: ScalprumWidgetMapping): WidgetMap
       },
       renderWidget: (_widgetId: string) => (
         <ScalprumComponent
-          fallback={<Skeleton style={{ borderRadius: 0 }} shape="square" width="100%" height="100%" />}
+          fallback={<Skeleton shape="square" width="100%" height="100%" />}
           scope={scalprumWidget.scope}
           module={scalprumWidget.module}
           importName={scalprumWidget.importName}

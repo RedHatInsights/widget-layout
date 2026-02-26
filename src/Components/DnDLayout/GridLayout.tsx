@@ -8,6 +8,7 @@ import ResizeHandleSVG from './resize-handle.svg';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { layoutVariantAtom } from '../../state/layoutAtom';
 import { templateAtom, templateIdAtom } from '../../state/templateAtom';
+import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import DebouncePromise from 'awesome-debounce-promise';
 import {
   LayoutTypes,
@@ -59,8 +60,8 @@ const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplate, 
   onlyResolvesLast: true,
 });
 
-const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLElement>) => (
-  <div ref={ref as React.Ref<HTMLDivElement>} className={`react-resizable-handle react-resizable-handle-${resizeHandleAxis}`}>
+const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => (
+  <div ref={ref} className={`react-resizable-handle react-resizable-handle-${resizeHandleAxis}`}>
     <img src={ResizeHandleSVG} alt="" aria-hidden="true" />
   </div>
 );
@@ -76,6 +77,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const addNotification = useAddNotification();
   const setCurrentlyUsedWidgets = useSetAtom(currentlyUsedWidgetsAtom);
   const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
+  const currentDropInItem = useAtomValue(currentDropInItemAtom);
   const { analytics } = useChrome();
 
   // Convert Scalprum mapping to PatternFly mapping
@@ -199,6 +201,7 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
           showEmptyState={!isLoaded}
           onDrawerExpandChange={handleDrawerExpandChange}
           onActiveWidgetsChange={handleActiveWidgetsChange}
+          droppingWidgetType={currentDropInItem}
         />
       )}
     </div>
