@@ -1,0 +1,67 @@
+// Widget header overrides for @patternfly/widgetized-dashboard
+// Matches the old grid-tile card header styling
+
+.pf-v6-widget-grid-tile {
+  overflow: hidden;
+
+  // Header padding and background (matches old .pf-v6-c-card__header)
+  .pf-v6-widget-grid-tile__header {
+    background: var(--pf-t--global--background--color--200);
+    border-bottom: var(--pf-t--global--border--width--regular) solid var(--pf-t--global--border--color--default);
+    padding: var(--pf-t--global--spacer--md);
+    padding-top: var(--pf-t--global--spacer--sm);
+    padding-bottom: var(--pf-t--global--spacer--sm);
+
+
+    // Prevent header content from overflowing
+    .pf-v6-c-card__header-main {
+      min-width: 0;
+
+      > .pf-v6-l-flex {
+        min-width: 0;
+      }
+    }
+  }
+
+  // Card actions spacing (matches old .pf-v6-c-card__actions)
+  .pf-v6-c-card__actions {
+    padding-left: var(--pf-t--global--spacer--xs);
+  }
+
+  // Card body background (matches old .pf-v6-c-card__body)
+  .pf-v6-widget-grid-tile__body {
+    background: var(--pf-t--global--background--color--100);
+  }
+
+  // Header layout: icon + text row
+  .pf-v6-widget-header-layout {
+    align-items: center;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  // Header text: title + link on same row, wrapping allowed
+  .pf-v6-widget-card-header-text {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--pf-t--global--spacer--sm);
+    line-height: 1.5;
+    min-width: 0;
+    flex-shrink: 1;
+
+    // Header link (matches old .pf-v6-u-font-size-xs .pf-v6-u-font-weight-bold)
+    .pf-v6-widget-grid-tile__header-link {
+      font-size: var(--pf-t--global--font--size--xs);
+      font-weight: var(--pf-t--global--font--weight--body--bold);
+      white-space: normal;
+      padding: 0;
+    }
+  }
+
+  // Kebab menu toggle compact padding (matches old .pf-v6-c-menu-toggle)
+  .pf-v6-widget-grid-tile__menu-toggle {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
