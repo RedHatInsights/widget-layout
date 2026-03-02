@@ -1,4 +1,4 @@
-import { Layout } from 'react-grid-layout';
+import { LayoutItem } from 'react-grid-layout';
 import { ScalprumComponentProps } from '@scalprum/react-core';
 import { dropping_elem_id } from '../consts';
 import { VisibilityFunctions } from '@redhat-cloud-services/types';
@@ -14,7 +14,7 @@ export type LayoutTypes = 'landingPage';
 
 export type Variants = 'sm' | 'md' | 'lg' | 'xl';
 
-export type LayoutWithTitle = Layout & { title: string };
+export type LayoutWithTitle = LayoutItem & { title: string };
 
 export type TemplateConfig = {
   [k in Variants]: LayoutWithTitle[];
@@ -80,6 +80,7 @@ export type WidgetDefaults = {
   h: number;
   maxH: number;
   minH: number;
+  minW?: number;
 };
 
 export type WidgetHeaderLink = {

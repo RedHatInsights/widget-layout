@@ -1,0 +1,33 @@
+// Icon sizing for the widget drawer (uses .widg-c-icon--header wrapper)
+.widg-c-icon--header {
+  .service-icon {
+    height: 28px;
+    width: 28px;
+  }
+  .pf-v6-svg {
+    color: var(--pf-t--color--blue--50);
+    height: 22px;
+    width: 22px;
+    margin-bottom: var(--pf-t--global--spacer--sm);
+  }
+}
+
+// Icon sizing for the card header (library wraps icons in .pf-v6-c-icon)
+.pf-v6-widget-header-layout {
+  .pf-v6-c-icon {
+    --pf-v6-c-icon--Width: 28px;
+    --pf-v6-c-icon--Height: 28px;
+    flex-shrink: 0;
+
+    .service-icon {
+      display: block;
+      height: 28px;
+      width: 28px;
+    }
+    .pf-v6-svg {
+      color: var(--pf-t--color--blue--50);
+      height: 22px;
+      width: 22px;
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Custom widgets are React components that integrate with the Widget Layout system through federated modules. They are loaded dynamically via ScalprumComponent and displayed within GridTile containers that provide drag-and-drop functionality.
+Custom widgets are React components that integrate with the Widget Layout system through federated modules. They are loaded dynamically via ScalprumComponent and displayed within widget cards provided by `@patternfly/widgetized-dashboard`, which handles drag-and-drop functionality.
 
 ## Widget System Architecture
 
@@ -12,7 +12,7 @@ Widgets are loaded through a multi-step process:
 
 1. **Widget Mapping**: The backend provides widget configuration via `/api/chrome-service/v1/dashboard-templates/widget-mapping`
 2. **Module Federation**: Widgets are loaded as federated modules using ScalprumComponent (configured via `fec.config.js`)
-3. **Grid Integration**: Each widget is wrapped in a GridTile that provides layout and interaction capabilities
+3. **Grid Integration**: The PatternFly GridLayout component renders each widget within a Card component that provides layout and interaction capabilities
 
 *Note: Module federation is handled by the Red Hat Cloud Services frontend tooling. You don't need to configure webpack directly.*
 
@@ -77,7 +77,7 @@ export type WidgetPermission = {
 
 ### Step 1: Create the Widget Component
 
-Your widget is a standard React component that provides content for the CardBody wrapper. **Note**: The Card wrapper (including header, title, and actions) is automatically provided by the GridTile component - your widget should only provide the content.
+Your widget is a standard React component that provides content for the CardBody wrapper. **Note**: The Card wrapper (including header, title, and actions) is automatically provided by the PatternFly GridLayout component - your widget should only provide the content.
 
 ```tsx
 // MyCustomWidget.tsx
@@ -163,9 +163,9 @@ The widget mapping must be provided by the backend API at `/api/chrome-service/v
 
 ## Widget Integration Details
 
-### GridTile Integration
+### PatternFly GridLayout Integration
 
-Your widget is automatically wrapped in a GridTile component that provides:
+Your widget is automatically wrapped in a widget card by the `@patternfly/widgetized-dashboard` GridLayout component that provides:
 
 - **Drag and Drop**: Move widgets around the grid
 - **Resize Handles**: Resize widgets within min/max constraints
@@ -174,26 +174,45 @@ Your widget is automatically wrapped in a GridTile component that provides:
 
 ### Widget Container Structure
 
-Your custom widget content is automatically wrapped in a Card structure by the GridTile component:
+Your custom widget content is automatically wrapped in a Card structure by the PatternFly GridLayout component. The component internally manages widget cards with:
+
+- **Card Header**: Contains the widget title, icon, and action menu
+- **Card Body**: Your custom widget component renders here
+
+Widget rendering is handled through the widget mapping configuration:
 
 ```tsx
-// From src/Components/DnDLayout/GridTile.tsx - Simplified structure
-<Card className="grid-tile">
-  <CardHeader actions={{ actions: headerActions }}>
-    <Flex>
-      <HeaderIcon icon={widgetConfig?.config?.icon} />
-      <CardTitle>{widgetConfig?.config?.title || widgetType}</CardTitle>
-    </Flex>
-  </CardHeader>
-  <Divider />
-  <CardBody className="pf-v6-u-p-0">
-    {/* Your widget component renders here - this is where your custom component appears */}
-    {node}
-  </CardBody>
-</Card>
+// From src/Components/DnDLayout/GridLayout.tsx
+const convertWidgetMapping = (scalprumMapping: ScalprumWidgetMapping): WidgetMapping => {
+  const result: WidgetMapping = {};
+
+  Object.keys(scalprumMapping).forEach((widgetType) => {
+    const scalprumWidget = scalprumMapping[widgetType];
+    result[widgetType] = {
+      defaults: scalprumWidget.defaults,
+      config: {
+        title: scalprumWidget.config?.title,
+        icon: scalprumWidget.config?.icon ? <HeaderIcon icon={scalprumWidget.config.icon} /> : undefined,
+        headerLink: scalprumWidget.config?.headerLink,
+        wrapperProps: { className: scalprumWidget.scope },
+        cardBodyProps: { className: `${scalprumWidget.scope}-${widgetType}` }
+      },
+      renderWidget: (_widgetId: string) => (
+        <ScalprumComponent
+          fallback={<Skeleton />}
+          scope={scalprumWidget.scope}
+          module={scalprumWidget.module}
+          importName={scalprumWidget.importName}
+        />
+      ),
+    };
+  });
+
+  return result;
+};
 ```
 
-**Important**: Your widget should **NOT** include Card, CardHeader, or CardTitle components as these are provided by the GridTile wrapper.
+**Important**: Your widget should **NOT** include Card, CardHeader, or CardTitle components as these are provided by the PatternFly GridLayout component wrapper.
 
 ## Widget Sizing and Layout
 
