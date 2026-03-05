@@ -9,7 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: '3'
     pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
       == "master"
-    pipelinesascode.tekton.dev/pipeline: https://github.com/RedHatInsights/konflux-pipelines/raw/main/pipelines/platform-ui/docker-build-run-unit-tests.yaml
+    pipelinesascode.tekton.dev/pipeline: https://github.com/RedHatInsights/konflux-pipelines/raw/main/pipelines/platform-ui/docker-build-run-all-tests.yaml
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: widget-layout
@@ -37,6 +37,41 @@ spec:
         npm install
         npm run lint
         npm test --  --runInBand --no-cache
+    - name: test-app-name
+      value: "widget-layout"
+    - name: test-app-port
+      value: "8000"
+    - name: run-app-script
+      value: |
+        #!/bin/bash
+        set -ex
+        # Start Caddy to serve app assets on port 8000
+        caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+    - name: frontend-proxy-routes-configmap
+      value: "widget-layout-dev-proxy-caddyfile"
+    - name: e2e-tests-script
+      value: |
+        #!/bin/bash
+        set -ex
+
+        # Map secret keys to expected environment variables
+        # Secret keys (e2e-hcc-env-url) get converted to ENV vars with uppercase and underscores
+        export HCC_ENV_URL="${E2E_HCC_ENV_URL}"
+        export E2E_STAGE_ACTUAL_HOSTNAME="${E2E_STAGE_ACTUAL_HOSTNAME}"
+
+        # Log environment for debugging (without exposing sensitive data)
+        echo "===== E2E Test Environment ====="
+        echo "HCC_ENV_URL: ${HCC_ENV_URL:-NOT SET}"
+        echo "E2E_USER: ${E2E_USER:+***SET***}"
+        echo "E2E_PASSWORD: ${E2E_PASSWORD:+***SET***}"
+        echo "E2E_STAGE_ACTUAL_HOSTNAME: ${E2E_STAGE_ACTUAL_HOSTNAME:-NOT SET}"
+        echo "================================"
+
+        npm install
+        npx playwright install --with-deps chromium
+        npm run test:playwright
+    - name: e2e-credentials-secret
+      value: "widget-layout-credentials-secret"
   pipelineRef:
     name: docker-build
   taskRunTemplate:
@@ -51,7 +86,7 @@ spec:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 1Gi
+              storage: 5Gi
         status: {}
     - name: git-auth
       secret:
