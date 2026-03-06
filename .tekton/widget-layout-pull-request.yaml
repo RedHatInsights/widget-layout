@@ -49,6 +49,8 @@ spec:
         caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
     - name: frontend-proxy-routes-configmap
       value: "widget-layout-dev-proxy-caddyfile"
+    - name: e2e-playwright-image
+      value: mcr.microsoft.com/playwright:v1.58.0-jammy
     - name: e2e-tests-script
       value: |
         #!/bin/bash
@@ -67,15 +69,43 @@ spec:
         echo "E2E_STAGE_ACTUAL_HOSTNAME: ${E2E_STAGE_ACTUAL_HOSTNAME:-NOT SET}"
         echo "================================"
 
-        npm install
-        npx playwright install --with-deps chromium
-        npm run test:playwright
+        # Wait for dev server to be ready (critical!)
+        echo "Waiting for dev server to be ready..."
+        timeout 120s bash -c 'until curl -k https://${E2E_STAGE_ACTUAL_HOSTNAME}:1337 > /dev/null 2>&1; do
+          echo "Waiting for dev server to be ready..."
+          sleep 5
+        done'
+        echo "✅ Dev server ready!"
+
+        echo "Running Playwright tests..."
+        npx playwright test
     - name: e2e-credentials-secret
       value: "widget-layout-credentials-secret"
   pipelineRef:
-    name: docker-build
+    resolver: git
+    params:
+    - name: url
+      value: https://github.com/RedHatInsights/konflux-pipelines
+    - name: revision
+      value: main
+    - name: pathInRepo
+      value: pipelines/platform-ui/docker-build-run-all-tests.yaml
   taskRunTemplate:
     serviceAccountName: build-pipeline-widget-layout
+  taskRunSpecs:
+    - pipelineTaskName: run-e2e-tests
+      serviceAccountName: build-pipeline-widget-layout
+      podTemplate:
+        # Override /etc/hosts to redirect stage hostname to localhost
+        # NOTE: hostAliases doesn't support variable substitution - must be hardcoded
+        # TODO: Update this hostname to match the value stored in Vault at creds/konflux/widget-layout (e2e-stage-actual-hostname property)
+        hostAliases:
+          - ip: "::1"
+            hostnames:
+              - "console.stage.redhat.com"
+          - ip: "127.0.0.1"
+            hostnames:
+              - "console.stage.redhat.com"
   workspaces:
     - name: workspace
       volumeClaimTemplate:

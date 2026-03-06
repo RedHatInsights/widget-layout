@@ -4,15 +4,15 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright configuration for widget-layout E2E tests
  *
  * Environment variables:
- * - PLAYWRIGHT_BASE_URL: Base URL for the test environment (default: http://localhost:1337)
+ * - HCC_ENV_URL: HCC environment URL (used in CI/Konflux)
  * - E2E_USER: Test user credentials
  * - E2E_PASSWORD: Test user password
  */
 export default defineConfig({
   testDir: './playwright',
 
-  // Maximum time one test can run
-  timeout: 60 * 1000,
+  // Maximum time one test can run (increased for stage environment)
+  timeout: 120 * 1000,
 
   // Test configuration
   fullyParallel: true,
@@ -29,7 +29,9 @@ export default defineConfig({
   // Shared settings for all projects
   use: {
     // Base URL for navigation
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:1337',
+    // In CI/Konflux: uses HCC_ENV_URL (e.g., https://console.stage.redhat.com)
+    // Locally: uses localhost
+    baseURL: process.env.HCC_ENV_URL || process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:1337',
 
     // Collect trace on first retry of failed test
     trace: 'on-first-retry',
@@ -39,6 +41,10 @@ export default defineConfig({
 
     // Video on failure
     video: 'retain-on-failure',
+
+    // Increased timeouts for stage environment
+    navigationTimeout: 60 * 1000,
+    actionTimeout: 30 * 1000,
   },
 
   // Configure projects for different browsers
