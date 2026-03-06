@@ -16,6 +16,7 @@
     "patch:hosts": "fec patch-etc-hosts",
     "start": "HOT=true fec dev",
     "test": "jest --passWithNoTests",
+    "test:playwright": "playwright test",
     "postinstall": "ts-patch install && rimraf .cache",
     "verify": "npm-run-all build lint test",
     "static": "BETA=true PROXY=true fec static"
@@ -64,7 +65,8 @@
     "stylelint-scss": "3.21.0",
     "ts-patch": "^3.3.0",
     "typescript": "^5.9.3",
-    "webpack-bundle-analyzer": "4.10.2"
+    "webpack-bundle-analyzer": "4.10.2",
+    "@playwright/test": "^1.48.0"
   },
   "insights": {
     "appname": "widget-layout"
