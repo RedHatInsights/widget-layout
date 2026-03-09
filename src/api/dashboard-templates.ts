@@ -10,7 +10,7 @@ const getRequestHeaders = () => ({
 
 export const widgetIdSeparator = '#';
 
-export type LayoutTypes = 'landingPage';
+export type LayoutTypes = 'landingPage' | 'landing-landingPage';
 
 export type Variants = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -50,7 +50,7 @@ export type DashboardTemplate = {
   deletedAt: string | null;
   userIdentityID: number;
   default: boolean;
-  TemplateBase: {
+  templateBase: {
     name: string;
     displayName: string;
   };
@@ -136,6 +136,17 @@ export async function getDashboardTemplates(): Promise<DashboardTemplate[]>;
 export async function getDashboardTemplates(type: LayoutTypes): Promise<DashboardTemplate[]>;
 export async function getDashboardTemplates(type?: LayoutTypes): Promise<DashboardTemplate | DashboardTemplate[]> {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates${type ? `?dashboard=${type}` : ''}`, {
+    method: 'GET',
+    headers: getRequestHeaders(),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+}
+
+// Returns user's dashboards
+export async function getUsersDashboards(): Promise<DashboardTemplate[]> {
+  const resp = await fetch(`/api/widget-layout/v1/`, {
     method: 'GET',
     headers: getRequestHeaders(),
   });
