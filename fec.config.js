@@ -32,6 +32,7 @@ module.exports = {
     exposes: {
       './RootApp': path.resolve(__dirname, './src/AppEntry.tsx'),
       './WidgetLayout': path.resolve(__dirname, './src/Routes/Default/Default.tsx'),
+      './DashboardHub': path.resolve(__dirname, './src/Modules/DashboardHub.tsx'),
     },
     exclude: ['react-router-dom'],
     shared: [
