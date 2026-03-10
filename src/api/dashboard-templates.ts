@@ -198,6 +198,23 @@ export const deleteDashboardTemplate = async (templateId: DashboardTemplate['id'
   return resp.status === 204;
 };
 
+export const importDashboardTemplate = async (data: {
+  templateBase: {
+    name: string;
+    displayName: string;
+  };
+  templateConfig: TemplateConfig;
+}): Promise<DashboardTemplate> => {
+  const resp = await fetch(`/api/widget-layout/v1/import`, {
+    method: 'POST',
+    headers: getRequestHeaders(),
+    body: JSON.stringify(data),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+};
+
 export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTemplate | undefined => {
   return templates.find((itm) => itm.default === true);
 };
