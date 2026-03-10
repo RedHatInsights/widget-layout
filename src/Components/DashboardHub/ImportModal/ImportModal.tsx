@@ -1,4 +1,4 @@
-import { Alert, Button, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from '@patternfly/react-core';
+import { Alert, Button, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Spinner, TextInput } from '@patternfly/react-core';
 import React, { useEffect, useState } from 'react';
 import { CodeEditorImport } from '../CodeEditor/CodeEditor';
 import { useImportDashboard } from '../../../hooks/useImportDashboard';
@@ -17,8 +17,14 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
     setConfigString(value);
   };
 
+  const [name, setName] = useState('');
+
+  const handleNameChange = (_event: any, name: string) => {
+    setName(name);
+  };
+
   const handleSubmit = async () => {
-    await importDashboard(configString);
+    await importDashboard(configString, name);
   };
 
   // Handle successful import
@@ -29,6 +35,7 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
       onSuccess?.();
       // Reset form for next use
       setConfigString('');
+      setName('');
       reset();
     }
   }, [data, onClose, onSuccess, reset]);
@@ -37,11 +44,12 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
   useEffect(() => {
     if (!isOpen) {
       setConfigString('');
+      setName('');
       reset();
     }
   }, [isOpen, reset]);
 
-  const isFormValid = configString.trim() !== '';
+  const isFormValid = configString.trim() !== '' && name.trim() !== '';
 
   return (
     <Modal
@@ -66,6 +74,18 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
         )}
         <FormGroup label="Paste configuration string" isRequired>
           <CodeEditorImport onChange={handleConfigChange} />
+        </FormGroup>
+
+        <FormGroup label="New dashboard name" isRequired>
+          <TextInput
+            value={name}
+            isRequired
+            type="text"
+            id="horizontal-form-name"
+            aria-describedby="horizontal-form-name-helper"
+            name="horizontal-form-name"
+            onChange={handleNameChange}
+          />
         </FormGroup>
       </ModalBody>
       <ModalFooter>

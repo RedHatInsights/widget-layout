@@ -3,7 +3,7 @@ import { importDashboardTemplate } from '../api/dashboard-templates';
 import { DashboardTemplate } from '../api/dashboard-templates';
 
 interface UseImportDashboardReturn {
-  importDashboard: (configString: string) => Promise<void>;
+  importDashboard: (configString: string, dashboardName: string) => Promise<void>;
   isLoading: boolean;
   error: string | null;
   data: DashboardTemplate | null;
@@ -21,7 +21,7 @@ export const useImportDashboard = (): UseImportDashboardReturn => {
     setIsLoading(false);
   };
 
-  const importDashboard = async (configString: string) => {
+  const importDashboard = async (configString: string, dashboardName: string) => {
     setIsLoading(true);
     setError(null);
     setData(null);
@@ -30,8 +30,13 @@ export const useImportDashboard = (): UseImportDashboardReturn => {
       // Parse the JSON config string
       const parsedConfig = JSON.parse(configString);
 
-      // Call the API
-      const result = await importDashboardTemplate(parsedConfig);
+      // Combine dashboardName with parsed config
+      const requestData = {
+        dashboardName,
+        ...parsedConfig,
+      };
+
+      const result = await importDashboardTemplate(requestData);
 
       // Success
       setData(result);

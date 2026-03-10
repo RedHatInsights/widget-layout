@@ -41,7 +41,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
   // Map API data to table format
   const tableData: Dashboard[] = dashboards.map((dashboard) => ({
     id: dashboard.id,
-    name: dashboard.templateBase.displayName,
+    name: dashboard.dashboardName,
     description: dashboard.templateBase.name, // TODO: Update when description field is available
     lastModified: formatDate(dashboard.updatedAt),
   }));

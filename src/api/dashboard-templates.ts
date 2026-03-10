@@ -55,6 +55,7 @@ export type DashboardTemplate = {
     displayName: string;
   };
   templateConfig: TemplateConfig;
+  dashboardName: string;
 };
 
 // TODO use dynamic-plugin-sdk CustomError as base class instead
@@ -199,6 +200,7 @@ export const deleteDashboardTemplate = async (templateId: DashboardTemplate['id'
 };
 
 export const importDashboardTemplate = async (data: {
+  dashboardName: string;
   templateBase: {
     name: string;
     displayName: string;
