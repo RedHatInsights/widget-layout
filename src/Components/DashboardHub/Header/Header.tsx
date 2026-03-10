@@ -1,14 +1,14 @@
 import { Content, Dropdown, DropdownItem, DropdownList, Flex, FlexItem, MenuToggle, MenuToggleElement, PageSection } from '@patternfly/react-core';
-import React from 'react';
+import React, { useState } from 'react';
 import CopyIcon from '@patternfly/react-icons/dist/dynamic/icons/copy-icon';
 import CodeIcon from '@patternfly/react-icons/dist/dynamic/icons/code-icon';
 import ThIcon from '@patternfly/react-icons/dist/dynamic/icons/th-icon';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/dynamic/icons/external-link-alt-icon';
-
-import { useState } from 'react';
+import { ImportModal } from '../ImportModal/ImportModal';
 
 export const DropdownBasic: React.FunctionComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const onToggleClick = () => {
     setIsOpen(!isOpen);
@@ -20,31 +20,42 @@ export const DropdownBasic: React.FunctionComponent = () => {
     setIsOpen(false);
   };
 
+  const handleImportClick = () => {
+    setIsImportModalOpen(true);
+  };
+
+  const handleImportModalClose = () => {
+    setIsImportModalOpen(false);
+  };
+
   return (
-    <Dropdown
-      isOpen={isOpen}
-      onSelect={onSelect}
-      onOpenChange={(isOpen: boolean) => setIsOpen(isOpen)}
-      toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
-        <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen} variant="primary">
-          Create dashboard
-        </MenuToggle>
-      )}
-      ouiaId="BasicDropdown"
-      shouldFocusToggleOnSelect
-    >
-      <DropdownList>
-        <DropdownItem value={0} isDisabled key="disabled action">
-          <ThIcon /> Create from blank
-        </DropdownItem>
-        <DropdownItem value={1} key="action">
-          <CodeIcon /> Import from config string
-        </DropdownItem>
-        <DropdownItem value={2} isDisabled key="disabled action">
-          <CopyIcon /> Duplicate existing
-        </DropdownItem>
-      </DropdownList>
-    </Dropdown>
+    <>
+      <Dropdown
+        isOpen={isOpen}
+        onSelect={onSelect}
+        onOpenChange={(isOpen: boolean) => setIsOpen(isOpen)}
+        toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+          <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen} variant="primary">
+            Create dashboard
+          </MenuToggle>
+        )}
+        ouiaId="BasicDropdown"
+        shouldFocusToggleOnSelect
+      >
+        <DropdownList>
+          <DropdownItem value={0} isDisabled key="disabled action">
+            <ThIcon /> Create from blank
+          </DropdownItem>
+          <DropdownItem value={1} key="import" onClick={handleImportClick}>
+            <CodeIcon /> Import from config string
+          </DropdownItem>
+          <DropdownItem value={2} isDisabled key="disabled action">
+            <CopyIcon /> Duplicate existing
+          </DropdownItem>
+        </DropdownList>
+      </Dropdown>
+      <ImportModal isOpen={isImportModalOpen} onClose={handleImportModalClose} />
+    </>
   );
 };
 
