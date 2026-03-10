@@ -3,7 +3,7 @@ import { importDashboardTemplate } from '../api/dashboard-templates';
 import { DashboardTemplate } from '../api/dashboard-templates';
 
 interface UseImportDashboardReturn {
-  importDashboard: (configString: string, dashboardName: string) => Promise<void>;
+  importDashboard: (configString: string, dashboardName: string) => Promise<DashboardTemplate | null>;
   isLoading: boolean;
   error: string | null;
   data: DashboardTemplate | null;
@@ -21,16 +21,14 @@ export const useImportDashboard = (): UseImportDashboardReturn => {
     setIsLoading(false);
   };
 
-  const importDashboard = async (configString: string, dashboardName: string) => {
+  const importDashboard = async (configString: string, dashboardName: string): Promise<DashboardTemplate | null> => {
     setIsLoading(true);
     setError(null);
     setData(null);
 
     try {
-      // Parse the JSON config string
+      // Parse the JSON config string and combine dashboardName with parsed config
       const parsedConfig = JSON.parse(configString);
-
-      // Combine dashboardName with parsed config
       const requestData = {
         dashboardName,
         ...parsedConfig,
@@ -41,6 +39,7 @@ export const useImportDashboard = (): UseImportDashboardReturn => {
       // Success
       setData(result);
       setIsLoading(false);
+      return result;
     } catch (err) {
       // Handle different types of errors
       if (err instanceof SyntaxError) {
@@ -51,6 +50,7 @@ export const useImportDashboard = (): UseImportDashboardReturn => {
         setError('An unexpected error occurred. Please try again.');
       }
       setIsLoading(false);
+      return null;
     }
   };
 
