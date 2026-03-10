@@ -1,25 +1,47 @@
-import { Button, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, TextInput } from '@patternfly/react-core';
-import React, { useState } from 'react';
+import { Alert, Button, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from '@patternfly/react-core';
+import React, { useEffect, useState } from 'react';
 import { CodeEditorImport } from '../CodeEditor/CodeEditor';
+import { useImportDashboard } from '../../../hooks/useImportDashboard';
 
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen, onClose }) => {
-  const [name, setName] = useState('');
+export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [configString, setConfigString] = useState('');
-
-  const handleNameChange = (_event: any, name: string) => {
-    setName(name);
-  };
+  const { importDashboard, isLoading, error, data, reset } = useImportDashboard();
 
   const handleConfigChange = (value: string) => {
     setConfigString(value);
   };
 
-  const isFormValid = name.trim() !== '' && configString.trim() !== '';
+  const handleSubmit = async () => {
+    await importDashboard(configString);
+  };
+
+  // Handle successful import
+  useEffect(() => {
+    if (data) {
+      // Close modal and notify parent
+      onClose();
+      onSuccess?.();
+      // Reset form for next use
+      setConfigString('');
+      reset();
+    }
+  }, [data, onClose, onSuccess, reset]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setConfigString('');
+      reset();
+    }
+  }, [isOpen, reset]);
+
+  const isFormValid = configString.trim() !== '';
 
   return (
     <Modal
@@ -37,19 +59,27 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
         organization) to have that dashboard recreated in your account. Learn about using config strings."
       />
       <ModalBody id="modal-box-body-import">
+        {error && (
+          <Alert variant="danger" title="Import failed" isInline className="pf-v6-u-mb-md">
+            {error}
+          </Alert>
+        )}
         <FormGroup label="Paste configuration string" isRequired>
           <CodeEditorImport onChange={handleConfigChange} />
         </FormGroup>
-
-        <FormGroup label="New dashboard name" isRequired fieldId="dashboard-name">
-          <TextInput isRequired type="text" id="dashboard-name" name="dashboard-name" value={name} onChange={handleNameChange} />
-        </FormGroup>
       </ModalBody>
       <ModalFooter>
-        <Button key="confirm" variant="primary" onClick={onClose} isDisabled={!isFormValid}>
-          Create dashboard
+        <Button
+          key="confirm"
+          variant="primary"
+          onClick={handleSubmit}
+          isDisabled={!isFormValid || isLoading}
+          isLoading={isLoading}
+          spinnerAriaLabel="Importing dashboard"
+        >
+          {isLoading ? 'Importing...' : 'Create dashboard'}
         </Button>
-        <Button key="cancel" variant="link" onClick={onClose}>
+        <Button key="cancel" variant="link" onClick={onClose} isDisabled={isLoading}>
           Cancel
         </Button>
       </ModalFooter>
