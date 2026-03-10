@@ -3,7 +3,7 @@ import Header from '../Components/DashboardHub/Header/Header';
 import DashboardTable from '../Components/DashboardHub/DashboardTable/DashboardTable';
 import { PageSection } from '@patternfly/react-core';
 import useCurrentUser from '../hooks/useCurrentUser';
-import { DashboardTemplate, getDashboardTemplates, getUsersDashboards } from '../api/dashboard-templates';
+import { DashboardTemplate, getUsersDashboards } from '../api/dashboard-templates';
 
 const DashboardHub = () => {
   const { currentUser } = useCurrentUser();
