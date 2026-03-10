@@ -6,60 +6,50 @@ import ThIcon from '@patternfly/react-icons/dist/dynamic/icons/th-icon';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/dynamic/icons/external-link-alt-icon';
 import { ImportModal } from '../ImportModal/ImportModal';
 
-export const DropdownBasic: React.FunctionComponent = () => {
+interface CreateDashboardDropdownProps {
+  onRefetchDashboards: () => void;
+}
+
+const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownProps> = ({ onRefetchDashboards }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-
-  const onToggleClick = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const onSelect = (_event: React.MouseEvent<Element, MouseEvent> | undefined, value: string | number | undefined) => {
-    // eslint-disable-next-line no-console
-    console.log('selected', value);
-    setIsOpen(false);
-  };
-
-  const handleImportClick = () => {
-    setIsImportModalOpen(true);
-  };
-
-  const handleImportModalClose = () => {
-    setIsImportModalOpen(false);
-  };
 
   return (
     <>
       <Dropdown
         isOpen={isOpen}
-        onSelect={onSelect}
-        onOpenChange={(isOpen: boolean) => setIsOpen(isOpen)}
+        onSelect={() => setIsOpen(false)}
+        onOpenChange={setIsOpen}
         toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
-          <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen} variant="primary">
+          <MenuToggle ref={toggleRef} onClick={() => setIsOpen(!isOpen)} isExpanded={isOpen} variant="primary">
             Create dashboard
           </MenuToggle>
         )}
-        ouiaId="BasicDropdown"
+        ouiaId="CreateDashboardDropdown"
         shouldFocusToggleOnSelect
       >
         <DropdownList>
-          <DropdownItem value={0} isDisabled key="disabled action">
+          <DropdownItem isDisabled key="create-blank">
             <ThIcon /> Create from blank
           </DropdownItem>
-          <DropdownItem value={1} key="import" onClick={handleImportClick}>
+          <DropdownItem key="import" onClick={() => setIsImportModalOpen(true)}>
             <CodeIcon /> Import from config string
           </DropdownItem>
-          <DropdownItem value={2} isDisabled key="disabled action">
+          <DropdownItem isDisabled key="duplicate">
             <CopyIcon /> Duplicate existing
           </DropdownItem>
         </DropdownList>
       </Dropdown>
-      <ImportModal isOpen={isImportModalOpen} onClose={handleImportModalClose} />
+      <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onSuccess={onRefetchDashboards} />
     </>
   );
 };
 
-const Header = () => {
+interface HeaderProps {
+  onRefetchDashboards: () => void;
+}
+
+const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards }) => {
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
@@ -76,7 +66,7 @@ const Header = () => {
         </FlexItem>
 
         <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
-          <DropdownBasic />
+          <CreateDashboardDropdown onRefetchDashboards={onRefetchDashboards} />
         </FlexItem>
       </Flex>
     </PageSection>

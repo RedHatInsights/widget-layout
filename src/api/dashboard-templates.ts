@@ -214,7 +214,7 @@ export const importDashboardTemplate = async (data: {
   });
   handleErrors(resp);
   const json = await resp.json();
-  return json.data;
+  return json;
 };
 
 export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTemplate | undefined => {

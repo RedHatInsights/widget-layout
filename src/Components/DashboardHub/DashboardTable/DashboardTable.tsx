@@ -13,7 +13,7 @@ import { TrashIcon } from '@patternfly/react-icons/dist/dynamic/icons/trash-icon
 interface Dashboard {
   id: number;
   name: string;
-  description: string;
+  description: string; // TODO
   lastModified: string;
 }
 
@@ -53,7 +53,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
     actions: '',
   };
 
-  // Sorting state (only for name column)
+  // Sorting state
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Sort dashboards by name

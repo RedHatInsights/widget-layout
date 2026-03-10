@@ -9,26 +9,26 @@ const DashboardHub = () => {
   const { currentUser } = useCurrentUser();
   const [dashboards, setDashboards] = useState<DashboardTemplate[]>([]);
 
+  const fetchDashboards = async () => {
+    try {
+      const userDashboards = await getUsersDashboards();
+      setDashboards(userDashboards);
+    } catch (error) {
+      console.error('Error fetching user dashboards:', error);
+    }
+  };
+
   useEffect(() => {
     if (!currentUser) {
       return;
     }
-
-    const fetchDashboards = async () => {
-      try {
-        const userDashboards = await getUsersDashboards();
-        setDashboards(userDashboards);
-      } catch (error) {
-        console.error('Error fetching user dashboards:', error);
-      }
-    };
 
     fetchDashboards();
   }, [currentUser]);
 
   return (
     <div className="dashboardHub">
-      <Header />
+      <Header onRefetchDashboards={fetchDashboards} />
       <PageSection>
         <DashboardTable dashboards={dashboards} />
       </PageSection>

@@ -1,4 +1,4 @@
-import { Alert, Button, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Spinner, TextInput } from '@patternfly/react-core';
+import { Alert, Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, TextInput } from '@patternfly/react-core';
 import React, { useEffect, useState } from 'react';
 import { CodeEditorImport } from '../CodeEditor/CodeEditor';
 import { useImportDashboard } from '../../../hooks/useImportDashboard';
@@ -11,36 +11,27 @@ interface ImportModalProps {
 
 export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [configString, setConfigString] = useState('');
-  const { importDashboard, isLoading, error, data, reset } = useImportDashboard();
+  const [name, setName] = useState('');
+  const { importDashboard, isLoading, error, reset } = useImportDashboard();
+  const isFormValid = configString.trim() !== '' && name.trim() !== '';
 
   const handleConfigChange = (value: string) => {
     setConfigString(value);
   };
 
-  const [name, setName] = useState('');
-
-  const handleNameChange = (_event: any, name: string) => {
+  const handleNameChange = (_event: React.FormEvent<HTMLInputElement>, name: string) => {
     setName(name);
   };
 
   const handleSubmit = async () => {
-    await importDashboard(configString, name);
+    const result = await importDashboard(configString, name);
+    if (result) {
+      onSuccess?.();
+      onClose();
+    }
   };
 
-  // Handle successful import
-  useEffect(() => {
-    if (data) {
-      // Close modal and notify parent
-      onClose();
-      onSuccess?.();
-      // Reset form for next use
-      setConfigString('');
-      setName('');
-      reset();
-    }
-  }, [data, onClose, onSuccess, reset]);
-
-  // Reset form when modal closes
+  // Clean up on close
   useEffect(() => {
     if (!isOpen) {
       setConfigString('');
@@ -48,8 +39,6 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
       reset();
     }
   }, [isOpen, reset]);
-
-  const isFormValid = configString.trim() !== '' && name.trim() !== '';
 
   return (
     <Modal
@@ -72,21 +61,15 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
             {error}
           </Alert>
         )}
-        <FormGroup label="Paste configuration string" isRequired>
-          <CodeEditorImport onChange={handleConfigChange} />
-        </FormGroup>
+        <Form>
+          <FormGroup label="Paste configuration string" isRequired>
+            <CodeEditorImport onChange={handleConfigChange} />
+          </FormGroup>
 
-        <FormGroup label="New dashboard name" isRequired>
-          <TextInput
-            value={name}
-            isRequired
-            type="text"
-            id="horizontal-form-name"
-            aria-describedby="horizontal-form-name-helper"
-            name="horizontal-form-name"
-            onChange={handleNameChange}
-          />
-        </FormGroup>
+          <FormGroup label="New dashboard name" isRequired>
+            <TextInput value={name} isRequired type="text" id="dashboard-name" name="dashboard-name" onChange={handleNameChange} />
+          </FormGroup>
+        </Form>
       </ModalBody>
       <ModalFooter>
         <Button
