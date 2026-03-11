@@ -58,6 +58,14 @@ export type DashboardTemplate = {
   dashboardName: string;
 };
 
+export type ExportDashboardTemplate = {
+  templateBase: {
+    name: string;
+    displayName: string;
+  };
+  templateConfig: TemplateConfig;
+};
+
 // TODO use dynamic-plugin-sdk CustomError as base class instead
 export class DashboardTemplatesError extends Error {
   constructor(message: string, readonly status: number, readonly response: Response) {
@@ -211,6 +219,16 @@ export const importDashboardTemplate = async (data: {
     method: 'POST',
     headers: getRequestHeaders(),
     body: JSON.stringify(data),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json;
+};
+
+export const exportDashboardTemplate = async (templateId: number): Promise<ExportDashboardTemplate> => {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}/export`, {
+    method: 'GET',
+    headers: getRequestHeaders(),
   });
   handleErrors(resp);
   const json = await resp.json();
