@@ -9,6 +9,7 @@ import { HomeIcon } from '@patternfly/react-icons/dist/dynamic/icons/home-icon';
 import { CodeIcon } from '@patternfly/react-icons/dist/dynamic/icons/code-icon';
 import { UsersIcon } from '@patternfly/react-icons/dist/dynamic/icons/users-icon';
 import { TrashIcon } from '@patternfly/react-icons/dist/dynamic/icons/trash-icon';
+import { useExportDashboard } from '../../../hooks/useExportDashboard';
 
 interface Dashboard {
   id: number;
@@ -38,6 +39,8 @@ const formatDate = (dateString: string): string => {
 };
 
 export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ dashboards }) => {
+  const { exportDashboard, isLoading, error } = useExportDashboard();
+
   // Map API data to table format
   const tableData: Dashboard[] = dashboards.map((dashboard) => ({
     id: dashboard.id,
@@ -55,6 +58,20 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
 
   // Sorting state
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  const handleCopyConfiguration = async (dashboardId: number) => {
+    const result = await exportDashboard(dashboardId);
+
+    if (result) {
+      try {
+        const configString = JSON.stringify(result, null, 2);
+        await navigator.clipboard.writeText(configString);
+        console.log('Configuration copied to clipboard');
+      } catch (err) {
+        console.error('Failed to copy to clipboard:', err);
+      }
+    }
+  };
 
   // Sort dashboards by name
   const sortedDashboards = [...tableData].sort((a, b) => {
@@ -93,7 +110,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
     {
       icon: <CodeIcon />,
       title: 'Copy configuration string',
-      onClick: () => console.log(`Copy configuration string ${dashboard.id}`),
+      onClick: () => handleCopyConfiguration(dashboard.id),
     },
     {
       icon: <UsersIcon />,
@@ -119,7 +136,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
           <Th sort={getSortParams()}>{columnNames.name}</Th>
           <Th>{columnNames.description}</Th>
           <Th>{columnNames.lastModified}</Th>
-          <Th>{columnNames.actions}</Th>
+          <Th screenReaderText="Actions" />
         </Tr>
       </Thead>
       <Tbody>
