@@ -1,14 +1,13 @@
 import { CodeEditor, CodeEditorControl, Language } from '@patternfly/react-code-editor';
 import RedoIcon from '@patternfly/react-icons/dist/esm/icons/redo-icon';
-import React, { useState } from 'react';
+import React from 'react';
 
 interface CodeEditorImportProps {
+  value: string;
   onChange?: (value: string) => void;
 }
 
-export const CodeEditorImport: React.FunctionComponent<CodeEditorImportProps> = ({ onChange: onChangeFromParent }) => {
-  const [code, setCode] = useState('');
-
+export const CodeEditorImport: React.FunctionComponent<CodeEditorImportProps> = ({ value, onChange }) => {
   const onEditorDidMount = (
     editor: { layout: () => void; focus: () => void },
     monaco: { editor: { getModels: () => { updateOptions: (arg0: { tabSize: number }) => void }[] } }
@@ -18,14 +17,8 @@ export const CodeEditorImport: React.FunctionComponent<CodeEditorImportProps> = 
     monaco.editor.getModels()[0].updateOptions({ tabSize: 5 });
   };
 
-  const onChange = (value: string) => {
-    setCode(value);
-    onChangeFromParent?.(value);
-  };
-
   const onRefreshCode = () => {
-    setCode('');
-    onChangeFromParent?.('');
+    onChange?.('');
   };
 
   const customControl = (
@@ -34,23 +27,21 @@ export const CodeEditorImport: React.FunctionComponent<CodeEditorImportProps> = 
       aria-label="Clear code"
       tooltipProps={{ content: 'Clear code' }}
       onClick={onRefreshCode}
-      isVisible={code !== ''}
+      isVisible={value !== ''}
     />
   );
 
   return (
-    <>
-      <CodeEditor
-        isCopyEnabled
-        isLanguageLabelVisible
-        isLineNumbersVisible={false}
-        code={code}
-        customControls={customControl}
-        onChange={onChange}
-        language={Language.json}
-        onEditorDidMount={onEditorDidMount}
-        height="200px"
-      />
-    </>
+    <CodeEditor
+      isCopyEnabled
+      isLanguageLabelVisible
+      isLineNumbersVisible={false}
+      code={value}
+      customControls={customControl}
+      onChange={(val) => onChange?.(val)}
+      language={Language.json}
+      onEditorDidMount={onEditorDidMount}
+      height="200px"
+    />
   );
 };

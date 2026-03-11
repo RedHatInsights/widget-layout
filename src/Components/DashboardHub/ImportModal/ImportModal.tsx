@@ -63,7 +63,7 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
         )}
         <Form>
           <FormGroup label="Paste configuration string" isRequired>
-            <CodeEditorImport onChange={handleConfigChange} />
+            <CodeEditorImport value={configString} onChange={handleConfigChange} />
           </FormGroup>
 
           <FormGroup label="New dashboard name" isRequired>
