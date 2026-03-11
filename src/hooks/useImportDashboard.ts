@@ -30,8 +30,8 @@ export const useImportDashboard = (): UseImportDashboardReturn => {
       // Parse the JSON config string and combine dashboardName with parsed config
       const parsedConfig = JSON.parse(configString);
       const requestData = {
-        dashboardName,
         ...parsedConfig,
+        dashboardName,
       };
 
       const result = await importDashboardTemplate(requestData);
