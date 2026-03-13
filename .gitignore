@@ -21,3 +21,7 @@ coverage
 
 # cache folder
 .cache
+
+# Playwright test artifacts
+playwright-report
+test-results
