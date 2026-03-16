@@ -1,5 +1,5 @@
 import { Alert, Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, TextInput } from '@patternfly/react-core';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { CodeEditorImport } from '../CodeEditor/CodeEditor';
 import { useImportDashboard } from '../../../hooks/useImportDashboard';
 
@@ -10,21 +10,14 @@ interface ImportModalProps {
 }
 
 export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen, onClose, onSuccess }) => {
-  const [configString, setConfigString] = useState('');
-  const [name, setName] = useState('');
-  const { importDashboard, isLoading, error, reset } = useImportDashboard();
-  const isFormValid = configString.trim() !== '' && name.trim() !== '';
-
-  const handleConfigChange = (value: string) => {
-    setConfigString(value);
-  };
+  const { configString, setConfigString, name, setName, isFormValid, importDashboard, isLoading, error, reset } = useImportDashboard();
 
   const handleNameChange = (_event: React.FormEvent<HTMLInputElement>, name: string) => {
     setName(name);
   };
 
   const handleSubmit = async () => {
-    const result = await importDashboard(configString, name);
+    const result = await importDashboard();
     if (result) {
       onSuccess?.();
       onClose();
@@ -34,8 +27,6 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
   // Clean up on close
   useEffect(() => {
     if (!isOpen) {
-      setConfigString('');
-      setName('');
       reset();
     }
   }, [isOpen, reset]);
@@ -63,7 +54,7 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
         )}
         <Form>
           <FormGroup label="Paste configuration string" isRequired>
-            <CodeEditorImport value={configString} onChange={handleConfigChange} />
+            <CodeEditorImport value={configString} onChange={setConfigString} />
           </FormGroup>
 
           <FormGroup label="New dashboard name" isRequired>

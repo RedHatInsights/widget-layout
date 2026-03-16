@@ -2,14 +2,10 @@ import React, { useState } from 'react';
 import { Table, Tbody, Td, Th, ThProps, Thead, Tr } from '@patternfly/react-table';
 import { ActionsColumn } from '@patternfly/react-table';
 import { Button } from '@patternfly/react-core';
-import { CopyIcon } from '@patternfly/react-icons/dist/dynamic/icons/copy-icon';
-import { EditAltIcon } from '@patternfly/react-icons/dist/dynamic/icons/edit-alt-icon';
 import { DashboardTemplate } from '../../../api/dashboard-templates';
-import { HomeIcon } from '@patternfly/react-icons/dist/dynamic/icons/home-icon';
-import { CodeIcon } from '@patternfly/react-icons/dist/dynamic/icons/code-icon';
-import { UsersIcon } from '@patternfly/react-icons/dist/dynamic/icons/users-icon';
-import { TrashIcon } from '@patternfly/react-icons/dist/dynamic/icons/trash-icon';
+import { CodeIcon, CopyIcon, EditAltIcon, HomeIcon, TrashIcon, UsersIcon } from '@patternfly/react-icons';
 import { useExportDashboard } from '../../../hooks/useExportDashboard';
+import DateFormat from '@redhat-cloud-services/frontend-components/DateFormat';
 
 interface Dashboard {
   id: number;
@@ -27,17 +23,6 @@ export const ButtonCopy: React.FunctionComponent = () => {
   return <Button variant="plain" aria-label="Copy" icon={<CopyIcon />} onClick={() => {}} />;
 };
 
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  const day = date.getUTCDate();
-  const month = date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
-  const year = date.getUTCFullYear();
-  const hours = date.getUTCHours().toString().padStart(2, '0');
-  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-
-  return `${day} ${month} ${year} ${hours}:${minutes} UTC`;
-};
-
 export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ dashboards }) => {
   const { exportDashboard, isLoading, error } = useExportDashboard();
 
@@ -46,7 +31,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
     id: dashboard.id,
     name: dashboard.dashboardName,
     description: dashboard.templateBase.name, // TODO: Update when description field is available
-    lastModified: formatDate(dashboard.updatedAt),
+    lastModified: dashboard.updatedAt,
   }));
 
   const columnNames = {
@@ -144,7 +129,9 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
           <Tr key={dashboard.id}>
             <Td dataLabel={columnNames.name}>{dashboard.name}</Td>
             <Td dataLabel={columnNames.description}>{dashboard.description}</Td>
-            <Td dataLabel={columnNames.lastModified}>{dashboard.lastModified}</Td>
+            <Td dataLabel={columnNames.lastModified}>
+              <DateFormat date={dashboard.lastModified} />
+            </Td>
             <Td isActionCell>
               <Td className="pf-v6-u-display-flex pf-v6-u-align-items-center pf-v6-u-gap-sm">
                 <ButtonCopy />

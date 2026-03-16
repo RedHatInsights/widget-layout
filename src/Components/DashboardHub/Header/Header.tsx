@@ -1,10 +1,7 @@
 import { Content, Dropdown, DropdownItem, DropdownList, Flex, FlexItem, MenuToggle, MenuToggleElement, PageSection } from '@patternfly/react-core';
 import React, { useState } from 'react';
-import CopyIcon from '@patternfly/react-icons/dist/dynamic/icons/copy-icon';
-import CodeIcon from '@patternfly/react-icons/dist/dynamic/icons/code-icon';
-import ThIcon from '@patternfly/react-icons/dist/dynamic/icons/th-icon';
-import ExternalLinkAltIcon from '@patternfly/react-icons/dist/dynamic/icons/external-link-alt-icon';
 import { ImportModal } from '../ImportModal/ImportModal';
+import { CodeIcon, CopyIcon, ExternalLinkAltIcon, ThIcon } from '@patternfly/react-icons';
 
 interface CreateDashboardDropdownProps {
   onRefetchDashboards: () => void;

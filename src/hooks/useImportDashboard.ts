@@ -2,63 +2,71 @@ import { useState } from 'react';
 import { importDashboardTemplate } from '../api/dashboard-templates';
 import { DashboardTemplate } from '../api/dashboard-templates';
 
-interface UseImportDashboardReturn {
-  importDashboard: (configString: string, dashboardName: string) => Promise<DashboardTemplate | null>;
+interface ImportDashboardState {
+  configString: string;
+  name: string;
   isLoading: boolean;
   error: string | null;
-  data: DashboardTemplate | null;
-  reset: () => void;
 }
 
+const initState: ImportDashboardState = {
+  configString: '',
+  name: '',
+  isLoading: false,
+  error: null,
+};
+
+type UseImportDashboardReturn = ImportDashboardState & {
+  setConfigString: (value: string) => void;
+  setName: (value: string) => void;
+  isFormValid: boolean;
+  importDashboard: () => Promise<DashboardTemplate | null>;
+  reset: () => void;
+};
+
 export const useImportDashboard = (): UseImportDashboardReturn => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<DashboardTemplate | null>(null);
+  const [state, setState] = useState<ImportDashboardState>(initState);
 
-  const reset = () => {
-    setError(null);
-    setData(null);
-    setIsLoading(false);
-  };
+  const isFormValid = state.configString.trim() !== '' && state.name.trim() !== '';
 
-  const importDashboard = async (configString: string, dashboardName: string): Promise<DashboardTemplate | null> => {
-    setIsLoading(true);
-    setError(null);
-    setData(null);
+  const reset = () => setState(initState);
+
+  const setConfigString = (value: string) => setState((prev) => ({ ...prev, configString: value }));
+
+  const setName = (value: string) => setState((prev) => ({ ...prev, name: value }));
+
+  const importDashboard = async (): Promise<DashboardTemplate | null> => {
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Parse the JSON config string and combine dashboardName with parsed config
-      const parsedConfig = JSON.parse(configString);
+      const parsedConfig = JSON.parse(state.configString);
       const requestData = {
         ...parsedConfig,
-        dashboardName,
+        dashboardName: state.name,
       };
 
       const result = await importDashboardTemplate(requestData);
 
-      // Success
-      setData(result);
-      setIsLoading(false);
+      setState((prev) => ({ ...prev, isLoading: false }));
       return result;
     } catch (err) {
-      // Handle different types of errors
       if (err instanceof SyntaxError) {
-        setError('Invalid JSON format. Please check your configuration string.');
+        setState((prev) => ({ ...prev, error: 'Invalid JSON format. Please check your configuration string.', isLoading: false }));
       } else if (err instanceof Error) {
-        setError(err.message || 'Failed to import dashboard. Please try again.');
+        setState((prev) => ({ ...prev, error: err.message || 'Failed to import dashboard. Please try again.', isLoading: false }));
       } else {
-        setError('An unexpected error occurred. Please try again.');
+        setState((prev) => ({ ...prev, error: 'An unexpected error occurred. Please try again.', isLoading: false }));
       }
-      setIsLoading(false);
       return null;
     }
   };
 
   return {
+    ...state,
+    setConfigString,
+    setName,
+    isFormValid,
     importDashboard,
-    isLoading,
-    error,
-    data,
     reset,
   };
 };

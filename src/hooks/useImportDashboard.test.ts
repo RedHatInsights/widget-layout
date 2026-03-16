@@ -28,9 +28,11 @@ describe('useImportDashboard', () => {
   it('should return correct initial state', () => {
     const { result } = renderHook(() => useImportDashboard());
 
+    expect(result.current.configString).toBe('');
+    expect(result.current.name).toBe('');
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
-    expect(result.current.data).toBeNull();
+    expect(result.current.isFormValid).toBe(false);
     expect(typeof result.current.importDashboard).toBe('function');
     expect(typeof result.current.reset).toBe('function');
   });
@@ -45,9 +47,14 @@ describe('useImportDashboard', () => {
 
     const { result } = renderHook(() => useImportDashboard());
 
+    act(() => {
+      result.current.setConfigString(configString);
+      result.current.setName('My Dashboard');
+    });
+
     let returnValue: DashboardTemplate | null = null;
     await act(async () => {
-      returnValue = await result.current.importDashboard(configString, 'My Dashboard');
+      returnValue = await result.current.importDashboard();
     });
 
     expect(mockedImportDashboardTemplate).toHaveBeenCalledTimes(1);
@@ -56,7 +63,6 @@ describe('useImportDashboard', () => {
       templateBase: { name: 'test-base', displayName: 'Test Base' },
       templateConfig: { someKey: 'someValue' },
     });
-    expect(result.current.data).toEqual(mockDashboardTemplate);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
     expect(returnValue).toEqual(mockDashboardTemplate);
@@ -65,14 +71,18 @@ describe('useImportDashboard', () => {
   it('should set error for invalid JSON config string', async () => {
     const { result } = renderHook(() => useImportDashboard());
 
+    act(() => {
+      result.current.setConfigString('not valid json');
+      result.current.setName('My Dashboard');
+    });
+
     let returnValue: DashboardTemplate | null = null;
     await act(async () => {
-      returnValue = await result.current.importDashboard('not valid json', 'My Dashboard');
+      returnValue = await result.current.importDashboard();
     });
 
     expect(result.current.error).toBe('Invalid JSON format. Please check your configuration string.');
     expect(result.current.isLoading).toBe(false);
-    expect(result.current.data).toBeNull();
     expect(returnValue).toBeNull();
     expect(mockedImportDashboardTemplate).not.toHaveBeenCalled();
   });
@@ -83,14 +93,18 @@ describe('useImportDashboard', () => {
     const configString = JSON.stringify({ templateBase: { name: 'x', displayName: 'X' } });
     const { result } = renderHook(() => useImportDashboard());
 
+    act(() => {
+      result.current.setConfigString(configString);
+      result.current.setName('Dashboard');
+    });
+
     let returnValue: DashboardTemplate | null = null;
     await act(async () => {
-      returnValue = await result.current.importDashboard(configString, 'Dashboard');
+      returnValue = await result.current.importDashboard();
     });
 
     expect(result.current.error).toBe('Network failure');
     expect(result.current.isLoading).toBe(false);
-    expect(result.current.data).toBeNull();
     expect(returnValue).toBeNull();
   });
 
@@ -100,8 +114,13 @@ describe('useImportDashboard', () => {
     const configString = JSON.stringify({ templateBase: { name: 'x', displayName: 'X' } });
     const { result } = renderHook(() => useImportDashboard());
 
+    act(() => {
+      result.current.setConfigString(configString);
+      result.current.setName('Dashboard');
+    });
+
     await act(async () => {
-      await result.current.importDashboard(configString, 'Dashboard');
+      await result.current.importDashboard();
     });
 
     expect(result.current.error).toBe('Failed to import dashboard. Please try again.');
@@ -113,14 +132,18 @@ describe('useImportDashboard', () => {
     const configString = JSON.stringify({ templateBase: { name: 'x', displayName: 'X' } });
     const { result } = renderHook(() => useImportDashboard());
 
+    act(() => {
+      result.current.setConfigString(configString);
+      result.current.setName('Dashboard');
+    });
+
     let returnValue: DashboardTemplate | null = null;
     await act(async () => {
-      returnValue = await result.current.importDashboard(configString, 'Dashboard');
+      returnValue = await result.current.importDashboard();
     });
 
     expect(result.current.error).toBe('An unexpected error occurred. Please try again.');
     expect(result.current.isLoading).toBe(false);
-    expect(result.current.data).toBeNull();
     expect(returnValue).toBeNull();
   });
 
@@ -130,8 +153,13 @@ describe('useImportDashboard', () => {
     const configString = JSON.stringify({ key: 'value' });
     const { result } = renderHook(() => useImportDashboard());
 
+    act(() => {
+      result.current.setConfigString(configString);
+      result.current.setName('Dashboard');
+    });
+
     await act(async () => {
-      await result.current.importDashboard(configString, 'Dashboard');
+      await result.current.importDashboard();
     });
 
     // Confirm error state is set before reset
@@ -142,11 +170,12 @@ describe('useImportDashboard', () => {
     });
 
     expect(result.current.error).toBeNull();
-    expect(result.current.data).toBeNull();
+    expect(result.current.configString).toBe('');
+    expect(result.current.name).toBe('');
     expect(result.current.isLoading).toBe(false);
   });
 
-  it('should overwrite dashboardName from config with the explicitly passed name', async () => {
+  it('should overwrite dashboardName from config with the explicitly set name', async () => {
     mockedImportDashboardTemplate.mockResolvedValue(mockDashboardTemplate);
 
     const configString = JSON.stringify({
@@ -156,14 +185,35 @@ describe('useImportDashboard', () => {
 
     const { result } = renderHook(() => useImportDashboard());
 
-    await act(async () => {
-      await result.current.importDashboard(configString, 'Correct Name');
+    act(() => {
+      result.current.setConfigString(configString);
+      result.current.setName('Correct Name');
     });
 
-    // The explicitly passed dashboardName overwrites the one from parsedConfig
+    await act(async () => {
+      await result.current.importDashboard();
+    });
+
+    // The name state overwrites the dashboardName from parsedConfig
     expect(mockedImportDashboardTemplate).toHaveBeenCalledWith({
       dashboardName: 'Correct Name',
       templateBase: { name: 'b', displayName: 'B' },
     });
+  });
+
+  it('should report form as valid when both configString and name are non-empty', () => {
+    const { result } = renderHook(() => useImportDashboard());
+
+    expect(result.current.isFormValid).toBe(false);
+
+    act(() => {
+      result.current.setConfigString('some config');
+    });
+    expect(result.current.isFormValid).toBe(false);
+
+    act(() => {
+      result.current.setName('Dashboard Name');
+    });
+    expect(result.current.isFormValid).toBe(true);
   });
 });
