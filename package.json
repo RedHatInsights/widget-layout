@@ -24,7 +24,7 @@
     "@patternfly/react-component-groups": "^6.4.0",
     "@patternfly/react-core": "^6.4.1",
     "@patternfly/widgetized-dashboard": "1.0.0-prerelease.6",
-    "@redhat-cloud-services/frontend-components": "^7.0.44",
+    "@redhat-cloud-services/frontend-components": "^7.0.45",
     "@redhat-cloud-services/frontend-components-notifications": "^5.0.7",
     "awesome-debounce-promise": "^2.1.0",
     "classnames": "^2.5.1",
