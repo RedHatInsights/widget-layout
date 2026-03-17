@@ -10,7 +10,7 @@ const getRequestHeaders = () => ({
 
 export const widgetIdSeparator = '#';
 
-export type LayoutTypes = 'landingPage';
+export type LayoutTypes = 'landingPage' | 'landing-landingPage';
 
 export type Variants = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -50,7 +50,16 @@ export type DashboardTemplate = {
   deletedAt: string | null;
   userIdentityID: number;
   default: boolean;
-  TemplateBase: {
+  templateBase: {
+    name: string;
+    displayName: string;
+  };
+  templateConfig: TemplateConfig;
+  dashboardName: string;
+};
+
+export type ExportDashboardTemplate = {
+  templateBase: {
     name: string;
     displayName: string;
   };
@@ -144,6 +153,17 @@ export async function getDashboardTemplates(type?: LayoutTypes): Promise<Dashboa
   return json.data;
 }
 
+// Returns user's dashboards
+export async function getUsersDashboards(): Promise<DashboardTemplate[]> {
+  const resp = await fetch(`/api/widget-layout/v1/`, {
+    method: 'GET',
+    headers: getRequestHeaders(),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+}
+
 export async function getWidgetMapping(): Promise<WidgetMapping> {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/widget-mapping`, {
     method: 'GET',
@@ -185,6 +205,34 @@ export const deleteDashboardTemplate = async (templateId: DashboardTemplate['id'
   });
   handleErrors(resp);
   return resp.status === 204;
+};
+
+export const importDashboardTemplate = async (data: {
+  dashboardName: string;
+  templateBase: {
+    name: string;
+    displayName: string;
+  };
+  templateConfig: TemplateConfig;
+}): Promise<DashboardTemplate> => {
+  const resp = await fetch(`/api/widget-layout/v1/import`, {
+    method: 'POST',
+    headers: getRequestHeaders(),
+    body: JSON.stringify(data),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json;
+};
+
+export const exportDashboardTemplate = async (templateId: number): Promise<ExportDashboardTemplate> => {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}/export`, {
+    method: 'GET',
+    headers: getRequestHeaders(),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json;
 };
 
 export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTemplate | undefined => {
