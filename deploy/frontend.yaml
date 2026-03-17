@@ -26,8 +26,12 @@ objects:
         modules:
           - id: widgetLayout
             module: ./RootApp
-            routes: 
+            routes:
             - pathname: /staging/widget-layout
+          - id: dashboardHub
+            module: ./DashboardHub
+            routes:
+            - pathname: /staging/dashboard-hub
 
 parameters:
   - name: ENV_NAME

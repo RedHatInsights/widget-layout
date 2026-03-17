@@ -21,3 +21,9 @@ coverage
 
 # cache folder
 .cache
+.cypress-cache
+
+# cypress
+cypress/screenshots
+cypress/videos
+cypress/downloads
