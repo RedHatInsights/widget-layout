@@ -6,6 +6,7 @@ import { DashboardTemplate } from '../../../api/dashboard-templates';
 import { CodeIcon, CopyIcon, EditAltIcon, HomeIcon, TrashIcon, UsersIcon } from '@patternfly/react-icons';
 import { useExportDashboard } from '../../../hooks/useExportDashboard';
 import { useDeleteDashboard } from '../../../hooks/useDeleteDashboard';
+import { DeleteDashboardModal } from '../DeleteDashboardModal/DeleteDashboardModal';
 import DateFormat from '@redhat-cloud-services/frontend-components/DateFormat';
 
 interface Dashboard {
@@ -27,7 +28,8 @@ export const ButtonCopy: React.FunctionComponent = () => {
 
 export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ dashboards, onRefetchDashboards }) => {
   const { exportDashboard, isLoading, error } = useExportDashboard();
-  const { deleteDashboard } = useDeleteDashboard(onRefetchDashboards);
+  const { deleteDashboard, isLoading: isDeleting } = useDeleteDashboard(onRefetchDashboards);
+  const [dashboardToDelete, setDashboardToDelete] = useState<Dashboard | null>(null);
 
   // Map API data to table format
   const tableData: Dashboard[] = dashboards.map((dashboard) => ({
@@ -112,38 +114,54 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
     {
       icon: <TrashIcon />,
       title: 'Delete dashboard',
-      onClick: () => deleteDashboard(dashboard.id),
+      onClick: () => setDashboardToDelete(dashboard),
     },
   ];
 
+  const handleDeleteConfirm = async () => {
+    if (dashboardToDelete) {
+      await deleteDashboard(dashboardToDelete.id);
+      setDashboardToDelete(null);
+    }
+  };
+
   return (
-    <Table aria-label="Dashboards table" ouiaId="DashboardsTable">
-      <Thead>
-        <Tr>
-          <Th sort={getSortParams()}>{columnNames.name}</Th>
-          <Th>{columnNames.description}</Th>
-          <Th>{columnNames.lastModified}</Th>
-          <Th screenReaderText="Actions" />
-        </Tr>
-      </Thead>
-      <Tbody>
-        {sortedDashboards.map((dashboard) => (
-          <Tr key={dashboard.id}>
-            <Td dataLabel={columnNames.name}>{dashboard.name}</Td>
-            <Td dataLabel={columnNames.description}>{dashboard.description}</Td>
-            <Td dataLabel={columnNames.lastModified}>
-              <DateFormat date={dashboard.lastModified} />
-            </Td>
-            <Td isActionCell>
-              <Td className="pf-v6-u-display-flex pf-v6-u-align-items-center pf-v6-u-gap-sm">
-                <ButtonCopy />
-                <ActionsColumn items={getRowActions(dashboard)} />
-              </Td>
-            </Td>
+    <>
+      <DeleteDashboardModal
+        isOpen={dashboardToDelete !== null}
+        dashboardName={dashboardToDelete?.name ?? ''}
+        isDeleting={isDeleting}
+        onClose={() => setDashboardToDelete(null)}
+        onDelete={handleDeleteConfirm}
+      />
+      <Table aria-label="Dashboards table" ouiaId="DashboardsTable">
+        <Thead>
+          <Tr>
+            <Th sort={getSortParams()}>{columnNames.name}</Th>
+            <Th>{columnNames.description}</Th>
+            <Th>{columnNames.lastModified}</Th>
+            <Th screenReaderText="Actions" />
           </Tr>
-        ))}
-      </Tbody>
-    </Table>
+        </Thead>
+        <Tbody>
+          {sortedDashboards.map((dashboard) => (
+            <Tr key={dashboard.id}>
+              <Td dataLabel={columnNames.name}>{dashboard.name}</Td>
+              <Td dataLabel={columnNames.description}>{dashboard.description}</Td>
+              <Td dataLabel={columnNames.lastModified}>
+                <DateFormat date={dashboard.lastModified} />
+              </Td>
+              <Td isActionCell>
+                <Td className="pf-v6-u-display-flex pf-v6-u-align-items-center pf-v6-u-gap-sm">
+                  <ButtonCopy />
+                  <ActionsColumn items={getRowActions(dashboard)} />
+                </Td>
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </>
   );
 };
 
