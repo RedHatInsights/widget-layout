@@ -29,7 +29,7 @@ import useCurrentUser from '../../hooks/useCurrentUser';
 import { WarningModal } from '@patternfly/react-component-groups';
 import { Link } from 'react-router-dom';
 
-const KebabDropdown = () => {
+export const KebabDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const onToggleClick = () => {
