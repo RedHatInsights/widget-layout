@@ -30,7 +30,7 @@ const DashboardHub = () => {
     <div className="dashboardHub">
       <Header onRefetchDashboards={fetchDashboards} />
       <PageSection>
-        <DashboardTable dashboards={dashboards} />
+        <DashboardTable dashboards={dashboards} onRefetchDashboards={fetchDashboards} />
       </PageSection>
     </div>
   );

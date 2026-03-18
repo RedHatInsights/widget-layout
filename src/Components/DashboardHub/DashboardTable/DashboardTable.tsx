@@ -5,6 +5,7 @@ import { Button } from '@patternfly/react-core';
 import { DashboardTemplate } from '../../../api/dashboard-templates';
 import { CodeIcon, CopyIcon, EditAltIcon, HomeIcon, TrashIcon, UsersIcon } from '@patternfly/react-icons';
 import { useExportDashboard } from '../../../hooks/useExportDashboard';
+import { useDeleteDashboard } from '../../../hooks/useDeleteDashboard';
 import DateFormat from '@redhat-cloud-services/frontend-components/DateFormat';
 
 interface Dashboard {
@@ -16,6 +17,7 @@ interface Dashboard {
 
 interface DashboardTableProps {
   dashboards: DashboardTemplate[];
+  onRefetchDashboards: () => void;
 }
 
 export const ButtonCopy: React.FunctionComponent = () => {
@@ -23,8 +25,9 @@ export const ButtonCopy: React.FunctionComponent = () => {
   return <Button variant="plain" aria-label="Copy" icon={<CopyIcon />} onClick={() => {}} />;
 };
 
-export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ dashboards }) => {
+export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ dashboards, onRefetchDashboards }) => {
   const { exportDashboard, isLoading, error } = useExportDashboard();
+  const { deleteDashboard } = useDeleteDashboard(onRefetchDashboards);
 
   // Map API data to table format
   const tableData: Dashboard[] = dashboards.map((dashboard) => ({
@@ -109,8 +112,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
     {
       icon: <TrashIcon />,
       title: 'Delete dashboard',
-      isDisabled: true,
-      onClick: () => console.log(`Delete dashboard ${dashboard.id}`),
+      onClick: () => deleteDashboard(dashboard.id),
     },
   ];
 
