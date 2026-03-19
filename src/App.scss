@@ -27,10 +27,10 @@
 }
 .widg-c-page__main-section--header,
 .widg-c-page__main-section--drawer {
-  border-bottom: 1px solid var(--pf-t--global--color--disabled--100);
+  border-bottom: 1px solid var(--pf-t--global--text--color--disabled);
 }
 .widg-c-page__main-section--drawer {
-  background-color: var(--pf-t--color--blue--10);
+  background-color: var(--pf-t--global--color--nonstatus--blue--default);
 }
 .widg-c-page__main-section--grid {
   border-bottom: 0;
