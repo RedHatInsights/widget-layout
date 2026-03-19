@@ -4,8 +4,8 @@
     --pf-v6-c-toolbar__content--PaddingRight: 0;
     .pf-v6-c-clipboard-copy {
       .pf-v6-c-button {
-        --pf-v6-c-button--after--BorderColor: var(--pf-t--global--background--color--100);
-        --pf-v6-c-button--m-control--Color: var(--pf-t--color--gray--60);
+        --pf-v6-c-button--after--BorderColor: var(--pf-t--global--background--color--primary--default);
+        --pf-v6-c-button--m-control--Color: var(--pf-t--global--text--color--disabled);
         --pf-v6-c-button--PaddingRight: var(--pf-t--global--spacer--md);
         --pf-v6-c-button--PaddingLeft: var(--pf-t--global--spacer--s,);
       }
@@ -16,16 +16,16 @@
     .pf-v6-c-menu-toggle {
       min-width: 275px;
       .pf-m-expanded {
-        background-color: var(--pf-t--global--background--color--100);
+        background-color: var(--pf-t--global--background--color--primary--default);
       }
     }
     .pf-v6-c-menu__list-item:hover {
-      --pf-v6-c-menu__list-item--BackgroundColor: var(--pf-t--global--background--color--100);
+      --pf-v6-c-menu__list-item--BackgroundColor: var(--pf-t--global--background--color--primary--default);
     }
     textarea {
-      background-color: var(--pf-t--color--gray--60);
+      background-color: var(--pf-t--global--text--color--disabled);
       &:focus {
-        background-color: var(--pf-t--global--background--color--100);
+        background-color: var(--pf-t--global--background--color--primary--default);
       }
     }
   }
