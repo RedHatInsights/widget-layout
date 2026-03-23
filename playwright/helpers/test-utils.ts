@@ -49,17 +49,20 @@ export async function ensureLoggedIn(page: Page): Promise<void> {
 
   // Check if already logged in by looking for the Add widgets button
   const addWidgetsButton = page.getByRole('button', { name: 'Add widgets' });
-  const loggedIn = await addWidgetsButton.isVisible().catch(() => false);
+  const loggedIn = await addWidgetsButton.waitFor({ state: 'visible', timeout: 15000 }).then(() => true).catch(() => false);
 
   if (!loggedIn) {
     // Wait for SSO redirect and login form to load
     await page.waitForLoadState("load");
     await login(page, user, password);
+
+    // Wait for navigation after login (SSO redirect back to app)
+    await page.waitForLoadState("networkidle", { timeout: 60000 });
     await page.waitForLoadState("load");
     await expect(page.getByText('Invalid login')).not.toBeVisible();
 
-    // Wait for dashboard to be displayed
-    await expect(addWidgetsButton, 'dashboard not displayed').toBeVisible({ timeout: 30000 });
+    // Wait for dashboard to be displayed (increased timeout for slow SSO)
+    await expect(addWidgetsButton, 'dashboard not displayed').toBeVisible({ timeout: 60000 });
 
     // Conditionally accept cookie prompt
     const acceptAllButton = page.getByRole('button', { name: 'Accept all'});
