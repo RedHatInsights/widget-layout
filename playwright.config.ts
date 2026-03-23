@@ -29,9 +29,8 @@ export default defineConfig({
   // Shared settings for all projects
   use: {
     // Base URL for navigation
-    // In CI/Konflux: uses HCC_ENV_URL (e.g., https://console.stage.redhat.com)
-    // Locally: uses localhost
-    baseURL: process.env.HCC_ENV_URL || process.env.PLAYWRIGHT_BASE_URL || 'https://stage.foo.redhat.com:1337/',
+    // Uses the proxy at https://stage.foo.redhat.com:1337 which routes to the app
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://stage.foo.redhat.com:1337/',
 
     // Skip TLS certificate verification (self-signed certs)
     ignoreHTTPSErrors: true,

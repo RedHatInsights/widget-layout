@@ -2,7 +2,7 @@ import { Page, expect } from '@playwright/test';
 
 // Get the base URL from environment or use default
 const getBaseURL = () => {
-  return process.env.HCC_ENV_URL || process.env.PLAYWRIGHT_BASE_URL || 'https://stage.foo.redhat.com:1337';
+  return process.env.PLAYWRIGHT_BASE_URL || 'https://stage.foo.redhat.com:1337';
 };
 
 // Prevents inconsistent cookie prompting that is problematic for UI testing
