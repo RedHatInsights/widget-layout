@@ -9,6 +9,7 @@ import { useDeleteDashboard } from '../../../hooks/useDeleteDashboard';
 import { DeleteDashboardModal } from '../DeleteDashboardModal/DeleteDashboardModal';
 import DateFormat from '@redhat-cloud-services/frontend-components/DateFormat';
 import { useFlag } from '@unleash/proxy-client-react';
+import { useAddNotification } from '../../../state/notificationsAtom';
 
 interface Dashboard {
   id: number;
@@ -32,6 +33,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
   const { deleteDashboard, isLoading: isDeleting } = useDeleteDashboard(onRefetchDashboards);
   const [dashboardToDelete, setDashboardToDelete] = useState<Dashboard | null>(null);
   const isEnabledDelete = useFlag('platform.widget-layout.delete-dashboard');
+  const addNotification = useAddNotification();
 
   // Map API data to table format
   const tableData: Dashboard[] = dashboards.map((dashboard) => ({
@@ -123,8 +125,13 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
 
   const handleDeleteConfirm = async () => {
     if (dashboardToDelete) {
+      const name = dashboardToDelete.name;
       await deleteDashboard(dashboardToDelete.id);
       setDashboardToDelete(null);
+      addNotification({
+        variant: 'danger',
+        title: `'${name}' has been deleted and removed from Dashboard Hub`,
+      });
     }
   };
 
