@@ -60,6 +60,17 @@ spec:
     name: docker-build
   taskRunTemplate:
     serviceAccountName: build-pipeline-widget-layout
+  taskRunSpecs:
+    - pipelineTaskName: run-e2e-tests
+      serviceAccountName: build-pipeline-widget-layout
+      podTemplate:
+        hostAliases:
+          - ip: "::1"
+            hostnames:
+              - "stage.foo.redhat.com"
+          - ip: "127.0.0.1"
+            hostnames:
+              - "stage.foo.redhat.com"
   workspaces:
     - name: workspace
       volumeClaimTemplate:

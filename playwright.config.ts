@@ -11,14 +11,14 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './playwright',
 
-  // Maximum time one test can run (increased for stage environment)
-  timeout: 120 * 1000,
+  // Maximum time one test can run (increased for stage environment and slow SSO)
+  timeout: 180 * 1000,
 
   // Test configuration
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
 
   // Reporter configuration
   reporter: [
@@ -29,9 +29,11 @@ export default defineConfig({
   // Shared settings for all projects
   use: {
     // Base URL for navigation
-    // In CI/Konflux: uses HCC_ENV_URL (e.g., https://console.stage.redhat.com)
-    // Locally: uses localhost
-    baseURL: process.env.HCC_ENV_URL || process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:1337',
+    // Uses the proxy at https://stage.foo.redhat.com:1337 which routes to the app
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://stage.foo.redhat.com:1337/',
+
+    // Skip TLS certificate verification (self-signed certs)
+    ignoreHTTPSErrors: true,
 
     // Collect trace on first retry of failed test
     trace: 'on-first-retry',
@@ -55,12 +57,4 @@ export default defineConfig({
     },
   ],
 
-  // Development server configuration (for local testing)
-  // Skip if CI or if HCC_ENV_URL is set (testing against remote environment)
-  webServer: process.env.CI || process.env.HCC_ENV_URL ? undefined : {
-    command: 'npm start',
-    url: 'http://localhost:1337',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
 });

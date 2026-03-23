@@ -1,50 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './helpers/base';
+import { ensureLoggedIn } from './helpers/test-utils';
 
 test.describe('Widget Layout - Basic Rendering', () => {
   test('should render the site correctly', async ({ page }) => {
-    // Navigate to the application
-    await page.goto('/');
-
-    // Wait for the page to be fully loaded
-    await page.waitForLoadState('domcontentloaded');
-
-    // Handle cookie consent if present
-    try {
-      const cookieFrame = page.frameLocator('iframe[name="trustarc_cm"]');
-      const cookieButton = cookieFrame.getByRole('button', { name: 'Agree and proceed with' });
-      await cookieButton.waitFor({ state: 'visible', timeout: 10000 });
-      await cookieButton.click();
-      await page.waitForTimeout(2000);
-    } catch (error) {
-      // Cookie banner didn't appear or was already accepted
-    }
-
-    // Check if we're redirected to SSO login page
-    const currentUrl = page.url();
-    if (currentUrl.includes('sso.stage.redhat.com') || currentUrl.includes('auth')) {
-      const username = process.env.E2E_USER;
-      const password = process.env.E2E_PASSWORD;
-
-      if (username && password) {
-        // Step 1: Fill in username
-        await page.getByRole('textbox', { name: 'Red Hat login' }).fill(username);
-
-        // Step 2: Click Next button
-        await page.getByRole('button', { name: 'Next' }).click();
-
-        // Wait for password field to appear
-        await page.waitForTimeout(1000);
-
-        // Step 3: Fill in password
-        await page.getByRole('textbox', { name: 'Password' }).fill(password);
-
-        // Step 4: Click Log in button
-        await page.getByRole('button', { name: 'Log in' }).click();
-
-        // Wait for redirect back to console
-        await page.waitForLoadState('networkidle', { timeout: 30000 });
-      }
-    }
+    await ensureLoggedIn(page);
 
     // Wait for the page to be fully loaded after authentication
     await page.waitForLoadState('domcontentloaded');
@@ -70,59 +29,7 @@ test.describe('Widget Layout - Basic Rendering', () => {
 
 test.describe('Widget Layout - Add Widget from Drawer', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to the root console page
-    await page.goto('/');
-
-    // Wait for the page to load
-    await page.waitForLoadState('domcontentloaded');
-
-    // Handle cookie consent if present
-    // Cookie banner is inside an iframe, so we need to access it
-    try {
-      // Wait for the cookie consent iframe to appear
-      const cookieFrame = page.frameLocator('iframe[name="trustarc_cm"]');
-      const cookieButton = cookieFrame.getByRole('button', { name: 'Agree and proceed with' });
-      await cookieButton.waitFor({ state: 'visible', timeout: 10000 });
-      await cookieButton.click();
-      // Wait a bit for the cookie banner to close
-      await page.waitForTimeout(2000);
-    } catch (error) {
-      // Cookie banner didn't appear or was already accepted, continue
-    }
-
-    // Check if we're redirected to SSO login page
-    const currentUrl = page.url();
-    if (currentUrl.includes('sso.stage.redhat.com') || currentUrl.includes('auth')) {
-      // We need to authenticate
-      const username = process.env.E2E_USER;
-      const password = process.env.E2E_PASSWORD;
-
-      if (username && password) {
-        // Step 1: Fill in username
-        await page.getByRole('textbox', { name: 'Red Hat login' }).fill(username);
-
-        // Step 2: Click Next button
-        await page.getByRole('button', { name: 'Next' }).click();
-
-        // Wait for password field to appear
-        await page.waitForTimeout(1000);
-
-        // Step 3: Fill in password
-        await page.getByRole('textbox', { name: 'Password' }).fill(password);
-
-        // Step 4: Click Log in button
-        await page.getByRole('button', { name: 'Log in' }).click();
-
-        // Wait for redirect back to console
-        await page.waitForLoadState('networkidle', { timeout: 30000 });
-      }
-    }
-
-    // Wait for the page to be fully loaded after authentication
-    await page.waitForLoadState('domcontentloaded');
-
-    // Wait for the Add widgets button to be visible (indicates page is ready)
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
+    await ensureLoggedIn(page);
   });
 
   test('should open the widget drawer when clicking Add widgets button', async ({ page }) => {
