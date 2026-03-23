@@ -5,22 +5,9 @@ const getBaseURL = () => {
   return process.env.PLAYWRIGHT_BASE_URL || 'https://stage.foo.redhat.com:1337';
 };
 
-// Prevents inconsistent cookie prompting that is problematic for UI testing
-export async function disableCookiePrompt(page: Page) {
-  await page.route('**/*', async (route, request) => {
-    if (request.url().includes('consent.trustarc.com') && request.resourceType() !== 'document') {
-      await route.abort();
-    } else {
-      await route.continue();
-    }
-  });
-}
-
 export async function login(page: Page, user: string, password: string): Promise<void> {
   // Fail in a friendly way if the proxy config is not set up correctly
   await expect(page.locator("text=Lockdown"), 'proxy config incorrect').toHaveCount(0);
-
-  await disableCookiePrompt(page);
 
   // Wait for and fill username field
   await page.getByLabel('Red Hat login').first().fill(user);
@@ -45,9 +32,6 @@ export async function ensureLoggedIn(page: Page): Promise<void> {
 
   // Navigate to the app (will redirect to SSO if not logged in)
   const baseURL = getBaseURL();
-  console.log('[DEBUG] Environment - HCC_ENV_URL:', process.env.HCC_ENV_URL || 'not set');
-  console.log('[DEBUG] Environment - PLAYWRIGHT_BASE_URL:', process.env.PLAYWRIGHT_BASE_URL || 'not set');
-  console.log('[DEBUG] Computed baseURL:', baseURL);
   await page.goto(baseURL, { waitUntil: 'load', timeout: 60000 });
 
   // Check if already logged in by looking for the Add widgets button
@@ -58,7 +42,6 @@ export async function ensureLoggedIn(page: Page): Promise<void> {
     // Wait for SSO redirect and login form to load
     await page.waitForLoadState("load");
 
-    console.log('[DEBUG] Before login - URL:', page.url());
     await login(page, user, password);
 
     // Wait for navigation after login (SSO redirect back to app)
@@ -69,16 +52,7 @@ export async function ensureLoggedIn(page: Page): Promise<void> {
     // Additional wait for React app to initialize and render
     await page.waitForTimeout(3000);
 
-    console.log('[DEBUG] After login - URL:', page.url());
-    console.log('[DEBUG] After login - Page title:', await page.title());
-
     await expect(page.getByText('Invalid login')).not.toBeVisible();
-
-    // Check what's actually on the page
-    const bodyText = await page.locator('body').textContent();
-    console.log('[DEBUG] Body text length:', bodyText?.length || 0);
-    console.log('[DEBUG] Body contains "Add widgets":', bodyText?.includes('Add widgets') || false);
-    console.log('[DEBUG] Body contains "widget-layout":', bodyText?.includes('widget-layout') || false);
 
     // Wait for dashboard to be displayed (increased timeout for slow SSO)
     await expect(addWidgetsButton, 'dashboard not displayed').toBeVisible({ timeout: 60000 });
