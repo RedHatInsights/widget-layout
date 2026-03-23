@@ -1,7 +1,21 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+
+// Prevents inconsistent cookie prompting that is problematic for UI testing
+export async function disableCookiePrompt(page: Page) {
+  await page.route('**/*', async (route, request) => {
+    if (request.url().includes('consent.trustarc.com') && request.resourceType() !== 'document') {
+      await route.abort();
+    } else {
+      await route.continue();
+    }
+  });
+}
 
 test.describe('Widget Layout - Basic Rendering', () => {
   test('should render the site correctly', async ({ page }) => {
+    // Block trustarc network requests
+    await disableCookiePrompt(page);
+
     // Navigate to the application
     await page.goto('/');
 
@@ -70,6 +84,9 @@ test.describe('Widget Layout - Basic Rendering', () => {
 
 test.describe('Widget Layout - Add Widget from Drawer', () => {
   test.beforeEach(async ({ page }) => {
+    // Block trustarc network requests
+    await disableCookiePrompt(page);
+
     // Navigate to the root console page
     await page.goto('/');
 
