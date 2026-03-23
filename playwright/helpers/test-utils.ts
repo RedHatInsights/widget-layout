@@ -64,6 +64,10 @@ export async function ensureLoggedIn(page: Page): Promise<void> {
     // Wait for navigation after login (SSO redirect back to app)
     await page.waitForLoadState("networkidle", { timeout: 60000 });
     await page.waitForLoadState("load");
+    await page.waitForLoadState("domcontentloaded");
+
+    // Additional wait for React app to initialize and render
+    await page.waitForTimeout(3000);
 
     console.log('[DEBUG] After login - URL:', page.url());
     console.log('[DEBUG] After login - Page title:', await page.title());

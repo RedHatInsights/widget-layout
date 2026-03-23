@@ -11,14 +11,14 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './playwright',
 
-  // Maximum time one test can run (increased for stage environment)
-  timeout: 120 * 1000,
+  // Maximum time one test can run (increased for stage environment and slow SSO)
+  timeout: 180 * 1000,
 
   // Test configuration
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
 
   // Reporter configuration
   reporter: [
