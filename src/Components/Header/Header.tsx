@@ -28,6 +28,7 @@ import { resetDashboardTemplate } from '../../api/dashboard-templates';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { WarningModal } from '@patternfly/react-component-groups';
 import { Link } from 'react-router-dom';
+import { useFlag } from '@unleash/proxy-client-react';
 
 export const KebabDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -136,6 +137,7 @@ const Controls = () => {
 const Header = () => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
+  const isDashboardHub = useFlag('platform.chrome.dashboard-hub');
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
@@ -151,9 +153,11 @@ const Header = () => {
           <Toolbar>
             <ToolbarContent>
               <Controls />
-              <ToolbarItem>
-                <KebabDropdown />
-              </ToolbarItem>
+              {isDashboardHub && (
+                <ToolbarItem>
+                  <KebabDropdown />
+                </ToolbarItem>
+              )}
             </ToolbarContent>
           </Toolbar>
         </FlexItem>
