@@ -45,6 +45,9 @@ export async function ensureLoggedIn(page: Page): Promise<void> {
 
   // Navigate to the app (will redirect to SSO if not logged in)
   const baseURL = getBaseURL();
+  console.log('[DEBUG] Environment - HCC_ENV_URL:', process.env.HCC_ENV_URL || 'not set');
+  console.log('[DEBUG] Environment - PLAYWRIGHT_BASE_URL:', process.env.PLAYWRIGHT_BASE_URL || 'not set');
+  console.log('[DEBUG] Computed baseURL:', baseURL);
   await page.goto(baseURL, { waitUntil: 'load', timeout: 60000 });
 
   // Check if already logged in by looking for the Add widgets button
@@ -54,12 +57,24 @@ export async function ensureLoggedIn(page: Page): Promise<void> {
   if (!loggedIn) {
     // Wait for SSO redirect and login form to load
     await page.waitForLoadState("load");
+
+    console.log('[DEBUG] Before login - URL:', page.url());
     await login(page, user, password);
 
     // Wait for navigation after login (SSO redirect back to app)
     await page.waitForLoadState("networkidle", { timeout: 60000 });
     await page.waitForLoadState("load");
+
+    console.log('[DEBUG] After login - URL:', page.url());
+    console.log('[DEBUG] After login - Page title:', await page.title());
+
     await expect(page.getByText('Invalid login')).not.toBeVisible();
+
+    // Check what's actually on the page
+    const bodyText = await page.locator('body').textContent();
+    console.log('[DEBUG] Body text length:', bodyText?.length || 0);
+    console.log('[DEBUG] Body contains "Add widgets":', bodyText?.includes('Add widgets') || false);
+    console.log('[DEBUG] Body contains "widget-layout":', bodyText?.includes('widget-layout') || false);
 
     // Wait for dashboard to be displayed (increased timeout for slow SSO)
     await expect(addWidgetsButton, 'dashboard not displayed').toBeVisible({ timeout: 60000 });
