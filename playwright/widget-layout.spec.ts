@@ -1,10 +1,9 @@
 import { test, expect } from './helpers/base';
-import { login } from './helpers/login';
+import { ensureLoggedIn } from './helpers/test-utils';
 
 test.describe('Widget Layout - Basic Rendering', () => {
   test('should render the site correctly', async ({ page }) => {
-    await page.goto('/');
-    await login(page);
+    await ensureLoggedIn(page);
 
     // Wait for the page to be fully loaded after authentication
     await page.waitForLoadState('domcontentloaded');
@@ -30,11 +29,7 @@ test.describe('Widget Layout - Basic Rendering', () => {
 
 test.describe('Widget Layout - Add Widget from Drawer', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await login(page);
-
-    // Wait for the Add widgets button to be visible (indicates page is ready)
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
+    await ensureLoggedIn(page);
   });
 
   test('should open the widget drawer when clicking Add widgets button', async ({ page }) => {

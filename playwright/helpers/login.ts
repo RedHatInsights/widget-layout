@@ -1,29 +1,35 @@
-import type { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
-export async function login(page: Page) {
+export async function disableCookiePrompt(page: Page) {
+  await page.route('*/*', async (route, request) => {
+    if (request.url().includes('consent.trustarc.com') &&
+        request.resourceType() !== 'document') {
+      await route.abort();
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+export async function login(page: Page): Promise<void> {
   const username = process.env.E2E_USER;
   const password = process.env.E2E_PASSWORD;
   if (!username || !password) return;
 
-  // Wait for SSO redirect
-  await page.waitForURL(/sso.*redhat\.com|auth/, { timeout: 30000 });
+  // Check for proxy configuration issues
+  await expect(page.locator("text=Lockdown"), 'proxy config incorrect')
+    .toHaveCount(0);
 
-  // Fill username
-  const usernameField = page.locator('#username-verification');
-  await usernameField.waitFor({ state: 'visible', timeout: 15000 });
-  await usernameField.fill(username);
+  await disableCookiePrompt(page);
 
-  // Click Next
-  await page.locator('#login-show-step2').click();
+  // Fill username using semantic label
+  await page.getByLabel('Red Hat login').first().fill(username);
+  await page.getByRole('button', { name: 'Next' }).click();
 
-  // Fill password
-  const passwordField = page.locator('#password');
-  await passwordField.waitFor({ state: 'visible', timeout: 15000 });
-  await passwordField.fill(password);
+  // Fill password using semantic label
+  await page.getByLabel('Password').first().fill(password);
+  await page.getByRole('button', { name: 'Log in' }).click();
 
-  // Submit login
-  await page.locator('#rh-password-verification-submit-button').click();
-
-  // Wait for redirect back to the app
-  await page.waitForLoadState('networkidle', { timeout: 30000 });
+  // Verify login was successful
+  await expect(page.getByText('Invalid login')).not.toBeVisible();
 }
