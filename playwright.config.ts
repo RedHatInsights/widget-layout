@@ -31,7 +31,10 @@ export default defineConfig({
     // Base URL for navigation
     // In CI/Konflux: uses HCC_ENV_URL (e.g., https://console.stage.redhat.com)
     // Locally: uses localhost
-    baseURL: process.env.HCC_ENV_URL || process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:1337',
+    baseURL: process.env.HCC_ENV_URL || process.env.PLAYWRIGHT_BASE_URL || 'https://stage.foo.redhat.com:1337/',
+
+    // Skip TLS certificate verification (self-signed certs)
+    ignoreHTTPSErrors: true,
 
     // Collect trace on first retry of failed test
     trace: 'on-first-retry',
@@ -55,12 +58,4 @@ export default defineConfig({
     },
   ],
 
-  // Development server configuration (for local testing)
-  // Skip if CI or if HCC_ENV_URL is set (testing against remote environment)
-  webServer: process.env.CI || process.env.HCC_ENV_URL ? undefined : {
-    command: 'npm start',
-    url: 'http://localhost:1337',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
 });
