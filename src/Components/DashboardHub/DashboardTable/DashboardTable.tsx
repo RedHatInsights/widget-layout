@@ -8,6 +8,7 @@ import { useExportDashboard } from '../../../hooks/useExportDashboard';
 import { useDeleteDashboard } from '../../../hooks/useDeleteDashboard';
 import { DeleteDashboardModal } from '../DeleteDashboardModal/DeleteDashboardModal';
 import DateFormat from '@redhat-cloud-services/frontend-components/DateFormat';
+import { useFlag } from '@unleash/proxy-client-react';
 
 interface Dashboard {
   id: number;
@@ -30,6 +31,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
   const { exportDashboard, isLoading, error } = useExportDashboard();
   const { deleteDashboard, isLoading: isDeleting } = useDeleteDashboard(onRefetchDashboards);
   const [dashboardToDelete, setDashboardToDelete] = useState<Dashboard | null>(null);
+  const isEnabledDelete = useFlag('platform.widget-layout.delete-dashboard');
 
   // Map API data to table format
   const tableData: Dashboard[] = dashboards.map((dashboard) => ({
@@ -114,6 +116,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
     {
       icon: <TrashIcon />,
       title: 'Delete dashboard',
+      isDisabled: !isEnabledDelete,
       onClick: () => setDashboardToDelete(dashboard),
     },
   ];
