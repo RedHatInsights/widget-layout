@@ -30,6 +30,7 @@ import useCurrentUser from '../../hooks/useCurrentUser';
 import { WarningModal } from '@patternfly/react-component-groups';
 import { Link } from 'react-router-dom';
 import { useFlag } from '@unleash/proxy-client-react';
+import useGetDashboards from '../../hooks/useGetDashboards';
 
 export const KebabDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,6 +40,8 @@ export const KebabDropdown = () => {
   const [activeMenu, setActiveMenu] = useState<string>('kebab-rootMenu');
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const { dashboards } = useGetDashboards();
 
   const onToggleClick = () => {
     setIsOpen(!isOpen);
@@ -90,6 +93,13 @@ export const KebabDropdown = () => {
     >
       <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
         <MenuList>
+          {dashboards.length > 0}
+          {dashboards.map((dashboard) => (
+            <MenuItem key={dashboard.id} itemId={`dashboard-${dashboard.id}`}>
+              {dashboard.templateBase.displayName}
+            </MenuItem>
+          ))}
+          <Divider component="li" />
           <MenuItem
             itemId="group:create"
             direction="down"
