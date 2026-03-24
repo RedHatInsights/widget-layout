@@ -1,8 +1,8 @@
 import { act, renderHook } from '@testing-library/react';
-import { useImportDashboard } from './useImportDashboard';
-import { DashboardTemplate, importDashboardTemplate } from '../api/dashboard-templates';
+import { useImportDashboard } from '../useImportDashboard';
+import { DashboardTemplate, importDashboardTemplate } from '../../api/dashboard-templates';
 
-jest.mock('../api/dashboard-templates', () => ({
+jest.mock('../../api/dashboard-templates', () => ({
   importDashboardTemplate: jest.fn(),
 }));
 
