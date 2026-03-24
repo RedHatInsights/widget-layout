@@ -20,12 +20,22 @@ export const DeleteDashboardModal: React.FunctionComponent<DeleteDashboardModalP
 }) => {
   const [isConfirmed, setIsConfirmed] = useState(false);
 
+  const handleClose = () => {
+    setIsConfirmed(false);
+    onClose();
+  };
+
+  const handleDelete = () => {
+    setIsConfirmed(false);
+    onDelete();
+  };
+
   return (
     <Modal
       variant="small"
       className="delete-dashboard-modal"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       aria-labelledby="delete-dashboard-modal-title"
       aria-describedby="delete-dashboard-modal-description"
     >
@@ -52,10 +62,10 @@ export const DeleteDashboardModal: React.FunctionComponent<DeleteDashboardModalP
         />
       </ModalBody>
       <ModalFooter>
-        <Button key="delete" variant="danger" onClick={onDelete} isLoading={isDeleting} isDisabled={isDeleting || !isConfirmed}>
+        <Button key="delete" variant="danger" onClick={handleDelete} isLoading={isDeleting} isDisabled={isDeleting || !isConfirmed}>
           Delete dashboard
         </Button>
-        <Button key="cancel" variant="link" onClick={onClose} isDisabled={isDeleting}>
+        <Button key="cancel" variant="link" onClick={handleClose} isDisabled={isDeleting}>
           Cancel
         </Button>
       </ModalFooter>
