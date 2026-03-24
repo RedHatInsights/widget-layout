@@ -5,22 +5,23 @@ import {
   ButtonVariant,
   Content,
   Divider,
-  Dropdown,
-  DropdownItem,
-  DropdownList,
+  DrilldownMenu,
   Flex,
   FlexItem,
+  Menu,
+  MenuContainer,
+  MenuContent,
   MenuItem,
+  MenuList,
   MenuToggle,
-  MenuToggleElement,
   PageSection,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
-import React, { useState } from 'react';
-import { CodeIcon, CopyIcon, EllipsisVIcon, PlusCircleIcon, UsersIcon } from '@patternfly/react-icons';
+import React, { useRef, useState } from 'react';
+import { CodeIcon, CopyIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon } from '@patternfly/react-icons';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { templateIdAtom } from '../../state/templateAtom';
@@ -32,50 +33,106 @@ import { useFlag } from '@unleash/proxy-client-react';
 
 export const KebabDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
+  const [drilldownPath, setDrilldownPath] = useState<string[]>([]);
+  const [menuHeights, setMenuHeights] = useState<Record<string, number>>({});
+  const [activeMenu, setActiveMenu] = useState<string>('kebab-rootMenu');
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const onToggleClick = () => {
     setIsOpen(!isOpen);
+    setMenuDrilledIn([]);
+    setDrilldownPath([]);
+    setActiveMenu('kebab-rootMenu');
   };
 
-  const onSelect = (_event: React.MouseEvent<Element, MouseEvent> | undefined, value: string | number | undefined) => {
-    console.log('selected', value);
-    setIsOpen(false);
+  const drillIn = (_event: React.KeyboardEvent | React.MouseEvent, fromMenuId: string, toMenuId: string, pathId: string) => {
+    setMenuDrilledIn([...menuDrilledIn, fromMenuId]);
+    setDrilldownPath([...drilldownPath, pathId]);
+    setActiveMenu(toMenuId);
   };
+
+  const drillOut = (_event: React.KeyboardEvent | React.MouseEvent, toMenuId: string) => {
+    setMenuDrilledIn(menuDrilledIn.slice(0, menuDrilledIn.length - 1));
+    setDrilldownPath(drilldownPath.slice(0, drilldownPath.length - 1));
+    setActiveMenu(toMenuId);
+  };
+
+  const setHeight = (menuId: string, height: number) => {
+    if (menuHeights[menuId] === undefined || (menuId !== 'kebab-rootMenu' && menuHeights[menuId] !== height)) {
+      setMenuHeights({ ...menuHeights, [menuId]: height });
+    }
+  };
+
+  const toggle = (
+    <MenuToggle
+      ref={toggleRef}
+      aria-label="kebab dropdown toggle"
+      variant="plain"
+      onClick={onToggleClick}
+      isExpanded={isOpen}
+      icon={<EllipsisVIcon />}
+    />
+  );
+
+  const menu = (
+    <Menu
+      id="kebab-rootMenu"
+      containsDrilldown
+      drilldownItemPath={drilldownPath}
+      drilledInMenus={menuDrilledIn}
+      activeMenu={activeMenu}
+      onDrillIn={drillIn}
+      onDrillOut={drillOut}
+      onGetMenuHeight={setHeight}
+      ref={menuRef}
+    >
+      <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
+        <MenuList>
+          <MenuItem
+            itemId="group:create"
+            direction="down"
+            icon={<PlusIcon />}
+            drilldownMenu={
+              <DrilldownMenu id="kebab-drilldownMenuCreate">
+                <MenuItem itemId="group:create_breadcrumb" direction="up" icon={<PlusCircleIcon />}>
+                  Create new dashboard
+                </MenuItem>
+                <Divider component="li" />
+                <MenuItem itemId="share-dashboard" icon={<ThIcon />} isDisabled>
+                  Create from blank
+                </MenuItem>
+                <MenuItem itemId="copy-config" icon={<CodeIcon />} isDisabled>
+                  Import from config string
+                </MenuItem>
+                <MenuItem itemId="duplicate-dashboard" icon={<CopyIcon />} isDisabled>
+                  Duplicate existing
+                </MenuItem>
+              </DrilldownMenu>
+            }
+          >
+            Create new dashboard
+          </MenuItem>
+          <Divider component="li" key="separator" />
+          <MenuItem component={(props) => <Link {...props} to="/staging/dashboard-hub" />} description="Create, manage, share dashboards">
+            Dashboard Hub
+          </MenuItem>
+        </MenuList>
+      </MenuContent>
+    </Menu>
+  );
 
   return (
-    <Dropdown
+    <MenuContainer
       isOpen={isOpen}
-      onSelect={onSelect}
+      onOpenChange={(isOpen) => setIsOpen(isOpen)}
+      menu={menu}
+      menuRef={menuRef}
+      toggle={toggle}
+      toggleRef={toggleRef}
       popperProps={{ position: 'end' }}
-      onOpenChange={(isOpen: boolean) => setIsOpen(isOpen)}
-      toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
-        <MenuToggle
-          ref={toggleRef}
-          aria-label="kebab dropdown toggle"
-          variant="plain"
-          onClick={onToggleClick}
-          isExpanded={isOpen}
-          icon={<EllipsisVIcon />}
-        />
-      )}
-      shouldFocusToggleOnSelect
-    >
-      <DropdownList>
-        <DropdownItem key="copy-config" isDisabled icon={<CodeIcon />}>
-          Copy configuration string
-        </DropdownItem>
-        <DropdownItem key="duplicate-dashboard" isDisabled icon={<CopyIcon />}>
-          Duplicate dashboard
-        </DropdownItem>
-        <DropdownItem key="share-dashboard" isDisabled icon={<UsersIcon />}>
-          Share dashboard
-        </DropdownItem>
-        <Divider component="li" key="separator" />
-        <MenuItem component={(props) => <Link {...props} to="/staging/dashboard-hub" />} description="Create, manage, share dashboards">
-          Dashboard Hub
-        </MenuItem>
-      </DropdownList>
-    </Dropdown>
+    />
   );
 };
 
