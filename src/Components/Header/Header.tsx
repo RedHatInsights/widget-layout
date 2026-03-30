@@ -93,13 +93,20 @@ export const KebabDropdown = () => {
     >
       <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
         <MenuList>
-          {dashboards.length > 0}
-          {dashboards.map((dashboard) => (
-            <MenuItem key={dashboard.id} itemId={`dashboard-${dashboard.id}`}>
-              {dashboard.templateBase.displayName}
-            </MenuItem>
-          ))}
-          <Divider component="li" />
+          {dashboards.length > 0 && (
+            <>
+              {dashboards.map((dashboard) => (
+                <MenuItem
+                  key={dashboard.id}
+                  itemId={`dashboard-${dashboard.id}`}
+                  component={(props) => <Link {...props} to={`/staging/dashboard-hub/${dashboard.id}`} />}
+                >
+                  {dashboard.dashboardName}
+                </MenuItem>
+              ))}
+              <Divider component="li" />
+            </>
+          )}
           <MenuItem
             itemId="group:create"
             direction="down"
