@@ -139,7 +139,11 @@ describe('DashboardTable', () => {
   });
 
   it('renders an actions kebab menu for each row', () => {
-    cy.mount(<DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />);
+    cy.mount(
+      <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
+        <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+      </FlagProvider>
+    );
 
     // Each row should have a kebab toggle button
     cy.get('tbody tr').each(($row) => {
@@ -157,7 +161,7 @@ describe('DashboardTable', () => {
   });
 
   describe('Delete dashboard', () => {
-    it('"Delete dashboard" is disabled when feature flag is off', () => {
+    it('"Delete dashboard" is hidden when feature flag is off', () => {
       cy.mount(
         <FlagProvider unleashClient={createMockClient(false)} startClient={false}>
           <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
@@ -165,9 +169,7 @@ describe('DashboardTable', () => {
       );
 
       cy.get('tbody tr').eq(0).find('button[aria-label="Kebab toggle"]').click();
-      cy.get('[role="menuitem"]').contains('Delete dashboard')
-        .closest('button')
-        .should('be.disabled');
+      cy.get('[role="menuitem"]').contains('Delete dashboard').should('not.exist'); 
     });
 
     it('"Delete dashboard" is enabled when feature flag is on', () => {
