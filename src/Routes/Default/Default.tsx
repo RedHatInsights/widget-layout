@@ -7,6 +7,7 @@ import { notificationsAtom, useRemoveNotification } from '../../state/notificati
 import Header from '../../Components/Header/Header';
 import React, { useEffect } from 'react';
 import useCurrentUser from '../../hooks/useCurrentUser';
+import useDashboardConfig from '../../hooks/useDashboardConfig';
 import { LayoutTypes, WidgetPermission, getWidgetMapping } from '../../api/dashboard-templates';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import '../../App.scss';
@@ -20,6 +21,7 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   const setWidgetMapping = useSetAtom(widgetMappingAtom);
   const { currentUser } = useCurrentUser();
   const { visibilityFunctions } = useChrome();
+  const { template, saveTemplate, isLoaded } = useDashboardConfig(props.layoutType);
 
   const checkPermissions = async (permissions: WidgetPermission[]): Promise<boolean> => {
     const permissionResults = await Promise.all(
@@ -72,7 +74,7 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
       <Header />
       <AddWidgetDrawer dismissible={false}>
         <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
-          <GridLayout isLayoutLocked={isLayoutLocked} {...props} />
+          <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} isLayoutLocked={isLayoutLocked} />
         </PageSection>
       </AddWidgetDrawer>
     </div>
