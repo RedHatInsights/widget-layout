@@ -112,15 +112,18 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
       isDisabled: true,
       onClick: () => console.log(`Share dashboard ${dashboard.id}`),
     },
-    {
-      isSeparator: true,
-    },
-    {
-      icon: <TrashIcon />,
-      title: 'Delete dashboard',
-      isDisabled: !isEnabledDelete,
-      onClick: () => setDashboardToDelete(dashboard),
-    },
+    ...(isEnabledDelete
+      ? [
+          {
+            isSeparator: true,
+          },
+          {
+            icon: <TrashIcon />,
+            title: 'Delete dashboard',
+            onClick: () => setDashboardToDelete(dashboard),
+          },
+        ]
+      : []),
   ];
 
   const handleDeleteConfirm = async () => {
