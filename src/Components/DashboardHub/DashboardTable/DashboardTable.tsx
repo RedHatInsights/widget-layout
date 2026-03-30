@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Table, Tbody, Td, Th, ThProps, Thead, Tr } from '@patternfly/react-table';
 import { ActionsColumn } from '@patternfly/react-table';
 import { Button } from '@patternfly/react-core';
+import { Link } from 'react-router-dom';
 import { DashboardTemplate } from '../../../api/dashboard-templates';
 import { CodeIcon, CopyIcon, EditAltIcon, HomeIcon, TrashIcon, UsersIcon } from '@patternfly/react-icons';
 import { useExportDashboard } from '../../../hooks/useExportDashboard';
@@ -159,7 +160,9 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
         <Tbody>
           {sortedDashboards.map((dashboard) => (
             <Tr key={dashboard.id}>
-              <Td dataLabel={columnNames.name}>{dashboard.name}</Td>
+              <Td dataLabel={columnNames.name}>
+                <Link to={`/staging/dashboard-hub/${dashboard.id}`}>{dashboard.name}</Link>
+              </Td>
               <Td dataLabel={columnNames.description}>{dashboard.description}</Td>
               <Td dataLabel={columnNames.lastModified}>
                 <DateFormat date={dashboard.lastModified} />
