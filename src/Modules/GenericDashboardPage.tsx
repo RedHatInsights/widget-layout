@@ -9,11 +9,12 @@ import AddWidgetDrawer from '../Components/WidgetDrawer/WidgetDrawer';
 import { getWidgetMapping } from '../api/dashboard-templates';
 import useCurrentUser from '../hooks/useCurrentUser';
 import { widgetMappingAtom } from '../state/widgetMappingAtom';
+import Header from '../Components/Header/Header';
 
 const GenericDashboardPage = () => {
   const { id } = useParams<{ id: string }>();
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
-  const { template, saveTemplate, isLoaded } = useDashboardTemplate(Number(id));
+  const { template, saveTemplate, isLoaded, dashboardName } = useDashboardTemplate(Number(id));
 
   const setWidgetMapping = useSetAtom(widgetMappingAtom);
   const { currentUser } = useCurrentUser();
@@ -46,14 +47,12 @@ const GenericDashboardPage = () => {
 
   return (
     <div className="genericDashboardPage">
-      <div>
-        <span>Hello, this is generic page</span>
-        <AddWidgetDrawer dismissible={false}>
-          <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
-            <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} />
-          </PageSection>
-        </AddWidgetDrawer>
-      </div>
+      <Header dashboardName={dashboardName} />
+      <AddWidgetDrawer dismissible={false}>
+        <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
+          <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} />
+        </PageSection>
+      </AddWidgetDrawer>
     </div>
   );
 };

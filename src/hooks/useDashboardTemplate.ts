@@ -46,6 +46,7 @@ const useDashboardTemplate = (id: number) => {
   const [template, setTemplate] = useState<ExtendedTemplateConfig>({ sm: [], md: [], lg: [], xl: [] });
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [dashboardName, setDashboardName] = useState<string>();
   // widget mapping
 
   useEffect(() => {
@@ -55,6 +56,7 @@ const useDashboardTemplate = (id: number) => {
 
       try {
         const result = await getDashboardTemplate(id);
+        setDashboardName(result.dashboardName);
         const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(result.templateConfig);
         const widgetMap = await getWidgetMapping();
         const remappedTemplate = remapWidgetTypes(extendedTemplateConfig, widgetMap);
@@ -96,7 +98,7 @@ const useDashboardTemplate = (id: number) => {
     [id]
   );
 
-  return { template, saveTemplate, isLoaded, error };
+  return { template, saveTemplate, isLoaded, dashboardName, error };
 };
 
 export default useDashboardTemplate;

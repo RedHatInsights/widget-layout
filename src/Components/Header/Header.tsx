@@ -15,6 +15,7 @@ import {
   MenuList,
   MenuToggle,
   PageSection,
+  TextInput,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
@@ -208,7 +209,11 @@ const Controls = () => {
   );
 };
 
-const Header = () => {
+interface HeaderProps {
+  dashboardName?: string;
+}
+
+const Header = ({ dashboardName }: HeaderProps) => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   const isDashboardHub = useFlag('platform.chrome.dashboard-hub');
@@ -216,12 +221,16 @@ const Header = () => {
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
         <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
-          <Content>
-            <Content component="h1">Hi{userName ? `, ${userName}` : '!'}</Content>
-            <Content component="h2" className="pf-v6-u-mt-0">
-              Welcome to your Hybrid Cloud Console.
+          {dashboardName !== undefined ? (
+            <Content component="h2">{dashboardName}</Content>
+          ) : (
+            <Content>
+              <Content component="h1">Hi{userName ? `, ${userName}` : '!'}</Content>
+              <Content component="h2" className="pf-v6-u-mt-0">
+                Welcome to your Hybrid Cloud Console.
+              </Content>
             </Content>
-          </Content>
+          )}
         </FlexItem>
         <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
           <Toolbar>
