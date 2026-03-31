@@ -207,6 +207,15 @@ export const deleteDashboardTemplate = async (templateId: DashboardTemplate['id'
   return resp.status === 204;
 };
 
+export const deleteDashboardTemplateFromHub = async (templateId: DashboardTemplate['id']): Promise<boolean> => {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}`, {
+    method: 'DELETE',
+    headers: getRequestHeaders(),
+  });
+  handleErrors(resp);
+  return resp.status === 204;
+};
+
 export const importDashboardTemplate = async (data: {
   dashboardName: string;
   templateBase: {
