@@ -12,6 +12,7 @@ import {
   MenuContainer,
   MenuContent,
   MenuItem,
+  MenuItemAction,
   MenuList,
   MenuToggle,
   PageSection,
@@ -22,7 +23,7 @@ import {
   ToolbarItem,
 } from '@patternfly/react-core';
 import React, { useRef, useState } from 'react';
-import { CodeIcon, CopyIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon } from '@patternfly/react-icons';
+import { CodeIcon, CopyIcon, EditAltIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon } from '@patternfly/react-icons';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { templateIdAtom } from '../../state/templateAtom';
@@ -32,8 +33,9 @@ import { WarningModal } from '@patternfly/react-component-groups';
 import { Link } from 'react-router-dom';
 import { useFlag } from '@unleash/proxy-client-react';
 import useGetDashboards from '../../hooks/useGetDashboards';
+import { DashboardTemplate } from '../../api/dashboard-templates';
 
-export const KebabDropdown = () => {
+export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
   const [drilldownPath, setDrilldownPath] = useState<string[]>([]);
@@ -41,8 +43,6 @@ export const KebabDropdown = () => {
   const [activeMenu, setActiveMenu] = useState<string>('kebab-rootMenu');
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const { dashboards } = useGetDashboards();
 
   const onToggleClick = () => {
     setIsOpen(!isOpen);
@@ -100,6 +100,17 @@ export const KebabDropdown = () => {
                 <MenuItem
                   key={dashboard.id}
                   itemId={`dashboard-${dashboard.id}`}
+                  isSelected={dashboard.default}
+                  actions={
+                    <MenuItemAction
+                      icon={<EditAltIcon />}
+                      actionId="edit"
+                      // eslint-disable-next-line no-console
+                      onClick={() => console.log('clicked on edit icon')}
+                      aria-label="Edit"
+                      isDisabled
+                    />
+                  }
                   component={(props) => <Link {...props} to={`/staging/dashboard-hub/${dashboard.id}`} />}
                 >
                   {dashboard.dashboardName}
@@ -216,7 +227,8 @@ interface HeaderProps {
 const Header = ({ dashboardName }: HeaderProps) => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
-  const isDashboardHub = useFlag('platform.chrome.dashboard-hub');
+  const isDashboardHub = useFlag('platform.widget-layout.dashboard-dropdown');
+  const { dashboards } = useGetDashboards();
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
@@ -238,7 +250,7 @@ const Header = ({ dashboardName }: HeaderProps) => {
               <Controls />
               {isDashboardHub && (
                 <ToolbarItem>
-                  <KebabDropdown />
+                  <KebabDropdown dashboards={dashboards} />
                 </ToolbarItem>
               )}
             </ToolbarContent>
