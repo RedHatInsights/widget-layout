@@ -1,10 +1,9 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { Provider, createStore } from 'jotai';
 import GridLayout from './GridLayout';
 import convertWidgetMapping from './ConvertWidgetMapping';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
-import { templateAtom, templateIdAtom } from '../../state/templateAtom';
 import { layoutVariantAtom } from '../../state/layoutAtom';
 import { WidgetMapping as ScalprumWidgetMapping } from '../../api/dashboard-templates';
 
@@ -27,13 +26,8 @@ jest.mock('@scalprum/react-core', () => ({
   ScalprumComponent: ({ scope, module }: { scope: string; module: string }) => <div data-testid={`scalprum-${scope}-${module}`}>ScalprumWidget</div>,
 }));
 
-const mockGetDashboardTemplates = jest.fn();
-const mockPatchDashboardTemplate = jest.fn();
-
 jest.mock('../../api/dashboard-templates', () => ({
   ...jest.requireActual('../../api/dashboard-templates'),
-  getDashboardTemplates: (...args: unknown[]) => mockGetDashboardTemplates(...args),
-  patchDashboardTemplate: (...args: unknown[]) => mockPatchDashboardTemplate(...args),
 }));
 
 jest.mock('@patternfly/widgetized-dashboard', () => ({
@@ -95,11 +89,17 @@ const mockTemplate = {
   ],
 };
 
+const mockSaveTemplate = jest.fn().mockResolvedValue(undefined);
+
+const defaultGridLayoutProps = {
+  template: mockTemplate,
+  saveTemplate: mockSaveTemplate,
+  isLoaded: true,
+};
+
 function renderWithStore(ui: React.ReactElement, storeOverrides?: Record<string, unknown>) {
   const store = createStore();
   if (storeOverrides?.widgetMapping) store.set(widgetMappingAtom, storeOverrides.widgetMapping as ScalprumWidgetMapping);
-  if (storeOverrides?.template) store.set(templateAtom, storeOverrides.template as any);
-  if (storeOverrides?.templateId !== undefined) store.set(templateIdAtom, storeOverrides.templateId as number);
   if (storeOverrides?.layoutVariant) store.set(layoutVariantAtom, storeOverrides.layoutVariant as any);
   return render(<Provider store={store}>{ui}</Provider>);
 }
@@ -174,92 +174,70 @@ describe('convertWidgetMapping', () => {
 
 describe('GridLayout rendering states', () => {
   beforeEach(() => {
-    mockGetDashboardTemplates.mockReset();
-    mockPatchDashboardTemplate.mockReset();
+    mockSaveTemplate.mockClear();
   });
 
   it('renders the container element', () => {
-    renderWithStore(<GridLayout />);
+    renderWithStore(<GridLayout {...defaultGridLayoutProps} />);
     expect(document.getElementById('widget-layout-container')).toBeInTheDocument();
   });
 
   it('does not render PatternFlyGridLayout when widget mapping is empty', () => {
-    renderWithStore(<GridLayout />);
+    renderWithStore(<GridLayout {...defaultGridLayoutProps} />);
     expect(screen.queryByTestId('pf-grid-layout')).not.toBeInTheDocument();
   });
 
   it('renders PatternFlyGridLayout when widget mapping has entries', () => {
-    renderWithStore(<GridLayout />, { widgetMapping: mockScalprumMapping });
+    renderWithStore(<GridLayout {...defaultGridLayoutProps} />, { widgetMapping: mockScalprumMapping });
     expect(screen.getByTestId('pf-grid-layout')).toBeInTheDocument();
   });
 
   it('passes showEmptyState=true while loading (isLoaded is false)', () => {
-    renderWithStore(<GridLayout />, { widgetMapping: mockScalprumMapping });
+    renderWithStore(<GridLayout {...defaultGridLayoutProps} isLoaded={false} />, { widgetMapping: mockScalprumMapping });
     const grid = screen.getByTestId('pf-grid-layout');
     expect(grid).toHaveAttribute('data-show-empty', 'true');
   });
 
-  it('shows empty state after loading when template has no widgets', async () => {
-    mockGetDashboardTemplates.mockResolvedValue([{ id: 1, default: true, templateConfig: { sm: [], md: [], lg: [], xl: [] } }]);
-
-    renderWithStore(<GridLayout />, { widgetMapping: mockScalprumMapping, templateId: -1 });
-
-    await waitFor(() => {
-      expect(screen.getByText('No dashboard content')).toBeInTheDocument();
-    });
+  it('shows empty state when template has no widgets and isLoaded is true', () => {
+    const emptyTemplate = { sm: [], md: [], lg: [], xl: [] };
+    renderWithStore(<GridLayout template={emptyTemplate} saveTemplate={mockSaveTemplate} isLoaded={true} />, { widgetMapping: mockScalprumMapping });
+    expect(screen.getByText('No dashboard content')).toBeInTheDocument();
   });
 
   it('renders widget tiles when template has widgets', () => {
-    renderWithStore(<GridLayout />, { widgetMapping: mockScalprumMapping, template: mockTemplate });
+    renderWithStore(<GridLayout {...defaultGridLayoutProps} />, { widgetMapping: mockScalprumMapping });
     expect(screen.getByTestId('widget-tile-favorite-services')).toBeInTheDocument();
     expect(screen.getByTestId('widget-tile-rhel-widget')).toBeInTheDocument();
     expect(screen.getByTestId('widget-tile-no-icon-widget')).toBeInTheDocument();
   });
 
   it('renders correct widget titles', () => {
-    renderWithStore(<GridLayout />, { widgetMapping: mockScalprumMapping, template: mockTemplate });
+    renderWithStore(<GridLayout {...defaultGridLayoutProps} />, { widgetMapping: mockScalprumMapping });
     expect(screen.getByTestId('widget-title-favorite-services')).toHaveTextContent('My favorite services');
     expect(screen.getByTestId('widget-title-rhel-widget')).toHaveTextContent('Red Hat Enterprise Linux');
   });
 
   it('renders icons inside widget tiles', () => {
-    renderWithStore(<GridLayout />, { widgetMapping: mockScalprumMapping, template: mockTemplate });
+    renderWithStore(<GridLayout {...defaultGridLayoutProps} />, { widgetMapping: mockScalprumMapping });
     expect(screen.getByTestId('widget-icon-favorite-services').querySelector('svg')).toBeInTheDocument();
     expect(screen.getByTestId('widget-icon-rhel-widget').querySelector('svg')).toBeInTheDocument();
-  });
-
-  it('shows error notification when API fails', async () => {
-    mockGetDashboardTemplates.mockRejectedValue(new Error('API error'));
-
-    renderWithStore(<GridLayout />, { widgetMapping: mockScalprumMapping, templateId: -1 });
-
-    await waitFor(() => {
-      expect(mockGetDashboardTemplates).toHaveBeenCalled();
-    });
-  });
-
-  it('does not fetch templates when templateId is >= 0', () => {
-    renderWithStore(<GridLayout />, { widgetMapping: mockScalprumMapping, templateId: 5 });
-    expect(mockGetDashboardTemplates).not.toHaveBeenCalled();
   });
 });
 
 describe('GridLayout snapshots', () => {
   it('matches snapshot in loading state (empty mapping)', () => {
-    const { container } = renderWithStore(<GridLayout />);
+    const { container } = renderWithStore(<GridLayout {...defaultGridLayoutProps} isLoaded={false} />);
     expect(container).toMatchSnapshot();
   });
 
-  it('matches snapshot with widget mapping (before API load)', () => {
-    const { container } = renderWithStore(<GridLayout />, { widgetMapping: mockScalprumMapping });
+  it('matches snapshot with widget mapping (loading)', () => {
+    const { container } = renderWithStore(<GridLayout {...defaultGridLayoutProps} isLoaded={false} />, { widgetMapping: mockScalprumMapping });
     expect(container).toMatchSnapshot();
   });
 
   it('matches snapshot with widgets and template', () => {
-    const { container } = renderWithStore(<GridLayout />, {
+    const { container } = renderWithStore(<GridLayout {...defaultGridLayoutProps} />, {
       widgetMapping: mockScalprumMapping,
-      template: mockTemplate,
-      templateId: 1,
       layoutVariant: 'xl',
     });
     expect(container).toMatchSnapshot();
