@@ -1,8 +1,8 @@
 import { Alert, Button, Checkbox, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, TextInput } from '@patternfly/react-core';
-import React, { useCallback, useEffect, useState } from 'react';
-import { DashboardTemplatesError, TemplateConfig, importDashboardTemplate, setDefaultTemplate } from '../../api/dashboard-templates';
+import React, { useEffect } from 'react';
 import { ThIcon } from '@patternfly/react-icons';
 import { useAddNotification } from '../../state/notificationsAtom';
+import { useCreateBlankDashboard } from '../../hooks/useCreateBlankDashboard';
 
 interface CreateModalProps {
   isOpen: boolean;
@@ -10,28 +10,9 @@ interface CreateModalProps {
   onSuccess?: () => void;
 }
 
-const blankTemplateConfig: TemplateConfig = {
-  sm: [],
-  md: [],
-  lg: [],
-  xl: [],
-};
-
 export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
-  const [name, setName] = useState('');
-  const [setAsHomepage, setSetAsHomepage] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { name, setName, setAsHomepage, setSetAsHomepage, isLoading, error, isFormValid, createDashboard, reset } = useCreateBlankDashboard();
   const addNotification = useAddNotification();
-
-  const isFormValid = name.trim() !== '';
-
-  const reset = useCallback(() => {
-    setName('');
-    setSetAsHomepage(false);
-    setIsLoading(false);
-    setError(null);
-  }, []);
 
   const handleNameChange = (_event: React.FormEvent<HTMLInputElement>, value: string) => {
     setName(value);
@@ -42,47 +23,14 @@ export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen,
   };
 
   const handleSubmit = async () => {
-    if (!isFormValid) {
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const result = await importDashboardTemplate({
-        dashboardName: name,
-        templateBase: {
-          name: 'landingPage',
-          displayName: 'Landing Page',
-        },
-        templateConfig: blankTemplateConfig,
-      });
-
-      if (setAsHomepage) {
-        await setDefaultTemplate(result.id);
-      }
-
+    const result = await createDashboard();
+    if (result) {
       addNotification({
         variant: 'success',
         title: `Dashboard '${name}' created successfully`,
       });
       onSuccess?.();
       onClose();
-    } catch (err) {
-      let errorMessage: string;
-      if (err instanceof DashboardTemplatesError && err.status >= 500) {
-        errorMessage = 'The server is currently unavailable. Please try again later.';
-      } else if (err instanceof DashboardTemplatesError) {
-        errorMessage = 'Failed to create dashboard. Please try again.';
-      } else if (err instanceof TypeError && err.message === 'Failed to fetch') {
-        errorMessage = 'Network error. Please check your connection and try again.';
-      } else {
-        errorMessage = 'An unexpected error occurred. Please try again.';
-      }
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -90,7 +38,7 @@ export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen,
     if (!isOpen) {
       reset();
     }
-  }, [isOpen, reset]);
+  }, [isOpen]);
 
   return (
     <Modal
@@ -113,7 +61,7 @@ export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen,
             <TextInput
               value={name}
               isRequired
-              validated={name.trim() !== '' ? 'success' : 'default'}
+              validated={isFormValid ? 'success' : 'default'}
               type="text"
               id="blank-dashboard-name"
               name="blank-dashboard-name"
