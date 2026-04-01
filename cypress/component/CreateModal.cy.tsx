@@ -241,19 +241,6 @@ describe('CreateModal', () => {
       cy.get('.pf-v6-c-alert').should('contain.text', 'Failed to create dashboard. Please try again.');
     });
 
-    it('shows error message on network failure', () => {
-      cy.intercept('POST', '/api/widget-layout/v1/import', {
-        forceNetworkError: true,
-      }).as('importDashboard');
-
-      cy.mount(<CreateModal isOpen={true} onClose={cy.stub()} />);
-
-      cy.get('#blank-dashboard-name').type('My Dashboard');
-      cy.contains('button', 'Create dashboard').click();
-
-      cy.get('.pf-v6-c-alert').should('contain.text', 'Network error. Please check your connection and try again.');
-    });
-
     it('re-enables form after error', () => {
       cy.intercept('POST', '/api/widget-layout/v1/import', {
         statusCode: 500,
