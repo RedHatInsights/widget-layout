@@ -1,6 +1,7 @@
 import React from 'react';
 import FlagProvider from '@unleash/proxy-client-react';
 import { UnleashClient } from 'unleash-proxy-client';
+import { MemoryRouter } from 'react-router-dom';
 import { DashboardTable } from '../../src/Components/DashboardHub/DashboardTable/DashboardTable';
 import { DashboardTemplate, TemplateConfig } from '../../src/api/dashboard-templates';
 import Portal from '@redhat-cloud-services/frontend-components-notifications/Portal';
@@ -72,7 +73,7 @@ describe('DashboardTable', () => {
   });
 
   it('renders table with column headers', () => {
-    cy.mount(<DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />);
+    cy.mount(<MemoryRouter><DashboardTable dashboards={mockDashboards}  onRefetchDashboards={cy.stub()}/></MemoryRouter>);
 
     cy.get('th').contains('Name').should('be.visible');
     cy.get('th').contains('Description').should('be.visible');
@@ -80,7 +81,7 @@ describe('DashboardTable', () => {
   });
 
   it('renders dashboard rows with correct data', () => {
-    cy.mount(<DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />);
+    cy.mount(<MemoryRouter><DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()}/></MemoryRouter>);
 
     cy.get('tbody tr').should('have.length', 3);
 
@@ -105,7 +106,7 @@ describe('DashboardTable', () => {
   });
 
   it('sorts by name when the Name column header is clicked', () => {
-    cy.mount(<DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />);
+    cy.mount(<MemoryRouter><DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()}/></MemoryRouter>);
 
     // Default ascending: Alpha, Bravo, Charlie
     cy.get('tbody tr').eq(0).find('td[data-label="Name"]').should('contain.text', 'Alpha Dashboard');
@@ -127,7 +128,7 @@ describe('DashboardTable', () => {
   });
 
   it('renders an empty table when no dashboards are provided', () => {
-    cy.mount(<DashboardTable dashboards={[]} onRefetchDashboards={cy.stub()} />);
+    cy.mount(<MemoryRouter><DashboardTable dashboards={[]} onRefetchDashboards={cy.stub()}/></MemoryRouter>);
 
     // Headers should still render
     cy.get('th').contains('Name').should('be.visible');
@@ -140,10 +141,11 @@ describe('DashboardTable', () => {
 
   it('renders an actions kebab menu for each row', () => {
     cy.mount(
+    <MemoryRouter>
       <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
-        <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+        <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()}/>
       </FlagProvider>
-    );
+    </MemoryRouter>);
 
     // Each row should have a kebab toggle button
     cy.get('tbody tr').each(($row) => {
@@ -163,9 +165,11 @@ describe('DashboardTable', () => {
   describe('Delete dashboard', () => {
     it('"Delete dashboard" is hidden when feature flag is off', () => {
       cy.mount(
-        <FlagProvider unleashClient={createMockClient(false)} startClient={false}>
-          <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
-        </FlagProvider>
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(false)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+          </FlagProvider>
+        </MemoryRouter>
       );
 
       cy.get('tbody tr').eq(0).find('button[aria-label="Kebab toggle"]').click();
@@ -174,9 +178,11 @@ describe('DashboardTable', () => {
 
     it('"Delete dashboard" is enabled when feature flag is on', () => {
       cy.mount(
-        <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
-          <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
-        </FlagProvider>
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+          </FlagProvider>
+        </MemoryRouter>
       );
 
       cy.get('tbody tr').eq(0).find('button[aria-label="Kebab toggle"]').click();
@@ -187,9 +193,11 @@ describe('DashboardTable', () => {
 
     it('shows delete modal with correct dashboard name', () => {
       cy.mount(
-        <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
-          <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
-        </FlagProvider>
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+          </FlagProvider>
+        </MemoryRouter>
       );
 
       // Alpha Dashboard is at index 0 after default ascending sort
@@ -201,9 +209,11 @@ describe('DashboardTable', () => {
 
     it('checkbox is unchecked by default when modal opens', () => {
       cy.mount(
-        <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
-          <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
-        </FlagProvider>
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+          </FlagProvider>
+        </MemoryRouter>
       );
 
       cy.get('tbody tr').eq(0).find('button[aria-label="Kebab toggle"]').click();
@@ -214,9 +224,11 @@ describe('DashboardTable', () => {
 
     it('checkbox is unchecked after closing and reopening modal', () => {
       cy.mount(
-        <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
-          <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
-        </FlagProvider>
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+          </FlagProvider>
+        </MemoryRouter>
       );
 
       // Open modal and check the checkbox
@@ -238,9 +250,11 @@ describe('DashboardTable', () => {
 
     it('delete button in modal is disabled until checkbox is checked', () => {
       cy.mount(
-        <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
-          <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
-        </FlagProvider>
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+          </FlagProvider>
+        </MemoryRouter>
       );
 
       cy.get('tbody tr').eq(0).find('button[aria-label="Kebab toggle"]').click();
@@ -271,10 +285,12 @@ describe('DashboardTable', () => {
       const refetchStub = cy.stub();
 
       cy.mount(
-        <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
-          <NotificationPortal />
-          <DashboardTable dashboards={mockDashboards} onRefetchDashboards={refetchStub} />
-        </FlagProvider>
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(true)} startClient={false}>
+            <NotificationPortal />
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={refetchStub} />
+          </FlagProvider>
+        </MemoryRouter>
       );
 
       // Open kebab and click Delete

@@ -1,13 +1,28 @@
 import React from 'react';
 import { KebabDropdown } from '../../src/Components/Header/Header';
 import { MemoryRouter } from 'react-router-dom';
+import { DashboardTemplate } from '../../src/api/dashboard-templates';
+
+const mockDashboards: DashboardTemplate[] = [
+  {
+    id: 1,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01',
+    deletedAt: null,
+    userIdentityID: 1,
+    default: false,
+    templateBase: { name: 'test', displayName: 'Test' },
+    templateConfig: { sm: [], md: [], lg: [], xl: [] },
+    dashboardName: 'My Dashboard',
+  },
+];
 
 describe('KebabDropdown', () => {
   beforeEach(() => {
     cy.mount(
       <MemoryRouter>
         <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px' }}>
-          <KebabDropdown />
+          <KebabDropdown dashboards={mockDashboards} />
         </div>
       </MemoryRouter>
     );
@@ -25,10 +40,8 @@ describe('KebabDropdown', () => {
   it('displays all dropdown items', () => {
     cy.get('button[aria-label="kebab dropdown toggle"]').click();
 
-    cy.get('[role="menuitem"]').should('have.length', 4);
-    cy.contains('[role="menuitem"]', 'Copy configuration string').should('be.visible');
-    cy.contains('[role="menuitem"]', 'Duplicate dashboard').should('be.visible');
-    cy.contains('[role="menuitem"]', 'Share dashboard').should('be.visible');
+    cy.contains('[role="menuitem"]', 'My Dashboard').should('be.visible');
+    cy.contains('[role="menuitem"]', 'Create new dashboard').should('be.visible');
     cy.contains('[role="menuitem"]', 'Dashboard Hub').should('be.visible');
   });
 
@@ -44,5 +57,32 @@ describe('KebabDropdown', () => {
     cy.get('button[aria-label="kebab dropdown toggle"]').should('have.attr', 'aria-expanded', 'false');
     cy.get('button[aria-label="kebab dropdown toggle"]').click();
     cy.get('button[aria-label="kebab dropdown toggle"]').should('have.attr', 'aria-expanded', 'true');
+  });
+
+  it('renders dashboard items with correct links', () => {
+    cy.get('button[aria-label="kebab dropdown toggle"]').click();
+
+    cy.contains('[role="menuitem"]', 'My Dashboard').should('have.attr', 'href', '/staging/dashboard-hub/1');
+  });
+
+  it('drills into Create new dashboard submenu and displays options', () => {
+    cy.get('button[aria-label="kebab dropdown toggle"]').click();
+    cy.contains('[role="menuitem"]', 'Create new dashboard').click();
+
+    cy.contains('[role="menuitem"]', 'Create from blank').should('be.visible');
+    cy.contains('[role="menuitem"]', 'Import from config string').should('be.visible');
+    cy.contains('[role="menuitem"]', 'Duplicate existing').should('be.visible');
+  });
+
+  it('drills back from Create new dashboard submenu', () => {
+    cy.get('button[aria-label="kebab dropdown toggle"]').click();
+    cy.contains('[role="menuitem"]', 'Create new dashboard').click();
+
+    // Click the breadcrumb back button to drill out
+    cy.get('#kebab-drilldownMenuCreate').contains('[role="menuitem"]', 'Create new dashboard').click();
+
+    // Root menu items should be visible again
+    cy.contains('[role="menuitem"]', 'My Dashboard').should('be.visible');
+    cy.contains('[role="menuitem"]', 'Dashboard Hub').should('be.visible');
   });
 });

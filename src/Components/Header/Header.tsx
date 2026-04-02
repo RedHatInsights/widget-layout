@@ -5,22 +5,25 @@ import {
   ButtonVariant,
   Content,
   Divider,
-  Dropdown,
-  DropdownItem,
-  DropdownList,
+  DrilldownMenu,
   Flex,
   FlexItem,
+  Menu,
+  MenuContainer,
+  MenuContent,
   MenuItem,
+  MenuItemAction,
+  MenuList,
   MenuToggle,
-  MenuToggleElement,
   PageSection,
+  TextInput,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
-import React, { useState } from 'react';
-import { CodeIcon, CopyIcon, EllipsisVIcon, PlusCircleIcon, UsersIcon } from '@patternfly/react-icons';
+import React, { useRef, useState } from 'react';
+import { CodeIcon, CopyIcon, EditAltIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon } from '@patternfly/react-icons';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { templateIdAtom } from '../../state/templateAtom';
@@ -29,53 +32,136 @@ import useCurrentUser from '../../hooks/useCurrentUser';
 import { WarningModal } from '@patternfly/react-component-groups';
 import { Link } from 'react-router-dom';
 import { useFlag } from '@unleash/proxy-client-react';
+import useGetDashboards from '../../hooks/useGetDashboards';
+import { DashboardTemplate } from '../../api/dashboard-templates';
 
-export const KebabDropdown = () => {
+export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
+  const [drilldownPath, setDrilldownPath] = useState<string[]>([]);
+  const [menuHeights, setMenuHeights] = useState<Record<string, number>>({});
+  const [activeMenu, setActiveMenu] = useState<string>('kebab-rootMenu');
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const onToggleClick = () => {
     setIsOpen(!isOpen);
+    setMenuDrilledIn([]);
+    setDrilldownPath([]);
+    setActiveMenu('kebab-rootMenu');
   };
 
-  const onSelect = (_event: React.MouseEvent<Element, MouseEvent> | undefined, value: string | number | undefined) => {
-    console.log('selected', value);
-    setIsOpen(false);
+  const drillIn = (_event: React.KeyboardEvent | React.MouseEvent, fromMenuId: string, toMenuId: string, pathId: string) => {
+    setMenuDrilledIn([...menuDrilledIn, fromMenuId]);
+    setDrilldownPath([...drilldownPath, pathId]);
+    setActiveMenu(toMenuId);
   };
+
+  const drillOut = (_event: React.KeyboardEvent | React.MouseEvent, toMenuId: string) => {
+    setMenuDrilledIn(menuDrilledIn.slice(0, menuDrilledIn.length - 1));
+    setDrilldownPath(drilldownPath.slice(0, drilldownPath.length - 1));
+    setActiveMenu(toMenuId);
+  };
+
+  const setHeight = (menuId: string, height: number) => {
+    if (menuHeights[menuId] === undefined || (menuId !== 'kebab-rootMenu' && menuHeights[menuId] !== height)) {
+      setMenuHeights({ ...menuHeights, [menuId]: height });
+    }
+  };
+
+  const toggle = (
+    <MenuToggle
+      ref={toggleRef}
+      aria-label="kebab dropdown toggle"
+      variant="plain"
+      onClick={onToggleClick}
+      isExpanded={isOpen}
+      icon={<EllipsisVIcon />}
+    />
+  );
+
+  const menu = (
+    <Menu
+      id="kebab-rootMenu"
+      containsDrilldown
+      drilldownItemPath={drilldownPath}
+      drilledInMenus={menuDrilledIn}
+      activeMenu={activeMenu}
+      onDrillIn={drillIn}
+      onDrillOut={drillOut}
+      onGetMenuHeight={setHeight}
+      ref={menuRef}
+    >
+      <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
+        <MenuList>
+          {dashboards.length > 0 && (
+            <>
+              {dashboards.map((dashboard) => (
+                <MenuItem
+                  key={dashboard.id}
+                  itemId={`dashboard-${dashboard.id}`}
+                  isSelected={dashboard.default}
+                  actions={
+                    <MenuItemAction
+                      icon={<EditAltIcon />}
+                      actionId="edit"
+                      // eslint-disable-next-line no-console
+                      onClick={() => console.log('clicked on edit icon')}
+                      aria-label="Edit"
+                      isDisabled
+                    />
+                  }
+                  component={(props) => <Link {...props} to={`/staging/dashboard-hub/${dashboard.id}`} />}
+                >
+                  {dashboard.dashboardName}
+                </MenuItem>
+              ))}
+              <Divider component="li" />
+            </>
+          )}
+          <MenuItem
+            itemId="group:create"
+            direction="down"
+            icon={<PlusIcon />}
+            drilldownMenu={
+              <DrilldownMenu id="kebab-drilldownMenuCreate">
+                <MenuItem itemId="group:create_breadcrumb" direction="up" icon={<PlusCircleIcon />}>
+                  Create new dashboard
+                </MenuItem>
+                <Divider component="li" />
+                <MenuItem itemId="share-dashboard" icon={<ThIcon />} isDisabled>
+                  Create from blank
+                </MenuItem>
+                <MenuItem itemId="copy-config" icon={<CodeIcon />} isDisabled>
+                  Import from config string
+                </MenuItem>
+                <MenuItem itemId="duplicate-dashboard" icon={<CopyIcon />} isDisabled>
+                  Duplicate existing
+                </MenuItem>
+              </DrilldownMenu>
+            }
+          >
+            Create new dashboard
+          </MenuItem>
+          <Divider component="li" key="separator" />
+          <MenuItem component={(props) => <Link {...props} to="/staging/dashboard-hub" />} description="Create, manage, share dashboards">
+            Dashboard Hub
+          </MenuItem>
+        </MenuList>
+      </MenuContent>
+    </Menu>
+  );
 
   return (
-    <Dropdown
+    <MenuContainer
       isOpen={isOpen}
-      onSelect={onSelect}
+      onOpenChange={(isOpen) => setIsOpen(isOpen)}
+      menu={menu}
+      menuRef={menuRef}
+      toggle={toggle}
+      toggleRef={toggleRef}
       popperProps={{ position: 'end' }}
-      onOpenChange={(isOpen: boolean) => setIsOpen(isOpen)}
-      toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
-        <MenuToggle
-          ref={toggleRef}
-          aria-label="kebab dropdown toggle"
-          variant="plain"
-          onClick={onToggleClick}
-          isExpanded={isOpen}
-          icon={<EllipsisVIcon />}
-        />
-      )}
-      shouldFocusToggleOnSelect
-    >
-      <DropdownList>
-        <DropdownItem key="copy-config" isDisabled icon={<CodeIcon />}>
-          Copy configuration string
-        </DropdownItem>
-        <DropdownItem key="duplicate-dashboard" isDisabled icon={<CopyIcon />}>
-          Duplicate dashboard
-        </DropdownItem>
-        <DropdownItem key="share-dashboard" isDisabled icon={<UsersIcon />}>
-          Share dashboard
-        </DropdownItem>
-        <Divider component="li" key="separator" />
-        <MenuItem component={(props) => <Link {...props} to="/staging/dashboard-hub" />} description="Create, manage, share dashboards">
-          Dashboard Hub
-        </MenuItem>
-      </DropdownList>
-    </Dropdown>
+    />
   );
 };
 
@@ -134,20 +220,29 @@ const Controls = () => {
   );
 };
 
-const Header = () => {
+interface HeaderProps {
+  dashboardName?: string;
+}
+
+const Header = ({ dashboardName }: HeaderProps) => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
-  const isDashboardHub = useFlag('platform.chrome.dashboard-hub');
+  const isDashboardHub = useFlag('platform.widget-layout.dashboard-dropdown');
+  const { dashboards } = useGetDashboards();
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
         <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
-          <Content>
-            <Content component="h1">Hi{userName ? `, ${userName}` : '!'}</Content>
-            <Content component="h2" className="pf-v6-u-mt-0">
-              Welcome to your Hybrid Cloud Console.
+          {dashboardName !== undefined ? (
+            <Content component="h2">{dashboardName}</Content>
+          ) : (
+            <Content>
+              <Content component="h1">Hi{userName ? `, ${userName}` : '!'}</Content>
+              <Content component="h2" className="pf-v6-u-mt-0">
+                Welcome to your Hybrid Cloud Console.
+              </Content>
             </Content>
-          </Content>
+          )}
         </FlexItem>
         <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
           <Toolbar>
@@ -155,7 +250,7 @@ const Header = () => {
               <Controls />
               {isDashboardHub && (
                 <ToolbarItem>
-                  <KebabDropdown />
+                  <KebabDropdown dashboards={dashboards} />
                 </ToolbarItem>
               )}
             </ToolbarContent>
