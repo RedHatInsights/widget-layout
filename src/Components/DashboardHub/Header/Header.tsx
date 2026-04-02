@@ -1,6 +1,7 @@
 import { Content, Dropdown, DropdownItem, DropdownList, Flex, FlexItem, MenuToggle, MenuToggleElement, PageSection } from '@patternfly/react-core';
 import React, { useState } from 'react';
 import { ImportModal } from '../ImportModal/ImportModal';
+import { CreateModal } from '../../CreateModal/CreateModal';
 import { CodeIcon, CopyIcon, ExternalLinkAltIcon, ThIcon } from '@patternfly/react-icons';
 
 interface CreateDashboardDropdownProps {
@@ -10,6 +11,7 @@ interface CreateDashboardDropdownProps {
 const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownProps> = ({ onRefetchDashboards }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   return (
     <>
@@ -26,7 +28,7 @@ const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownPr
         shouldFocusToggleOnSelect
       >
         <DropdownList>
-          <DropdownItem isDisabled key="create-blank">
+          <DropdownItem key="create-blank" onClick={() => setIsCreateModalOpen(true)}>
             <ThIcon /> Create from blank
           </DropdownItem>
           <DropdownItem key="import" onClick={() => setIsImportModalOpen(true)}>
@@ -37,6 +39,7 @@ const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownPr
           </DropdownItem>
         </DropdownList>
       </Dropdown>
+      <CreateModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSuccess={onRefetchDashboards} />
       <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onSuccess={onRefetchDashboards} />
     </>
   );

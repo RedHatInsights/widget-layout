@@ -248,6 +248,16 @@ export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTem
   return templates.find((itm) => itm.default === true);
 };
 
+export const setDefaultTemplate = async (templateId: DashboardTemplate['id']): Promise<DashboardTemplate> => {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}/default`, {
+    method: 'POST',
+    headers: getRequestHeaders(),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json;
+};
+
 export const mapWidgetDefaults = (id: string): [string, string] => {
   const [widgetType, i] = id.split(widgetIdSeparator);
   return [widgetType, i];

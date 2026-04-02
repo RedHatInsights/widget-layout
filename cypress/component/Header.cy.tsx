@@ -38,7 +38,6 @@ describe('DashboardHub Header', () => {
 
       cy.contains('[role="menuitem"]', 'Create from blank')
         .should('be.visible')
-        .and('be.disabled');
 
       cy.contains('[role="menuitem"]', 'Import from config string')
         .should('be.visible')
