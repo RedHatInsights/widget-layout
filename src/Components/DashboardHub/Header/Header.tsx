@@ -2,6 +2,7 @@ import { Content, Dropdown, DropdownItem, DropdownList, Flex, FlexItem, MenuTogg
 import React, { useState } from 'react';
 import { ImportModal } from '../ImportModal/ImportModal';
 import { CreateModal } from '../../CreateModal/CreateModal';
+import { DuplicateModal } from '../../DuplicateModal/DuplicateModal';
 import { CodeIcon, CopyIcon, ExternalLinkAltIcon, ThIcon } from '@patternfly/react-icons';
 
 interface CreateDashboardDropdownProps {
@@ -12,6 +13,7 @@ const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownPr
   const [isOpen, setIsOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
 
   return (
     <>
@@ -34,12 +36,13 @@ const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownPr
           <DropdownItem key="import" onClick={() => setIsImportModalOpen(true)}>
             <CodeIcon /> Import from config string
           </DropdownItem>
-          <DropdownItem isDisabled key="duplicate">
+          <DropdownItem key="duplicate" onClick={() => setIsDuplicateModalOpen(true)}>
             <CopyIcon /> Duplicate existing
           </DropdownItem>
         </DropdownList>
       </Dropdown>
       <CreateModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSuccess={onRefetchDashboards} />
+      <DuplicateModal isOpen={isDuplicateModalOpen} onClose={() => setIsDuplicateModalOpen(false)} onSuccess={onRefetchDashboards} />
       <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onSuccess={onRefetchDashboards} />
     </>
   );
