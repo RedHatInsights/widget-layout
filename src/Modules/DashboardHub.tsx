@@ -21,7 +21,7 @@ const DashboardHub = () => {
         element={
           <div className="dashboardHub">
             <Portal notifications={notifications} removeNotification={removeNotification} />
-            <Header onRefetchDashboards={fetchDashboards} />
+            <Header onRefetchDashboards={fetchDashboards} dashboards={dashboards} />
             <PageSection>
               <DashboardTable dashboards={dashboards} onRefetchDashboards={fetchDashboards} />
             </PageSection>

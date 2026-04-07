@@ -16,15 +16,16 @@ import React, { useEffect } from 'react';
 import { CopyIcon } from '@patternfly/react-icons';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { useDuplicateDashboard } from '../../hooks/useDuplicateDashboard';
-import useGetDashboards from '../../hooks/useGetDashboards';
+import { DashboardTemplate } from '../../api/dashboard-templates';
 
 interface DuplicateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  dashboards: DashboardTemplate[];
 }
 
-export const DuplicateModal: React.FunctionComponent<DuplicateModalProps> = ({ isOpen, onClose, onSuccess }) => {
+export const DuplicateModal: React.FunctionComponent<DuplicateModalProps> = ({ isOpen, onClose, onSuccess, dashboards }) => {
   const {
     name,
     setName,
@@ -38,7 +39,6 @@ export const DuplicateModal: React.FunctionComponent<DuplicateModalProps> = ({ i
     duplicateDashboard,
     reset,
   } = useDuplicateDashboard();
-  const { dashboards } = useGetDashboards();
   const addNotification = useAddNotification();
 
   const handleDashboardChange = (_event: React.FormEvent<HTMLSelectElement>, value: string) => {
