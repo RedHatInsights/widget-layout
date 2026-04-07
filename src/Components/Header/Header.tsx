@@ -37,30 +37,38 @@ import { DashboardTemplate } from '../../api/dashboard-templates';
 
 export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
-  const [drilldownPath, setDrilldownPath] = useState<string[]>([]);
+  const [drilldownState, setDrilldownState] = useState({
+    menuDrilledIn: [] as string[],
+    drilldownPath: [] as string[],
+    activeMenu: 'kebab-rootMenu',
+  });
   const [menuHeights, setMenuHeights] = useState<Record<string, number>>({});
-  const [activeMenu, setActiveMenu] = useState<string>('kebab-rootMenu');
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const onToggleClick = () => {
     setIsOpen(!isOpen);
-    setMenuDrilledIn([]);
-    setDrilldownPath([]);
-    setActiveMenu('kebab-rootMenu');
+    setDrilldownState({
+      menuDrilledIn: [],
+      drilldownPath: [],
+      activeMenu: 'kebab-rootMenu',
+    });
   };
 
   const drillIn = (_event: React.KeyboardEvent | React.MouseEvent, fromMenuId: string, toMenuId: string, pathId: string) => {
-    setMenuDrilledIn([...menuDrilledIn, fromMenuId]);
-    setDrilldownPath([...drilldownPath, pathId]);
-    setActiveMenu(toMenuId);
+    setDrilldownState((prev) => ({
+      menuDrilledIn: [...prev.menuDrilledIn, fromMenuId],
+      drilldownPath: [...prev.drilldownPath, pathId],
+      activeMenu: toMenuId,
+    }));
   };
 
   const drillOut = (_event: React.KeyboardEvent | React.MouseEvent, toMenuId: string) => {
-    setMenuDrilledIn(menuDrilledIn.slice(0, menuDrilledIn.length - 1));
-    setDrilldownPath(drilldownPath.slice(0, drilldownPath.length - 1));
-    setActiveMenu(toMenuId);
+    setDrilldownState((prev) => ({
+      menuDrilledIn: prev.menuDrilledIn.slice(0, -1),
+      drilldownPath: prev.drilldownPath.slice(0, -1),
+      activeMenu: toMenuId,
+    }));
   };
 
   const setHeight = (menuId: string, height: number) => {
@@ -84,15 +92,15 @@ export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] 
     <Menu
       id="kebab-rootMenu"
       containsDrilldown
-      drilldownItemPath={drilldownPath}
-      drilledInMenus={menuDrilledIn}
-      activeMenu={activeMenu}
+      drilldownItemPath={drilldownState.drilldownPath}
+      drilledInMenus={drilldownState.menuDrilledIn}
+      activeMenu={drilldownState.activeMenu}
       onDrillIn={drillIn}
       onDrillOut={drillOut}
       onGetMenuHeight={setHeight}
       ref={menuRef}
     >
-      <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
+      <MenuContent menuHeight={`${menuHeights[drilldownState.activeMenu]}px`}>
         <MenuList>
           {dashboards.length > 0 && (
             <>
