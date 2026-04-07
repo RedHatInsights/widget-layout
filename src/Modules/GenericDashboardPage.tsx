@@ -1,20 +1,27 @@
 import { PageSection } from '@patternfly/react-core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import GridLayout from '../Components/DnDLayout/GridLayout';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { lockedLayoutAtom } from '../state/lockedLayoutAtom';
 import { useParams } from 'react-router-dom';
 import useDashboardTemplate from '../hooks/useDashboardTemplate';
 import AddWidgetDrawer from '../Components/WidgetDrawer/WidgetDrawer';
 import Header from '../Components/Header/Header';
-import useWidgetMapping from '../hooks/useWidgetMapping';
+import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
+import { resolvedWidgetMappingAtom } from '../state/widgetMappingAtom';
 
 const GenericDashboardPage = () => {
   const { id } = useParams<{ id: string }>();
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
   const { template, saveTemplate, isLoaded, dashboardName } = useDashboardTemplate(Number(id));
+  const resolveWidgetMapping = useSetAtom(resolvedWidgetMappingAtom);
+  const { visibilityFunctions } = useChrome();
 
-  useWidgetMapping();
+  useEffect(() => {
+    if (visibilityFunctions) {
+      resolveWidgetMapping(visibilityFunctions);
+    }
+  }, [visibilityFunctions]);
 
   return (
     <div className="genericDashboardPage">
