@@ -1,5 +1,5 @@
 import { PageSection } from '@patternfly/react-core';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import GridLayout from '../Components/DnDLayout/GridLayout';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { lockedLayoutAtom } from '../state/lockedLayoutAtom';
@@ -16,6 +16,7 @@ const GenericDashboardPage = () => {
   const { template, saveTemplate, isLoaded, dashboardName } = useDashboardTemplate(Number(id));
   const resolveWidgetMapping = useSetAtom(resolvedWidgetMappingAtom);
   const { visibilityFunctions } = useChrome();
+  const layoutRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (visibilityFunctions) {
@@ -28,7 +29,7 @@ const GenericDashboardPage = () => {
       <Header dashboardName={dashboardName} />
       <AddWidgetDrawer dismissible={false}>
         <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
-          <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} />
+          <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} layoutRef={layoutRef} />
         </PageSection>
       </AddWidgetDrawer>
     </div>

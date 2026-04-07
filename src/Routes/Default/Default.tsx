@@ -17,7 +17,7 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
   const notifications = useAtomValue(notificationsAtom);
   const removeNotification = useRemoveNotification();
-  const { template, saveTemplate, isLoaded } = useDashboardConfig(props.layoutType);
+  const { template, saveTemplate, isLoaded, layoutRef } = useDashboardConfig(props.layoutType);
   const resolveWidgetMapping = useSetAtom(resolvedWidgetMappingAtom);
   const { visibilityFunctions } = useChrome();
 
@@ -33,7 +33,7 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
       <Header />
       <AddWidgetDrawer dismissible={false}>
         <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
-          <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} isLayoutLocked={isLayoutLocked} />
+          <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} isLayoutLocked={isLayoutLocked} layoutRef={layoutRef} />
         </PageSection>
       </AddWidgetDrawer>
     </div>

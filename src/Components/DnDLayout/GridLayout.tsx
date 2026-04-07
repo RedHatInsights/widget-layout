@@ -57,9 +57,10 @@ interface GridLayoutProps {
   saveTemplate: (newTemplate: LocalExtendedTemplateConfig) => Promise<void>;
   isLoaded: boolean;
   isLayoutLocked?: boolean;
+  layoutRef?: React.Ref<HTMLDivElement>;
 }
 
-const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false }: GridLayoutProps) => {
+const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, layoutRef }: GridLayoutProps) => {
   const layoutVariant = useAtomValue(layoutVariantAtom);
   const scalprumWidgetMapping = useAtomValue(widgetMappingAtom);
   const setCurrentlyUsedWidgets = useSetAtom(currentlyUsedWidgetsAtom);
@@ -108,7 +109,7 @@ const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false }
   const activeLayout = patternFlyTemplate[layoutVariant] || [];
 
   return (
-    <div id="widget-layout-container" style={{ position: 'relative' }}>
+    <div id="widget-layout-container" style={{ position: 'relative' }} ref={layoutRef}>
       {activeLayout.length === 0 && isLoaded && <LayoutEmptyState />}
       {Object.keys(widgetMapping).length > 0 && (
         <PatternFlyGridLayout
