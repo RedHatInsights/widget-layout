@@ -13,7 +13,7 @@ import { resolvedWidgetMappingAtom } from '../state/widgetMappingAtom';
 const GenericDashboardPage = () => {
   const { id } = useParams<{ id: string }>();
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
-  const { template, saveTemplate, isLoaded, dashboardName } = useDashboardTemplate(Number(id));
+  const { template, saveTemplate, isLoaded, dashboardName, saveDashboardName } = useDashboardTemplate(Number(id));
   const resolveWidgetMapping = useSetAtom(resolvedWidgetMappingAtom);
   const { visibilityFunctions } = useChrome();
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -26,7 +26,7 @@ const GenericDashboardPage = () => {
 
   return (
     <div className="genericDashboardPage">
-      <Header dashboardName={dashboardName} />
+      <Header dashboardName={dashboardName} onDashboardNameChange={saveDashboardName} />
       <AddWidgetDrawer dismissible={false}>
         <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
           <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} layoutRef={layoutRef} />

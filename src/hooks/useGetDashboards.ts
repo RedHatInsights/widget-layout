@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
-import { DashboardTemplate, getUsersDashboards } from '../api/dashboard-templates';
+import { useEffect } from 'react';
+import { getUsersDashboards } from '../api/dashboard-templates';
 import useCurrentUser from './useCurrentUser';
+import { useAtom } from 'jotai';
+import { dashboardsAtom } from '../state/dashboardsAtom';
 
 const useGetDashboards = () => {
   const { currentUser } = useCurrentUser();
-  const [dashboards, setDashboards] = useState<DashboardTemplate[]>([]);
+  const [dashboards, setDashboards] = useAtom(dashboardsAtom);
 
   const fetchDashboards = async () => {
     try {

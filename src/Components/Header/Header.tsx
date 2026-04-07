@@ -16,7 +16,6 @@ import {
   MenuList,
   MenuToggle,
   PageSection,
-  TextInput,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
@@ -24,6 +23,7 @@ import {
 } from '@patternfly/react-core';
 import React, { useRef, useState } from 'react';
 import { CodeIcon, CopyIcon, EditAltIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon } from '@patternfly/react-icons';
+import InlineEditableName from '../InlineEditableName/InlineEditableName';
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { templateIdAtom } from '../../state/templateAtom';
@@ -230,19 +230,21 @@ const Controls = () => {
 
 interface HeaderProps {
   dashboardName?: string;
+  onDashboardNameChange?: (name: string) => void;
 }
 
-const Header = ({ dashboardName }: HeaderProps) => {
+const Header = ({ dashboardName, onDashboardNameChange }: HeaderProps) => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   const isDashboardHub = useFlag('platform.widget-layout.dashboard-dropdown');
   const { dashboards } = useGetDashboards();
+
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
         <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
           {dashboardName !== undefined ? (
-            <Content component="h2">{dashboardName}</Content>
+            <InlineEditableName name={dashboardName} onNameChange={onDashboardNameChange} />
           ) : (
             <Content>
               <Content component="h1">Hi{userName ? `, ${userName}` : '!'}</Content>
