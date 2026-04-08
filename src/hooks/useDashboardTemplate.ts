@@ -9,8 +9,11 @@ import {
   getWidgetMapping,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplateHub,
+  renameDashboardTemplate,
   widgetIdSeparator,
 } from '../api/dashboard-templates';
+import { useSetAtom } from 'jotai';
+import { dashboardsAtom } from '../state/dashboardsAtom';
 
 const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplateHub, 1500, {
   onlyResolvesLast: true,
@@ -47,6 +50,7 @@ const useDashboardTemplate = (id: number) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [dashboardName, setDashboardName] = useState<string>();
+  const setDashboards = useSetAtom(dashboardsAtom);
   // widget mapping
 
   useEffect(() => {
@@ -98,7 +102,20 @@ const useDashboardTemplate = (id: number) => {
     [id]
   );
 
-  return { template, saveTemplate, isLoaded, dashboardName, error };
+  const saveDashboardName = useCallback(
+    async (newName: string) => {
+      setDashboardName(newName);
+      setDashboards((prev) => prev.map((d) => (d.id === id ? { ...d, dashboardName: newName } : d)));
+      try {
+        await renameDashboardTemplate(id, { dashboardName: newName });
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [id]
+  );
+
+  return { template, saveTemplate, isLoaded, dashboardName, saveDashboardName, error };
 };
 
 export default useDashboardTemplate;

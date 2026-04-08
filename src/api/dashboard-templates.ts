@@ -222,6 +222,17 @@ export const patchDashboardTemplateHub = async (
   return json.data;
 };
 
+export const renameDashboardTemplate = async (templateId: DashboardTemplate['id'], data: { dashboardName: string }): Promise<DashboardTemplate> => {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}/rename`, {
+    method: 'PATCH',
+    headers: getRequestHeaders(),
+    body: JSON.stringify(data),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+};
+
 export const deleteDashboardTemplate = async (templateId: DashboardTemplate['id']): Promise<boolean> => {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}`, {
     method: 'DELETE',

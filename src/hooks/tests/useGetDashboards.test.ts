@@ -1,4 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
+import { createElement } from 'react';
+import { Provider, createStore } from 'jotai';
 import useGetDashboards from '../useGetDashboards';
 import { DashboardTemplate, getUsersDashboards } from '../../api/dashboard-templates';
 
@@ -43,6 +45,12 @@ const mockDashboards: DashboardTemplate[] = [
   } as DashboardTemplate,
 ];
 
+function createWrapper() {
+  const store = createStore();
+  const wrapper = ({ children }: { children: React.ReactNode }) => createElement(Provider, { store }, children);
+  return { wrapper, store };
+}
+
 describe('useGetDashboards', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -51,7 +59,8 @@ describe('useGetDashboards', () => {
   it('should return initial empty dashboards array', () => {
     mockedUseCurrentUser.mockReturnValue({ currentUser: undefined, isLoaded: false });
 
-    const { result } = renderHook(() => useGetDashboards());
+    const { wrapper } = createWrapper();
+    const { result } = renderHook(() => useGetDashboards(), { wrapper });
 
     expect(result.current.dashboards).toEqual([]);
     expect(typeof result.current.fetchDashboards).toBe('function');
@@ -60,7 +69,8 @@ describe('useGetDashboards', () => {
   it('should not fetch dashboards when currentUser is not available', () => {
     mockedUseCurrentUser.mockReturnValue({ currentUser: undefined, isLoaded: false });
 
-    renderHook(() => useGetDashboards());
+    const { wrapper } = createWrapper();
+    renderHook(() => useGetDashboards(), { wrapper });
 
     expect(mockedGetUsersDashboards).not.toHaveBeenCalled();
   });
@@ -72,7 +82,8 @@ describe('useGetDashboards', () => {
     });
     mockedGetUsersDashboards.mockResolvedValue(mockDashboards);
 
-    const { result } = renderHook(() => useGetDashboards());
+    const { wrapper } = createWrapper();
+    const { result } = renderHook(() => useGetDashboards(), { wrapper });
 
     await act(async () => {
       // wait for useEffect to resolve
@@ -90,7 +101,8 @@ describe('useGetDashboards', () => {
     });
     mockedGetUsersDashboards.mockRejectedValue(new Error('Network error'));
 
-    const { result } = renderHook(() => useGetDashboards());
+    const { wrapper } = createWrapper();
+    const { result } = renderHook(() => useGetDashboards(), { wrapper });
 
     await act(async () => {
       // wait for useEffect to resolve
@@ -105,7 +117,8 @@ describe('useGetDashboards', () => {
     mockedUseCurrentUser.mockReturnValue({ currentUser: undefined, isLoaded: false });
     mockedGetUsersDashboards.mockResolvedValue(mockDashboards);
 
-    const { result } = renderHook(() => useGetDashboards());
+    const { wrapper } = createWrapper();
+    const { result } = renderHook(() => useGetDashboards(), { wrapper });
 
     expect(result.current.dashboards).toEqual([]);
 
