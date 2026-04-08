@@ -128,6 +128,16 @@ export const getWidgetIdentifier = (widgetType: string, uniqueId: string = crypt
   return `${widgetType}${widgetIdSeparator}${uniqueId}`;
 };
 
+export const getDashboardTemplate = async (templateId: number): Promise<DashboardTemplate> => {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}`, {
+    method: 'GET',
+    headers: getRequestHeaders(),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json;
+};
+
 export async function getBaseDashboardTemplate(): Promise<BaseTemplate[]>;
 export async function getBaseDashboardTemplate(type: LayoutTypes): Promise<BaseTemplate>;
 export async function getBaseDashboardTemplate(type?: LayoutTypes): Promise<BaseTemplate | BaseTemplate[]> {
@@ -189,6 +199,20 @@ export const patchDashboardTemplate = async (
   data: { templateConfig: PartialTemplateConfig }
 ): Promise<DashboardTemplate> => {
   const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}`, {
+    method: 'PATCH',
+    headers: getRequestHeaders(),
+    body: JSON.stringify(data),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+};
+
+export const patchDashboardTemplateHub = async (
+  templateId: DashboardTemplate['id'],
+  data: { templateConfig: PartialTemplateConfig }
+): Promise<DashboardTemplate> => {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}`, {
     method: 'PATCH',
     headers: getRequestHeaders(),
     body: JSON.stringify(data),

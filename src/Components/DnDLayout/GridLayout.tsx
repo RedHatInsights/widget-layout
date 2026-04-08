@@ -2,27 +2,17 @@ import '@patternfly/widgetized-dashboard/dist/esm/styles.css';
 import './GridLayout.scss';
 import './WidgetHeader.scss';
 import '../Icons/HeaderIcon.scss';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import React, { useEffect, useMemo } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import ResizeHandleSVG from './resize-handle.svg';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { layoutVariantAtom } from '../../state/layoutAtom';
-import { templateAtom, templateIdAtom } from '../../state/templateAtom';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
-import DebouncePromise from 'awesome-debounce-promise';
-import {
-  LayoutTypes,
-  getDashboardTemplates,
-  getDefaultTemplate,
-  mapTemplateConfigToExtendedTemplateConfig,
-  patchDashboardTemplate,
-} from '../../api/dashboard-templates';
-import useCurrentUser from '../../hooks/useCurrentUser';
+import { ExtendedTemplateConfig as LocalExtendedTemplateConfig } from '../../api/dashboard-templates';
 import { Button, EmptyState, EmptyStateActions, EmptyStateBody, EmptyStateVariant, PageSection } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, GripVerticalIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-import { useAddNotification } from '../../state/notificationsAtom';
 import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
 import { ExtendedTemplateConfig, GridLayout as PatternFlyGridLayout, Variants } from '@patternfly/widgetized-dashboard';
 import convertWidgetMapping from './ConvertWidgetMapping';
@@ -56,25 +46,23 @@ const LayoutEmptyState = () => {
   );
 };
 
-const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplate, 1500, {
-  onlyResolvesLast: true,
-});
-
 const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => (
   <div ref={ref} className={`react-resizable-handle react-resizable-handle-${resizeHandleAxis}`}>
     <img src={ResizeHandleSVG} alt="" aria-hidden="true" />
   </div>
 );
 
-const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { isLayoutLocked?: boolean; layoutType?: LayoutTypes }) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [layoutVariant, setLayoutVariant] = useAtom(layoutVariantAtom);
-  const [template, setTemplate] = useAtom(templateAtom);
-  const [templateId, setTemplateId] = useAtom(templateIdAtom);
-  const layoutRef = useRef<HTMLDivElement>(null);
-  const { currentUser } = useCurrentUser();
+interface GridLayoutProps {
+  template: LocalExtendedTemplateConfig;
+  saveTemplate: (newTemplate: LocalExtendedTemplateConfig) => Promise<void>;
+  isLoaded: boolean;
+  isLayoutLocked?: boolean;
+  layoutRef?: React.Ref<HTMLDivElement>;
+}
+
+const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, layoutRef }: GridLayoutProps) => {
+  const layoutVariant = useAtomValue(layoutVariantAtom);
   const scalprumWidgetMapping = useAtomValue(widgetMappingAtom);
-  const addNotification = useAddNotification();
   const setCurrentlyUsedWidgets = useSetAtom(currentlyUsedWidgetsAtom);
   const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
   const currentDropInItem = useAtomValue(currentDropInItemAtom);
@@ -99,35 +87,15 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   }, [template, scalprumWidgetMapping]);
 
   const handleTemplateChange = async (newTemplate: ExtendedTemplateConfig) => {
-    if (isLayoutLocked || templateId < 0) {
+    if (isLayoutLocked) {
       return;
     }
-
-    setTemplate(newTemplate as any);
 
     // Update currently used widgets
     const activeLayout = newTemplate[layoutVariant] || [];
     setCurrentlyUsedWidgets(activeLayout.map((item) => item.widgetType));
 
-    try {
-      // Convert ExtendedTemplateConfig to TemplateConfig for API
-      const templateConfig: any = { sm: [], md: [], lg: [], xl: [] };
-      (Object.keys(newTemplate) as Variants[]).forEach((variant) => {
-        templateConfig[variant] = newTemplate[variant].map(({ widgetType, config, locked, ...item }) => ({
-          ...item,
-          title: item.title || 'Widget',
-        }));
-      });
-
-      await debouncedPatchDashboardTemplate(templateId, { templateConfig });
-    } catch (error) {
-      console.error(error);
-      addNotification({
-        variant: 'danger',
-        title: 'Failed to patch dashboard configuration',
-        description: 'Your dashboard changes were unable to be saved.',
-      });
-    }
+    await saveTemplate(newTemplate as LocalExtendedTemplateConfig);
   };
 
   const handleActiveWidgetsChange = (widgetTypes: string[]) => {
@@ -137,46 +105,6 @@ const GridLayout = ({ isLayoutLocked = false, layoutType = 'landingPage' }: { is
   const handleDrawerExpandChange = (expanded: boolean) => {
     setDrawerExpanded(expanded);
   };
-
-  useEffect(() => {
-    if (!currentUser || templateId >= 0) {
-      return;
-    }
-
-    getDashboardTemplates(layoutType)
-      .then((templates) => {
-        const customDefaultTemplate = getDefaultTemplate(templates);
-        if (!customDefaultTemplate) {
-          throw new Error('No custom default template found');
-        }
-        const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(customDefaultTemplate.templateConfig);
-        const currentWidth = layoutRef?.current?.clientWidth || document.body.clientWidth;
-        let targetVariant: Variants;
-        if (currentWidth >= sidebarBreakpoints.xl) {
-          targetVariant = 'xl';
-        } else if (currentWidth >= sidebarBreakpoints.lg) {
-          targetVariant = 'lg';
-        } else if (currentWidth >= sidebarBreakpoints.md) {
-          targetVariant = 'md';
-        } else {
-          targetVariant = 'sm';
-        }
-        setTemplate(extendedTemplateConfig);
-        setTemplateId(customDefaultTemplate.id);
-        setLayoutVariant(targetVariant);
-      })
-      .catch((err) => {
-        console.error(err);
-        addNotification({
-          variant: 'danger',
-          title: 'Failed to fetch dashboard template',
-          description: 'Try reloading the page.',
-        });
-      })
-      .finally(() => {
-        setIsLoaded(true);
-      });
-  }, [currentUser, templateId]);
 
   const activeLayout = patternFlyTemplate[layoutVariant] || [];
 

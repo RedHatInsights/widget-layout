@@ -6,65 +6,26 @@ import { lockedLayoutAtom } from '../../state/lockedLayoutAtom';
 import { notificationsAtom, useRemoveNotification } from '../../state/notificationsAtom';
 import Header from '../../Components/Header/Header';
 import React, { useEffect } from 'react';
-import useCurrentUser from '../../hooks/useCurrentUser';
-import { LayoutTypes, WidgetPermission, getWidgetMapping } from '../../api/dashboard-templates';
-import { widgetMappingAtom } from '../../state/widgetMappingAtom';
+import useDashboardConfig from '../../hooks/useDashboardConfig';
+import { LayoutTypes } from '../../api/dashboard-templates';
 import '../../App.scss';
 import Portal from '@redhat-cloud-services/frontend-components-notifications/Portal';
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
+import { resolvedWidgetMappingAtom } from '../../state/widgetMappingAtom';
 
 const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
   const notifications = useAtomValue(notificationsAtom);
   const removeNotification = useRemoveNotification();
-  const setWidgetMapping = useSetAtom(widgetMappingAtom);
-  const { currentUser } = useCurrentUser();
+  const { template, saveTemplate, isLoaded, layoutRef } = useDashboardConfig(props.layoutType);
+  const resolveWidgetMapping = useSetAtom(resolvedWidgetMappingAtom);
   const { visibilityFunctions } = useChrome();
 
-  const checkPermissions = async (permissions: WidgetPermission[]): Promise<boolean> => {
-    const permissionResults = await Promise.all(
-      permissions.map(async (permission) => {
-        try {
-          const { method, args } = permission;
-          if (visibilityFunctions[method] && typeof visibilityFunctions[method] === 'function') {
-            const permissionGranted = await (visibilityFunctions[method] as (...args: unknown[]) => Promise<boolean>)(...(args || []));
-            return permissionGranted;
-          }
-          return true;
-        } catch (error) {
-          console.error('Error checking permissions', error);
-          return false;
-        }
-      })
-    );
-    return permissionResults.every(Boolean);
-  };
-
   useEffect(() => {
-    if (!currentUser) {
-      return;
+    if (visibilityFunctions) {
+      resolveWidgetMapping(visibilityFunctions);
     }
-
-    const getWidgetMap = async () => {
-      const mapping = await getWidgetMapping();
-
-      if (mapping) {
-        const checkedMapping = await Object.entries(mapping).reduce(async (acc, [key, value]) => {
-          const resolvedAcc = await acc;
-          const widgetConfig = value.config;
-          const hasPermissions = widgetConfig && widgetConfig.permissions ? await checkPermissions(widgetConfig.permissions) : true;
-          if (hasPermissions) {
-            resolvedAcc[key] = value;
-          }
-          return acc;
-        }, Promise.resolve({} as Record<string, (typeof mapping)[string]>));
-
-        setWidgetMapping(checkedMapping);
-      }
-    };
-
-    getWidgetMap();
-  }, [currentUser]);
+  }, [visibilityFunctions]);
 
   return (
     <div className="widgetLayout">
@@ -72,7 +33,7 @@ const DefaultRoute = (props: { layoutType?: LayoutTypes }) => {
       <Header />
       <AddWidgetDrawer dismissible={false}>
         <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
-          <GridLayout isLayoutLocked={isLayoutLocked} {...props} />
+          <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} isLayoutLocked={isLayoutLocked} layoutRef={layoutRef} />
         </PageSection>
       </AddWidgetDrawer>
     </div>
