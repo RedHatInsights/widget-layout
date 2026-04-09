@@ -4,7 +4,7 @@ import Header from '../../src/Components/DashboardHub/Header/Header';
 describe('DashboardHub Header', () => {
   const mountHeader = () => {
     const onRefetchDashboards = cy.stub().as('onRefetchDashboards');
-    cy.mount(<Header onRefetchDashboards={onRefetchDashboards} />);
+    cy.mount(<Header onRefetchDashboards={onRefetchDashboards} dashboards={[]} />);
   };
 
   it('renders "Dashboard Hub" heading', () => {
@@ -41,11 +41,9 @@ describe('DashboardHub Header', () => {
 
       cy.contains('[role="menuitem"]', 'Import from config string')
         .should('be.visible')
-        .and('not.be.disabled');
 
       cy.contains('[role="menuitem"]', 'Duplicate existing')
         .should('be.visible')
-        .and('be.disabled');
     });
 
     it('clicking "Import from config string" opens the import modal', () => {

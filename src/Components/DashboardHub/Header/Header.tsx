@@ -2,16 +2,20 @@ import { Content, Dropdown, DropdownItem, DropdownList, Flex, FlexItem, MenuTogg
 import React, { useState } from 'react';
 import { ImportModal } from '../ImportModal/ImportModal';
 import { CreateModal } from '../../CreateModal/CreateModal';
+import { DuplicateModal } from '../../DuplicateModal/DuplicateModal';
 import { CodeIcon, CopyIcon, ExternalLinkAltIcon, ThIcon } from '@patternfly/react-icons';
+import { DashboardTemplate } from '../../../api/dashboard-templates';
 
 interface CreateDashboardDropdownProps {
   onRefetchDashboards: () => void;
+  dashboards: DashboardTemplate[];
 }
 
-const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownProps> = ({ onRefetchDashboards }) => {
+const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownProps> = ({ onRefetchDashboards, dashboards }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
 
   return (
     <>
@@ -34,12 +38,18 @@ const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownPr
           <DropdownItem key="import" onClick={() => setIsImportModalOpen(true)}>
             <CodeIcon /> Import from config string
           </DropdownItem>
-          <DropdownItem isDisabled key="duplicate">
+          <DropdownItem key="duplicate" onClick={() => setIsDuplicateModalOpen(true)}>
             <CopyIcon /> Duplicate existing
           </DropdownItem>
         </DropdownList>
       </Dropdown>
       <CreateModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSuccess={onRefetchDashboards} />
+      <DuplicateModal
+        isOpen={isDuplicateModalOpen}
+        onClose={() => setIsDuplicateModalOpen(false)}
+        onSuccess={onRefetchDashboards}
+        dashboards={dashboards}
+      />
       <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onSuccess={onRefetchDashboards} />
     </>
   );
@@ -47,9 +57,10 @@ const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownPr
 
 interface HeaderProps {
   onRefetchDashboards: () => void;
+  dashboards: DashboardTemplate[];
 }
 
-const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards }) => {
+const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards, dashboards }) => {
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
@@ -66,7 +77,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards }) =
         </FlexItem>
 
         <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
-          <CreateDashboardDropdown onRefetchDashboards={onRefetchDashboards} />
+          <CreateDashboardDropdown onRefetchDashboards={onRefetchDashboards} dashboards={dashboards} />
         </FlexItem>
       </Flex>
     </PageSection>
