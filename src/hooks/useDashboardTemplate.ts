@@ -10,6 +10,8 @@ import {
   widgetIdSeparator,
 } from '../api/dashboard-templates';
 import { useApi } from './useApi';
+import { useSetAtom } from 'jotai';
+import { renameDashboardAtom } from '../state/dashboardsAtom';
 
 const remapWidgetTypes = (extendedTemplate: ExtendedTemplateConfig, widgetMapping: WidgetMapping): ExtendedTemplateConfig => {
   // Build reverse lookup: "landing-./RhelWidget" -> "rhel"
@@ -44,6 +46,7 @@ const useDashboardTemplate = (id: number) => {
   const [dashboard, setDashboard] = useState<DashboardTemplate>();
   const api = useApi();
   const debouncedPatchDashboardTemplate = useMemo(() => DebouncePromise(api.patchDashboardTemplateHub, 1500, { onlyResolvesLast: true }), [api]);
+  const renameDashboardInList = useSetAtom(renameDashboardAtom);
 
   useEffect(() => {
     const fetchTemplate = async () => {
@@ -66,6 +69,14 @@ const useDashboardTemplate = (id: number) => {
 
     fetchTemplate();
   }, [id]);
+
+  const renameDashboard = useCallback(
+    async (dashboardName: string) => {
+      await renameDashboardInList({ id, dashboardName });
+      setDashboard((prev) => (prev ? { ...prev, dashboardName } : prev));
+    },
+    [id, renameDashboardInList]
+  );
 
   const saveTemplate = useCallback(
     async (newTemplate: ExtendedTemplateConfig) => {
@@ -94,7 +105,7 @@ const useDashboardTemplate = (id: number) => {
     [id]
   );
 
-  return { template, saveTemplate, isLoaded, dashboard, error };
+  return { template, saveTemplate, renameDashboard, isLoaded, dashboard, error };
 };
 
 export default useDashboardTemplate;
