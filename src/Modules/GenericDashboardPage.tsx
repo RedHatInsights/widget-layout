@@ -6,14 +6,14 @@ import { lockedLayoutAtom } from '../state/lockedLayoutAtom';
 import { useParams } from 'react-router-dom';
 import useDashboardTemplate from '../hooks/useDashboardTemplate';
 import AddWidgetDrawer from '../Components/WidgetDrawer/WidgetDrawer';
-import Header from '../Components/Header/Header';
+import GenericHeader from '../Components/GenericHeader/GenericHeader';
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { resolvedWidgetMappingAtom } from '../state/widgetMappingAtom';
 
 const GenericDashboardPage = () => {
   const { id } = useParams<{ id: string }>();
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
-  const { template, saveTemplate, isLoaded, dashboardName } = useDashboardTemplate(Number(id));
+  const { template, saveTemplate, isLoaded, dashboard } = useDashboardTemplate(Number(id));
   const resolveWidgetMapping = useSetAtom(resolvedWidgetMappingAtom);
   const { visibilityFunctions } = useChrome();
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -26,7 +26,7 @@ const GenericDashboardPage = () => {
 
   return (
     <div className="genericDashboardPage">
-      <Header dashboardName={dashboardName} />
+      <GenericHeader dashboard={dashboard} />
       <AddWidgetDrawer dismissible={false}>
         <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
           <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} layoutRef={layoutRef} />

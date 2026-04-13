@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import DebouncePromise from 'awesome-debounce-promise';
 import {
+  DashboardTemplate,
   ExtendedTemplateConfig,
   PartialTemplateConfig,
   Variants,
@@ -46,7 +47,7 @@ const useDashboardTemplate = (id: number) => {
   const [template, setTemplate] = useState<ExtendedTemplateConfig>({ sm: [], md: [], lg: [], xl: [] });
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [dashboardName, setDashboardName] = useState<string>();
+  const [dashboard, setDashboard] = useState<DashboardTemplate>();
   // widget mapping
 
   useEffect(() => {
@@ -56,7 +57,7 @@ const useDashboardTemplate = (id: number) => {
 
       try {
         const result = await getDashboardTemplate(id);
-        setDashboardName(result.dashboardName);
+        setDashboard(result);
         const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(result.templateConfig);
         const widgetMap = await getWidgetMapping();
         const remappedTemplate = remapWidgetTypes(extendedTemplateConfig, widgetMap);
@@ -98,7 +99,7 @@ const useDashboardTemplate = (id: number) => {
     [id]
   );
 
-  return { template, saveTemplate, isLoaded, dashboardName, error };
+  return { template, saveTemplate, isLoaded, dashboard, error };
 };
 
 export default useDashboardTemplate;

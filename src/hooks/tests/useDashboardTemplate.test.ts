@@ -94,7 +94,7 @@ describe('useDashboardTemplate', () => {
     expect(result.current.template).toEqual(emptyTemplate);
     expect(result.current.isLoaded).toBe(false);
     expect(result.current.error).toBeNull();
-    expect(result.current.dashboardName).toBeUndefined();
+    expect(result.current.dashboard?.dashboardName).toBeUndefined();
     expect(typeof result.current.saveTemplate).toBe('function');
   });
 
@@ -109,7 +109,7 @@ describe('useDashboardTemplate', () => {
     expect(mockedGetWidgetMapping).toHaveBeenCalled();
     expect(result.current.isLoaded).toBe(true);
     expect(result.current.error).toBeNull();
-    expect(result.current.dashboardName).toBe('My Dashboard');
+    expect(result.current.dashboard?.dashboardName).toBe('My Dashboard');
     expect(result.current.template).toEqual(mockRemappedTemplate);
   });
 
@@ -199,7 +199,7 @@ describe('useDashboardTemplate', () => {
     const { result, rerender } = await act(async () => renderHook(({ id }) => useDashboardTemplate(id), { initialProps: { id: 1 } }));
 
     expect(mockedGetDashboardTemplate).toHaveBeenCalledWith(1);
-    expect(result.current.dashboardName).toBe('Dashboard 1');
+    expect(result.current.dashboard?.dashboardName).toBe('Dashboard 1');
 
     mockedGetDashboardTemplate.mockResolvedValue(createMockDashboardTemplate({ id: 2, dashboardName: 'Dashboard 2' }));
 
@@ -208,7 +208,7 @@ describe('useDashboardTemplate', () => {
     });
 
     expect(mockedGetDashboardTemplate).toHaveBeenCalledWith(2);
-    expect(result.current.dashboardName).toBe('Dashboard 2');
+    expect(result.current.dashboard?.dashboardName).toBe('Dashboard 2');
   });
 
   it('should return items as-is when widget mapping has no match for scope-module', async () => {
