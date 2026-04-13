@@ -16,16 +16,17 @@ import {
   Toolbar,
   ToolbarContent,
   ToolbarItem,
+  Tooltip,
 } from '@patternfly/react-core';
 import React, { useRef, useState } from 'react';
 import { CodeIcon, CopyIcon, EllipsisVIcon, HomeIcon, PlusCircleIcon, TrashIcon } from '@patternfly/react-icons';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-import { DashboardTemplate, setDefaultTemplate } from '../../api/dashboard-templates';
+import { DashboardTemplate } from '../../api/dashboard-templates';
+import { dashboardsAtom, setDefaultDashboardAtom } from '../../state/dashboardsAtom';
 import { useExportDashboard } from '../../hooks/useExportDashboard';
 import { useDeleteDashboard } from '../../hooks/useDeleteDashboard';
 import { DeleteDashboardModal } from '../DashboardHub/DeleteDashboardModal/DeleteDashboardModal';
-import { DuplicateModal } from '../DuplicateModal/DuplicateModal';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,7 +37,8 @@ interface KebabDropdownProps {
 const KebabDropdown = ({ dashboard }: KebabDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+  const dashboards = useAtomValue(dashboardsAtom);
+  const isHomepage = dashboards.find((d) => d.id === dashboard.id)?.default ?? dashboard.default;
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const { exportDashboard } = useExportDashboard();
@@ -44,8 +46,21 @@ const KebabDropdown = ({ dashboard }: KebabDropdownProps) => {
   const addNotification = useAddNotification();
   const navigate = useNavigate();
 
+  const setDefaultDashboard = useSetAtom(setDefaultDashboardAtom);
+
   const handleSetAsHomepage = async () => {
-    await setDefaultTemplate(dashboard.id);
+    try {
+      await setDefaultDashboard(dashboard.id);
+      addNotification({
+        variant: 'success',
+        title: `'${dashboard.dashboardName}' has been set as homepage`,
+      });
+    } catch (err) {
+      addNotification({
+        variant: 'danger',
+        title: `Failed to set '${dashboard.dashboardName}' as homepage`,
+      });
+    }
     setIsOpen(false);
   };
 
@@ -55,8 +70,16 @@ const KebabDropdown = ({ dashboard }: KebabDropdownProps) => {
       try {
         const configString = JSON.stringify(result, null, 2);
         await navigator.clipboard.writeText(configString);
+        addNotification({
+          variant: 'success',
+          title: `'${dashboard.dashboardName}' has been copied to clipboard`,
+        });
       } catch (err) {
         console.error('Failed to copy to clipboard:', err);
+        addNotification({
+          variant: 'danger',
+          title: `Failed to copy '${dashboard.dashboardName}' to clipboard`,
+        });
       }
     }
     setIsOpen(false);
@@ -91,9 +114,11 @@ const KebabDropdown = ({ dashboard }: KebabDropdownProps) => {
     <Menu ref={menuRef}>
       <MenuContent>
         <MenuList>
-          <MenuItem icon={<HomeIcon />} isAriaDisabled={dashboard.default} onClick={handleSetAsHomepage}>
-            Set as homepage
-          </MenuItem>
+          <Tooltip content="This dashboard is already set as your homepage" trigger={isHomepage ? 'mouseenter' : 'manual'}>
+            <MenuItem icon={<HomeIcon />} isAriaDisabled={isHomepage} onClick={handleSetAsHomepage}>
+              Set as homepage
+            </MenuItem>
+          </Tooltip>
           <MenuItem icon={<CopyIcon />} isDisabled onClick={handleDuplicate}>
             Duplicate
           </MenuItem>

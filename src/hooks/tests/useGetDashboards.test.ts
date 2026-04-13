@@ -11,6 +11,17 @@ jest.mock('../useCurrentUser', () => ({
   default: jest.fn(),
 }));
 
+let mockAtomValue: DashboardTemplate[] = [];
+const mockSetAtom = jest.fn((val: DashboardTemplate[]) => {
+  mockAtomValue = val;
+});
+
+jest.mock('jotai', () => ({
+  ...jest.requireActual('jotai'),
+  useAtomValue: () => mockAtomValue,
+  useSetAtom: () => mockSetAtom,
+}));
+
 import useCurrentUser from '../useCurrentUser';
 
 const mockedGetUsersDashboards = getUsersDashboards as jest.MockedFunction<typeof getUsersDashboards>;
@@ -46,6 +57,7 @@ const mockDashboards: DashboardTemplate[] = [
 describe('useGetDashboards', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAtomValue = [];
   });
 
   it('should return initial empty dashboards array', () => {
@@ -72,14 +84,14 @@ describe('useGetDashboards', () => {
     });
     mockedGetUsersDashboards.mockResolvedValue(mockDashboards);
 
-    const { result } = renderHook(() => useGetDashboards());
+    renderHook(() => useGetDashboards());
 
     await act(async () => {
       // wait for useEffect to resolve
     });
 
     expect(mockedGetUsersDashboards).toHaveBeenCalledTimes(1);
-    expect(result.current.dashboards).toEqual(mockDashboards);
+    expect(mockSetAtom).toHaveBeenCalledWith(mockDashboards);
   });
 
   it('should handle API error and keep dashboards empty', async () => {
@@ -114,6 +126,6 @@ describe('useGetDashboards', () => {
     });
 
     expect(mockedGetUsersDashboards).toHaveBeenCalledTimes(1);
-    expect(result.current.dashboards).toEqual(mockDashboards);
+    expect(mockSetAtom).toHaveBeenCalledWith(mockDashboards);
   });
 });

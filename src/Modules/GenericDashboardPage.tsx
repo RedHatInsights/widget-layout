@@ -9,6 +9,8 @@ import AddWidgetDrawer from '../Components/WidgetDrawer/WidgetDrawer';
 import GenericHeader from '../Components/GenericHeader/GenericHeader';
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { resolvedWidgetMappingAtom } from '../state/widgetMappingAtom';
+import { notificationsAtom, useRemoveNotification } from '../state/notificationsAtom';
+import Portal from '@redhat-cloud-services/frontend-components-notifications/Portal';
 
 const GenericDashboardPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +20,9 @@ const GenericDashboardPage = () => {
   const { visibilityFunctions } = useChrome();
   const layoutRef = useRef<HTMLDivElement>(null);
 
+  const notifications = useAtomValue(notificationsAtom);
+  const removeNotification = useRemoveNotification();
+
   useEffect(() => {
     if (visibilityFunctions) {
       resolveWidgetMapping(visibilityFunctions);
@@ -26,6 +31,7 @@ const GenericDashboardPage = () => {
 
   return (
     <div className="genericDashboardPage">
+      <Portal notifications={notifications} removeNotification={removeNotification} />
       <GenericHeader dashboard={dashboard} />
       <AddWidgetDrawer dismissible={false}>
         <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
