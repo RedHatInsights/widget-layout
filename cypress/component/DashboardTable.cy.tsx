@@ -162,6 +162,76 @@ describe('DashboardTable', () => {
     cy.get('[role="menuitem"]').contains('Delete dashboard').should('exist');
   });
 
+  describe('Set as homepage', () => {
+    it('shows home icon for the default dashboard', () => {
+      cy.mount(
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(false)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+          </FlagProvider>
+        </MemoryRouter>
+      );
+
+      // Charlie Dashboard is default, sorted to index 2 (ascending by name: Alpha, Bravo, Charlie)
+      cy.get('tbody tr').eq(2).find('td').eq(0).find('svg').should('exist');
+      // Non-default dashboards should not have the icon
+      cy.get('tbody tr').eq(0).find('td').eq(0).find('svg').should('not.exist');
+      cy.get('tbody tr').eq(1).find('td').eq(0).find('svg').should('not.exist');
+    });
+
+    it('"Set as homepage" is disabled for the default dashboard', () => {
+      cy.mount(
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(false)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+          </FlagProvider>
+        </MemoryRouter>
+      );
+
+      // Charlie Dashboard (index 2) is default
+      cy.get('tbody tr').eq(2).find('button[aria-label="Kebab toggle"]').click();
+      cy.get('[role="menuitem"]').contains('Set as homepage').closest('button').should('have.attr', 'aria-disabled', 'true');
+    });
+
+    it('"Set as homepage" is enabled for non-default dashboards', () => {
+      cy.mount(
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(false)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
+          </FlagProvider>
+        </MemoryRouter>
+      );
+
+      // Alpha Dashboard (index 0) is not default
+      cy.get('tbody tr').eq(0).find('button[aria-label="Kebab toggle"]').click();
+      cy.get('[role="menuitem"]').contains('Set as homepage').closest('button').should('not.have.attr', 'aria-disabled', 'true');
+    });
+
+    it('calls API and refetches when "Set as homepage" is clicked', () => {
+      cy.intercept('POST', '/api/widget-layout/v1/*/default', {
+        statusCode: 200,
+        body: {},
+      }).as('setDefault');
+
+      const refetchStub = cy.stub().as('refetch');
+
+      cy.mount(
+        <MemoryRouter>
+          <FlagProvider unleashClient={createMockClient(false)} startClient={false}>
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={refetchStub} />
+          </FlagProvider>
+        </MemoryRouter>
+      );
+
+      // Click "Set as homepage" on Alpha Dashboard (index 0, non-default)
+      cy.get('tbody tr').eq(0).find('button[aria-label="Kebab toggle"]').click();
+      cy.get('[role="menuitem"]').contains('Set as homepage').click();
+
+      cy.wait('@setDefault');
+      cy.get('@refetch').should('have.been.calledOnce');
+    });
+  });
+
   describe('Delete dashboard', () => {
     it('"Delete dashboard" is hidden when feature flag is off', () => {
       cy.mount(
