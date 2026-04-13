@@ -279,6 +279,17 @@ export const copyDashboardTemplate = async (templateId: DashboardTemplate['id'],
   return json;
 };
 
+export const renameDashboardTemplate = async (templateId: DashboardTemplate['id'], data: { dashboardName: string }): Promise<DashboardTemplate> => {
+  const resp = await fetch(`/api/widget-layout/v1/${templateId}/rename`, {
+    method: 'PATCH',
+    headers: getRequestHeaders(),
+    body: JSON.stringify(data),
+  });
+  handleErrors(resp);
+  const json = await resp.json();
+  return json.data;
+};
+
 export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTemplate | undefined => {
   return templates.find((itm) => itm.default === true);
 };

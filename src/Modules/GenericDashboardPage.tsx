@@ -15,7 +15,11 @@ import Portal from '@redhat-cloud-services/frontend-components-notifications/Por
 const GenericDashboardPage = () => {
   const { id } = useParams<{ id: string }>();
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
+<<<<<<< HEAD
   const { template, saveTemplate, isLoaded, dashboard } = useDashboardTemplate(Number(id));
+=======
+  const { template, saveTemplate, renameDashboard, isLoaded, dashboard } = useDashboardTemplate(Number(id));
+>>>>>>> 9be2f2b (feat: add inline editing for dashboard name)
   const resolveWidgetMapping = useSetAtom(resolvedWidgetMappingAtom);
   const { visibilityFunctions } = useChrome();
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -32,7 +36,11 @@ const GenericDashboardPage = () => {
   return (
     <div className="genericDashboardPage">
       <Portal notifications={notifications} removeNotification={removeNotification} />
+<<<<<<< HEAD
       <GenericHeader dashboard={dashboard} />
+=======
+      <GenericHeader dashboard={dashboard} onRenameDashboard={renameDashboard} />
+>>>>>>> 9be2f2b (feat: add inline editing for dashboard name)
       <AddWidgetDrawer dismissible={false}>
         <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
           <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} layoutRef={layoutRef} />
