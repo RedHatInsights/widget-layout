@@ -32,7 +32,7 @@ export const ButtonCopy: React.FunctionComponent = () => {
 
 export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ dashboards, onRefetchDashboards }) => {
   const { exportDashboard, isLoading, error } = useExportDashboard();
-  const { deleteDashboard, isLoading: isDeleting } = useDeleteDashboard(onRefetchDashboards);
+  const { deleteDashboard, isLoading: isDeleting } = useDeleteDashboard();
   const [dashboardToDelete, setDashboardToDelete] = useState<Dashboard | null>(null);
   const isEnabledDelete = useFlag('platform.widget-layout.delete-dashboard');
   const addNotification = useAddNotification();
