@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Table, Tbody, Td, Th, ThProps, Thead, Tr } from '@patternfly/react-table';
 import { ActionsColumn } from '@patternfly/react-table';
-import { Button } from '@patternfly/react-core';
+import { Button, Content, TooltipPosition } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
-import { DashboardTemplate } from '../../../api/dashboard-templates';
+import { DashboardTemplate, setDefaultTemplate } from '../../../api/dashboard-templates';
 import { CodeIcon, CopyIcon, EditAltIcon, HomeIcon, TrashIcon, UsersIcon } from '@patternfly/react-icons';
 import { useExportDashboard } from '../../../hooks/useExportDashboard';
 import { useDeleteDashboard } from '../../../hooks/useDeleteDashboard';
@@ -17,6 +17,7 @@ interface Dashboard {
   name: string;
   description: string; // TODO
   lastModified: string;
+  isDefault: boolean;
 }
 
 interface DashboardTableProps {
@@ -42,6 +43,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
     name: dashboard.dashboardName,
     description: dashboard.templateBase.name, // TODO: Update when description field is available
     lastModified: dashboard.updatedAt,
+    isDefault: dashboard.default,
   }));
 
   const columnNames = {
@@ -66,6 +68,11 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
         console.error('Failed to copy to clipboard:', err);
       }
     }
+  };
+
+  const handleSetAsHomepage = async (dashboardId: number) => {
+    await setDefaultTemplate(dashboardId);
+    onRefetchDashboards();
   };
 
   // Sort dashboards by name
@@ -99,8 +106,9 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
     {
       icon: <HomeIcon />,
       title: 'Set as homepage',
-      isDisabled: true,
-      onClick: () => console.log(`Set as homepage dashboard ${dashboard.id}`),
+      isAriaDisabled: dashboard.isDefault,
+      tooltipProps: dashboard.isDefault ? { content: 'This dashboard is already set to your homepage', position: TooltipPosition.left } : undefined,
+      onClick: () => handleSetAsHomepage(dashboard.id),
     },
     {
       icon: <CodeIcon />,
@@ -151,6 +159,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
       <Table aria-label="Dashboards table" ouiaId="DashboardsTable">
         <Thead>
           <Tr>
+            <Th screenReaderText="Homepage" modifier="fitContent" />
             <Th sort={getSortParams()}>{columnNames.name}</Th>
             <Th>{columnNames.description}</Th>
             <Th>{columnNames.lastModified}</Th>
@@ -160,6 +169,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
         <Tbody>
           {sortedDashboards.map((dashboard) => (
             <Tr key={dashboard.id}>
+              <Td>{dashboard.isDefault && <HomeIcon />}</Td>
               <Td dataLabel={columnNames.name}>
                 <Link to={`/staging/dashboard-hub/${dashboard.id}`}>{dashboard.name}</Link>
               </Td>
