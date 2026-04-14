@@ -171,7 +171,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
             <Tr key={dashboard.id}>
               <Td>{dashboard.isDefault && <HomeIcon />}</Td>
               <Td dataLabel={columnNames.name}>
-                <Link to={`/staging/dashboard-hub/${dashboard.id}`}>{dashboard.name}</Link>
+                <Link to={`/dashboard-hub/${dashboard.id}`}>{dashboard.name}</Link>
               </Td>
               <Td dataLabel={columnNames.description}>{dashboard.description}</Td>
               <Td dataLabel={columnNames.lastModified}>
