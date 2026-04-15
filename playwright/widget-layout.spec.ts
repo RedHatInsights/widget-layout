@@ -1,10 +1,13 @@
-import { test, expect } from './helpers/base';
-import { ensureLoggedIn } from './helpers/test-utils';
+import { test, expect } from '@playwright/test';
+import { disableCookiePrompt } from '@redhat-cloud-services/playwright-test-auth';
 
 test.describe('Widget Layout - Basic Rendering', () => {
-  test('should render the site correctly', async ({ page }) => {
-    await ensureLoggedIn(page);
+  test.beforeEach(async ({ page }) => {
+    await disableCookiePrompt(page);
+    await page.goto('/');
+  });
 
+  test('should render the site correctly', async ({ page }) => {
     // Wait for the page to be fully loaded after authentication
     await page.waitForLoadState('domcontentloaded');
 
@@ -29,7 +32,10 @@ test.describe('Widget Layout - Basic Rendering', () => {
 
 test.describe('Widget Layout - Add Widget from Drawer', () => {
   test.beforeEach(async ({ page }) => {
-    await ensureLoggedIn(page);
+    await disableCookiePrompt(page);
+    await page.goto('/');
+    // Wait for dashboard to be ready
+    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
   });
 
   test('should open the widget drawer when clicking Add widgets button', async ({ page }) => {
@@ -76,7 +82,6 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     await expect(drawerText).toBeVisible({ timeout: 5000 });
 
     // Check for example draggable widgets in the drawer
-    // These might vary, so we'll check if ANY text content appears in the drawer area
     const drawerSection = page.locator('text=Add new and previously removed widgets').locator('..');
     await expect(drawerSection).toBeVisible();
   });

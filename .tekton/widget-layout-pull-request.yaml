@@ -49,7 +49,7 @@ spec:
         # Start Caddy to serve app assets
         caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
     - name: e2e-playwright-image
-      value: "mcr.microsoft.com/playwright:v1.58.2-jammy"
+      value: "mcr.microsoft.com/playwright:v1.59.1-noble"
     - name: frontend-proxy-routes-configmap
       value: "widget-layout-dev-proxy-caddyfile"
     - name: e2e-credentials-secret

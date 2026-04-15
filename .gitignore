@@ -23,6 +23,7 @@ coverage
 .cache
 # Playwright test artifacts
 playwright-report
+playwright/.auth
 test-results
 .cypress-cache
 
