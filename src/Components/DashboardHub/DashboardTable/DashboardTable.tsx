@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Tbody, Td, Th, ThProps, Thead, Tr } from '@patternfly/react-table';
 import { ActionsColumn } from '@patternfly/react-table';
-import { Button, Content, TooltipPosition } from '@patternfly/react-core';
+import { Button, Content, Tooltip, TooltipPosition } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
 import { DashboardTemplate } from '../../../api/dashboard-templates';
 import { setDefaultDashboardAtom } from '../../../state/dashboardsAtom';
@@ -9,6 +9,7 @@ import { CodeIcon, CopyIcon, EditAltIcon, HomeIcon, TrashIcon, UsersIcon } from 
 import { useExportDashboard } from '../../../hooks/useExportDashboard';
 import { useDeleteDashboard } from '../../../hooks/useDeleteDashboard';
 import { DeleteDashboardModal } from '../DeleteDashboardModal/DeleteDashboardModal';
+import { DuplicateModal } from '../../DuplicateModal/DuplicateModal';
 import DateFormat from '@redhat-cloud-services/frontend-components/DateFormat';
 import { useFlag } from '@unleash/proxy-client-react';
 import { useAddNotification } from '../../../state/notificationsAtom';
@@ -27,15 +28,15 @@ interface DashboardTableProps {
   onRefetchDashboards: () => void;
 }
 
-export const ButtonCopy: React.FunctionComponent = () => {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  return <Button variant="plain" aria-label="Copy" icon={<CopyIcon />} onClick={() => {}} />;
+export const ButtonCopy: React.FunctionComponent<{ onClick: () => void }> = ({ onClick }) => {
+  return <Button variant="plain" aria-label="Duplicate" icon={<CopyIcon />} onClick={onClick} />;
 };
 
 export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ dashboards, onRefetchDashboards }) => {
   const { exportDashboard, isLoading, error } = useExportDashboard();
   const { deleteDashboard, isLoading: isDeleting } = useDeleteDashboard();
   const [dashboardToDelete, setDashboardToDelete] = useState<Dashboard | null>(null);
+  const [duplicateDashboardId, setDuplicateDashboardId] = useState<number | null>(null);
   const isEnabledDelete = useFlag('platform.widget-layout.delete-dashboard');
   const addNotification = useAddNotification();
   const setDefaultDashboard = useSetAtom(setDefaultDashboardAtom);
@@ -151,6 +152,11 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
 
   return (
     <>
+      <DuplicateModal
+        isOpen={duplicateDashboardId !== null}
+        onClose={() => setDuplicateDashboardId(null)}
+        preselectedDashboardId={duplicateDashboardId}
+      />
       <DeleteDashboardModal
         isOpen={dashboardToDelete !== null}
         dashboardName={dashboardToDelete?.name ?? ''}
@@ -181,7 +187,9 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
               </Td>
               <Td isActionCell>
                 <Td className="pf-v6-u-display-flex pf-v6-u-align-items-center pf-v6-u-gap-sm">
-                  <ButtonCopy />
+                  <Tooltip content="Duplicate dashboard" position={TooltipPosition.left}>
+                    <ButtonCopy onClick={() => setDuplicateDashboardId(dashboard.id)} />
+                  </Tooltip>
                   <ActionsColumn items={getRowActions(dashboard)} />
                 </Td>
               </Td>

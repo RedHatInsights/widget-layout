@@ -1,6 +1,7 @@
 import { Alert, Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, TextInput } from '@patternfly/react-core';
 import React, { useEffect } from 'react';
 import { CodeEditorImport } from '../CodeEditor/CodeEditor';
+import { useAddNotification } from '../../../state/notificationsAtom';
 import { useImportDashboard } from '../../../hooks/useImportDashboard';
 
 interface ImportModalProps {
@@ -11,6 +12,7 @@ interface ImportModalProps {
 
 export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const { configString, setConfigString, name, setName, isFormValid, importDashboard, isLoading, error, reset } = useImportDashboard();
+  const addNotification = useAddNotification();
 
   const handleNameChange = (_event: React.FormEvent<HTMLInputElement>, name: string) => {
     setName(name);
@@ -19,6 +21,10 @@ export const ImportModal: React.FunctionComponent<ImportModalProps> = ({ isOpen,
   const handleSubmit = async () => {
     const result = await importDashboard();
     if (result) {
+      addNotification({
+        variant: 'success',
+        title: `Dashboard '${name}' imported successfully`,
+      });
       onSuccess?.();
       onClose();
     }
