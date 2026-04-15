@@ -60,22 +60,38 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
   // Sorting state
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const handleCopyConfiguration = async (dashboardId: number) => {
-    const result = await exportDashboard(dashboardId);
-
+  const handleCopyConfiguration = async (dashboard: Dashboard) => {
+    const result = await exportDashboard(dashboard.id);
     if (result) {
       try {
         const configString = JSON.stringify(result, null, 2);
         await navigator.clipboard.writeText(configString);
-        console.log('Configuration copied to clipboard');
+        addNotification({
+          variant: 'success',
+          title: `'${dashboard.name}' has been copied to clipboard`,
+        });
       } catch (err) {
-        console.error('Failed to copy to clipboard:', err);
+        addNotification({
+          variant: 'danger',
+          title: `Failed to copy '${dashboard.name}' to clipboard`,
+        });
       }
     }
   };
 
-  const handleSetAsHomepage = async (dashboardId: number) => {
-    await setDefaultDashboard(dashboardId);
+  const handleSetAsHomepage = async (dashboard: Dashboard) => {
+    try {
+      await setDefaultDashboard(dashboard.id);
+      addNotification({
+        variant: 'success',
+        title: `'${dashboard.name}' has been set as homepage`,
+      });
+    } catch (err) {
+      addNotification({
+        variant: 'danger',
+        title: `Failed to set '${dashboard.name}' as homepage`,
+      });
+    }
   };
 
   // Sort dashboards by name
@@ -111,12 +127,12 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
       title: 'Set as homepage',
       isAriaDisabled: dashboard.isDefault,
       tooltipProps: dashboard.isDefault ? { content: 'This dashboard is already set to your homepage', position: TooltipPosition.left } : undefined,
-      onClick: () => handleSetAsHomepage(dashboard.id),
+      onClick: () => handleSetAsHomepage(dashboard),
     },
     {
       icon: <CodeIcon />,
       title: 'Copy configuration string',
-      onClick: () => handleCopyConfiguration(dashboard.id),
+      onClick: () => handleCopyConfiguration(dashboard),
     },
     {
       icon: <UsersIcon />,

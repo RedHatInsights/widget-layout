@@ -2,6 +2,8 @@ import React from 'react';
 import { KebabDropdown } from '../../src/Components/Header/Header';
 import { MemoryRouter } from 'react-router-dom';
 import { DashboardTemplate } from '../../src/api/dashboard-templates';
+import { useSetAtom } from 'jotai';
+import { dashboardsAtom } from '../../src/state/dashboardsAtom';
 
 const mockDashboards: DashboardTemplate[] = [
   {
@@ -17,13 +19,23 @@ const mockDashboards: DashboardTemplate[] = [
   },
 ];
 
+const HydrateDashboards: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const set = useSetAtom(dashboardsAtom);
+  React.useEffect(() => {
+    set(mockDashboards);
+  }, []);
+  return <>{children}</>;
+};
+
 describe('KebabDropdown', () => {
   beforeEach(() => {
     cy.mount(
       <MemoryRouter>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px' }}>
-          <KebabDropdown dashboards={mockDashboards} />
-        </div>
+        <HydrateDashboards>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px' }}>
+            <KebabDropdown />
+          </div>
+        </HydrateDashboards>
       </MemoryRouter>
     );
   });

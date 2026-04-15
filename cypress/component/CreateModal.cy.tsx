@@ -85,6 +85,13 @@ describe('CreateModal', () => {
   });
 
   describe('Successful creation', () => {
+    beforeEach(() => {
+      cy.intercept('GET', '/api/widget-layout/v1/', {
+        statusCode: 200,
+        body: { data: [mockDashboardResponse] },
+      }).as('getDashboards');
+    });
+
     it('calls import API and closes modal on success', () => {
       cy.intercept('POST', '/api/widget-layout/v1/import', {
         statusCode: 200,
