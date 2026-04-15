@@ -50,7 +50,7 @@ describe('KebabDropdown', () => {
 
     cy.contains('[role="menuitem"]', 'Dashboard Hub')
       .should('not.be.disabled')
-      .should('have.attr', 'href', '/staging/dashboard-hub');
+      .should('have.attr', 'href', '/dashboard-hub');
   });
 
   it('toggle button has expanded state when open', () => {
@@ -62,7 +62,7 @@ describe('KebabDropdown', () => {
   it('renders dashboard items with correct links', () => {
     cy.get('button[aria-label="kebab dropdown toggle"]').click();
 
-    cy.contains('[role="menuitem"]', 'My Dashboard').should('have.attr', 'href', '/staging/dashboard-hub/1');
+    cy.contains('[role="menuitem"]', 'My Dashboard').should('have.attr', 'href', '/dashboard-hub/1');
   });
 
   it('drills into Create new dashboard submenu and displays options', () => {

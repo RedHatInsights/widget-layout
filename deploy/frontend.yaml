@@ -31,7 +31,7 @@ objects:
           - id: dashboardHub
             module: ./DashboardHub
             routes:
-            - pathname: /staging/dashboard-hub
+            - pathname: /dashboard-hub
 
 parameters:
   - name: ENV_NAME

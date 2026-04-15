@@ -119,7 +119,7 @@ export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] 
                       isDisabled
                     />
                   }
-                  component={(props) => <Link {...props} to={`/staging/dashboard-hub/${dashboard.id}`} />}
+                  component={(props) => <Link {...props} to={`/dashboard-hub/${dashboard.id}`} />}
                 >
                   {dashboard.dashboardName}
                 </MenuItem>
@@ -152,7 +152,7 @@ export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] 
             Create new dashboard
           </MenuItem>
           <Divider component="li" key="separator" />
-          <MenuItem component={(props) => <Link {...props} to="/staging/dashboard-hub" />} description="Create, manage, share dashboards">
+          <MenuItem component={(props) => <Link {...props} to="/dashboard-hub" />} description="Create, manage, share dashboards">
             Dashboard Hub
           </MenuItem>
         </MenuList>
