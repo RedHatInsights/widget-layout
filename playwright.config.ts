@@ -3,15 +3,21 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * Playwright configuration for widget-layout E2E tests
  *
+ * Authentication is handled by @redhat-cloud-services/playwright-test-auth
+ * via global setup. The session is saved to playwright/.auth/user.json
+ * and reused across all tests.
+ *
  * Environment variables:
- * - HCC_ENV_URL: HCC environment URL (used in CI/Konflux)
  * - E2E_USER: Test user credentials
  * - E2E_PASSWORD: Test user password
  */
 export default defineConfig({
   testDir: './playwright',
 
-  // Maximum time one test can run (increased for stage environment and slow SSO)
+  // Global setup: authenticate once and reuse session across all tests
+  globalSetup: require.resolve('@redhat-cloud-services/playwright-test-auth/global-setup'),
+
+  // Maximum time one test can run (increased for stage environment)
   timeout: 180 * 1000,
 
   // Test configuration
@@ -29,8 +35,10 @@ export default defineConfig({
   // Shared settings for all projects
   use: {
     // Base URL for navigation
-    // Uses the proxy at https://stage.foo.redhat.com:1337 which routes to the app
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://stage.foo.redhat.com:1337/',
+
+    // Reuse authentication state from global setup
+    storageState: 'playwright/.auth/user.json',
 
     // Skip TLS certificate verification (self-signed certs)
     ignoreHTTPSErrors: true,
