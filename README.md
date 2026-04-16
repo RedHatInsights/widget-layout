@@ -4,11 +4,18 @@ Reusable drag and drop UI layout for frontends
 
 ## Documentation
 
-- [Widget Layout Component Interface](docs/components/widget-layout.md) - Complete interface documentation for the WidgetLayout federated module
-- [GridLayout Component](docs/components/grid-layout.md) - Core layout engine with drag-and-drop, responsive grid system, and template persistence
-- [Creating Custom Widgets](docs/components/custom-widgets.md) - Guide for creating custom widgets that integrate with the grid layout system
-- [Layout Data Format](docs/layout-data-format.md) - Comprehensive documentation of the layout data structures, API endpoints, and data flow
-- [AI Agent Guidelines](docs/ai-agent-guidelines.md) - Guidelines for AI agents generating code documentation
+| Document | Description |
+|----------|-------------|
+| [AGENTS.md](AGENTS.md) | AI agent onboarding: tech stack, conventions, pitfalls |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow, commit conventions, PR guidelines |
+| [Architecture](docs/ARCHITECTURE.md) | System design, data flow, widget pipeline, deployment |
+| [Testing Guidelines](docs/testing-guidelines.md) | Jest and Playwright testing patterns |
+| [Component Development](docs/component-development-guidelines.md) | Widget and component development patterns |
+| [Layout Data Format](docs/layout-data-format.md) | Layout data structures, API endpoints, and data flow |
+| [Widget Layout Component](docs/components/widget-layout.md) | WidgetLayout federated module interface |
+| [GridLayout Component](docs/components/grid-layout.md) | Core layout engine with drag-and-drop |
+| [Creating Custom Widgets](docs/components/custom-widgets.md) | Custom widget integration guide |
+| [AI Agent Guidelines](docs/ai-agent-guidelines.md) | Guidelines for AI-generated code documentation |
 
 ## Initial etc/hosts setup
 
