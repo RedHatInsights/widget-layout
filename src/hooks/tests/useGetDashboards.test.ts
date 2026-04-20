@@ -18,6 +18,7 @@ const mockSetAtom = jest.fn((val: DashboardTemplate[]) => {
 
 jest.mock('jotai', () => ({
   ...jest.requireActual('jotai'),
+  useAtom: () => [mockAtomValue, mockSetAtom],
   useAtomValue: () => mockAtomValue,
   useSetAtom: () => mockSetAtom,
 }));
