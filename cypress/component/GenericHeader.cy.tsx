@@ -56,7 +56,7 @@ describe('GenericHeader', () => {
 
     it('renders the dashboard name', () => {
       mountHeader();
-      cy.contains('h2', 'My Dashboard').should('be.visible');
+      cy.contains('h1', 'My Dashboard').should('be.visible');
     });
 
     it('renders "Add widgets" button', () => {
@@ -91,7 +91,7 @@ describe('GenericHeader', () => {
       it('hides the dashboard name heading in edit mode', () => {
         mountHeader();
         cy.get('button[aria-label="Edit dashboard name"]').click();
-        cy.contains('h2', 'My Dashboard').should('not.exist');
+        cy.contains('h1', 'My Dashboard').should('not.exist');
       });
 
       it('calls onRenameDashboard with new name on confirm click', () => {
@@ -122,7 +122,7 @@ describe('GenericHeader', () => {
         cy.get('input[aria-label="Dashboard name"]').clear().type('Something else');
         cy.get('button[aria-label="Cancel editing"]').click();
 
-        cy.contains('h2', 'My Dashboard').should('be.visible');
+        cy.contains('h1', 'My Dashboard').should('be.visible');
         cy.get('input[aria-label="Dashboard name"]').should('not.exist');
       });
 
@@ -132,7 +132,7 @@ describe('GenericHeader', () => {
         cy.get('button[aria-label="Edit dashboard name"]').click();
         cy.get('input[aria-label="Dashboard name"]').clear().type('Something else{esc}');
 
-        cy.contains('h2', 'My Dashboard').should('be.visible');
+        cy.contains('h1', 'My Dashboard').should('be.visible');
         cy.get('input[aria-label="Dashboard name"]').should('not.exist');
       });
 

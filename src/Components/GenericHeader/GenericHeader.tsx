@@ -73,6 +73,7 @@ const GenericHeader = ({ dashboard, onRenameDashboard }: GenericHeaderProps) => 
 
   return (
     <PageHeader
+      ouiaId="Dashboard-hub-title-generic-page"
       title={titleContent}
       actionMenu={
         <ActionList>

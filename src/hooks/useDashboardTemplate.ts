@@ -110,15 +110,7 @@ const useDashboardTemplate = (id: number) => {
     [id]
   );
 
-<<<<<<< HEAD
-  return { template, saveTemplate, isLoaded, dashboard, error };
-=======
-<<<<<<< HEAD
-  return { template, saveTemplate, isLoaded, dashboardName, error };
-=======
   return { template, saveTemplate, renameDashboard, isLoaded, dashboard, error };
->>>>>>> 229c858 (feat: add inline editing for dashboard name)
->>>>>>> 9be2f2b (feat: add inline editing for dashboard name)
 };
 
 export default useDashboardTemplate;
