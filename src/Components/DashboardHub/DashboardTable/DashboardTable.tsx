@@ -3,7 +3,8 @@ import { Table, Tbody, Td, Th, ThProps, Thead, Tr } from '@patternfly/react-tabl
 import { ActionsColumn } from '@patternfly/react-table';
 import { Button, Content, TooltipPosition } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
-import { DashboardTemplate, setDefaultTemplate } from '../../../api/dashboard-templates';
+import { DashboardTemplate } from '../../../api/dashboard-templates';
+import { setDefaultDashboardAtom } from '../../../state/dashboardsAtom';
 import { CodeIcon, CopyIcon, EditAltIcon, HomeIcon, TrashIcon, UsersIcon } from '@patternfly/react-icons';
 import { useExportDashboard } from '../../../hooks/useExportDashboard';
 import { useDeleteDashboard } from '../../../hooks/useDeleteDashboard';
@@ -11,6 +12,7 @@ import { DeleteDashboardModal } from '../DeleteDashboardModal/DeleteDashboardMod
 import DateFormat from '@redhat-cloud-services/frontend-components/DateFormat';
 import { useFlag } from '@unleash/proxy-client-react';
 import { useAddNotification } from '../../../state/notificationsAtom';
+import { useSetAtom } from 'jotai';
 
 interface Dashboard {
   id: number;
@@ -32,10 +34,11 @@ export const ButtonCopy: React.FunctionComponent = () => {
 
 export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ dashboards, onRefetchDashboards }) => {
   const { exportDashboard, isLoading, error } = useExportDashboard();
-  const { deleteDashboard, isLoading: isDeleting } = useDeleteDashboard(onRefetchDashboards);
+  const { deleteDashboard, isLoading: isDeleting } = useDeleteDashboard();
   const [dashboardToDelete, setDashboardToDelete] = useState<Dashboard | null>(null);
   const isEnabledDelete = useFlag('platform.widget-layout.delete-dashboard');
   const addNotification = useAddNotification();
+  const setDefaultDashboard = useSetAtom(setDefaultDashboardAtom);
 
   // Map API data to table format
   const tableData: Dashboard[] = dashboards.map((dashboard) => ({
@@ -71,8 +74,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
   };
 
   const handleSetAsHomepage = async (dashboardId: number) => {
-    await setDefaultTemplate(dashboardId);
-    onRefetchDashboards();
+    await setDefaultDashboard(dashboardId);
   };
 
   // Sort dashboards by name

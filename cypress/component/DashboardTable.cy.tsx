@@ -213,12 +213,15 @@ describe('DashboardTable', () => {
         body: {},
       }).as('setDefault');
 
-      const refetchStub = cy.stub().as('refetch');
+      cy.intercept('GET', '/api/widget-layout/v1/', {
+        statusCode: 200,
+        body: mockDashboards,
+      }).as('getDashboards');
 
       cy.mount(
         <MemoryRouter>
           <FlagProvider unleashClient={createMockClient(false)} startClient={false}>
-            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={refetchStub} />
+            <DashboardTable dashboards={mockDashboards} onRefetchDashboards={cy.stub()} />
           </FlagProvider>
         </MemoryRouter>
       );
@@ -228,7 +231,7 @@ describe('DashboardTable', () => {
       cy.get('[role="menuitem"]').contains('Set as homepage').click();
 
       cy.wait('@setDefault');
-      cy.get('@refetch').should('have.been.calledOnce');
+      cy.wait('@getDashboards');
     });
   });
 
