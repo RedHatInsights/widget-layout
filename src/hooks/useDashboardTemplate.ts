@@ -12,6 +12,8 @@ import {
   patchDashboardTemplateHub,
   widgetIdSeparator,
 } from '../api/dashboard-templates';
+import { useSetAtom } from 'jotai';
+import { renameDashboardAtom } from '../state/dashboardsAtom';
 
 const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplateHub, 1500, {
   onlyResolvesLast: true,
@@ -48,6 +50,7 @@ const useDashboardTemplate = (id: number) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [dashboard, setDashboard] = useState<DashboardTemplate>();
+  const renameDashboardInList = useSetAtom(renameDashboardAtom);
   // widget mapping
 
   useEffect(() => {
@@ -71,6 +74,14 @@ const useDashboardTemplate = (id: number) => {
 
     fetchTemplate();
   }, [id]);
+
+  const renameDashboard = useCallback(
+    async (dashboardName: string) => {
+      await renameDashboardInList({ id, dashboardName });
+      setDashboard((prev) => (prev ? { ...prev, dashboardName } : prev));
+    },
+    [id, renameDashboardInList]
+  );
 
   const saveTemplate = useCallback(
     async (newTemplate: ExtendedTemplateConfig) => {
@@ -99,7 +110,7 @@ const useDashboardTemplate = (id: number) => {
     [id]
   );
 
-  return { template, saveTemplate, isLoaded, dashboard, error };
+  return { template, saveTemplate, renameDashboard, isLoaded, dashboard, error };
 };
 
 export default useDashboardTemplate;

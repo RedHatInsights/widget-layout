@@ -128,3 +128,67 @@ test.describe('Set Dashboard as Homepage from Generic Page', () => {
     expect(await hasHomeIcon(page, defaultName)).toBe(false);
   });
 });
+
+test.describe('Inline Editing Dashboard Name', () => {
+  test.beforeEach(async ({ page }) => {
+    await disableCookiePrompt(page);
+  });
+
+  test('should rename a dashboard and see the new name on the generic page and in Dashboard Hub', async ({ page }) => {
+    await navigateToDashboardHub(page);
+
+    const { nonDefaultName } = await findDashboardNames(page);
+    if (!nonDefaultName) {
+      test.skip(true, 'No non-default dashboard found to test with');
+      return;
+    }
+
+    const newName = `Renamed ${Date.now()}`;
+
+    await navigateToGenericDashboard(page, nonDefaultName);
+
+    await page.getByRole('button', { name: 'Edit dashboard name' }).click();
+    const input = page.getByRole('textbox', { name: 'Dashboard name' });
+    await expect(input).toBeVisible();
+    await input.clear();
+    await input.fill(newName);
+    await page.getByRole('button', { name: 'Confirm name' }).click();
+
+    await expect(input).not.toBeVisible({ timeout: 5000 });
+    await expect(page.locator('h1').filter({ hasText: newName })).toBeVisible({ timeout: 5000 });
+
+    await navigateToDashboardHub(page);
+    await expect(page.getByRole('link', { name: newName })).toBeVisible({ timeout: 10000 });
+
+    // Restore the original name
+    await navigateToGenericDashboard(page, newName);
+    await page.getByRole('button', { name: 'Edit dashboard name' }).click();
+    const restoreInput = page.getByRole('textbox', { name: 'Dashboard name' });
+    await restoreInput.clear();
+    await restoreInput.fill(nonDefaultName);
+    await page.getByRole('button', { name: 'Confirm name' }).click();
+    await expect(restoreInput).not.toBeVisible({ timeout: 5000 });
+  });
+
+  test('should cancel editing and keep the original name', async ({ page }) => {
+    await navigateToDashboardHub(page);
+
+    const { nonDefaultName } = await findDashboardNames(page);
+    if (!nonDefaultName) {
+      test.skip(true, 'No non-default dashboard found to test with');
+      return;
+    }
+
+    await navigateToGenericDashboard(page, nonDefaultName);
+
+    await page.getByRole('button', { name: 'Edit dashboard name' }).click();
+    const input = page.getByRole('textbox', { name: 'Dashboard name' });
+    await expect(input).toBeVisible();
+    await input.clear();
+    await input.fill('Should Not Be Saved');
+    await page.getByRole('button', { name: 'Cancel editing' }).click();
+
+    await expect(input).not.toBeVisible({ timeout: 5000 });
+    await expect(page.locator('h1').filter({ hasText: nonDefaultName })).toBeVisible({ timeout: 5000 });
+  });
+});
