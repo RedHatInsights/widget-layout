@@ -16,16 +16,18 @@ import React, { useEffect } from 'react';
 import { CopyIcon } from '@patternfly/react-icons';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { useDuplicateDashboard } from '../../hooks/useDuplicateDashboard';
-import { DashboardTemplate } from '../../api/dashboard-templates';
+import { useAtomValue } from 'jotai';
+import { dashboardsAtom } from '../../state/dashboardsAtom';
 
 interface DuplicateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  dashboards: DashboardTemplate[];
+  preselectedDashboardId?: number | null;
 }
 
-export const DuplicateModal: React.FunctionComponent<DuplicateModalProps> = ({ isOpen, onClose, onSuccess, dashboards }) => {
+export const DuplicateModal: React.FunctionComponent<DuplicateModalProps> = ({ isOpen, onClose, onSuccess, preselectedDashboardId }) => {
+  const dashboards = useAtomValue(dashboardsAtom);
   const {
     name,
     setName,
@@ -66,6 +68,9 @@ export const DuplicateModal: React.FunctionComponent<DuplicateModalProps> = ({ i
   };
 
   useEffect(() => {
+    if (isOpen && preselectedDashboardId != null) {
+      setSelectedDashboardId(preselectedDashboardId);
+    }
     if (!isOpen) {
       reset();
     }

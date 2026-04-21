@@ -6,6 +6,7 @@ jest.mock('../../api/dashboard-templates', () => ({
   ...jest.requireActual('../../api/dashboard-templates'),
   importDashboardTemplate: jest.fn(),
   setDefaultTemplate: jest.fn(),
+  getUsersDashboards: jest.fn().mockResolvedValue([]),
 }));
 
 const mockedImportDashboardTemplate = importDashboardTemplate as jest.MockedFunction<typeof importDashboardTemplate>;

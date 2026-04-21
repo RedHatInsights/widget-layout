@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { DashboardTemplate, DashboardTemplatesError, TemplateConfig, importDashboardTemplate, setDefaultTemplate } from '../api/dashboard-templates';
+import { DashboardTemplate, DashboardTemplatesError, TemplateConfig } from '../api/dashboard-templates';
+import { useSetAtom } from 'jotai';
+import { createDashboardAtom } from '../state/dashboardsAtom';
 
 interface CreateBlankDashboardState {
   name: string;
@@ -32,6 +34,7 @@ type UseCreateBlankDashboardReturn = CreateBlankDashboardState & {
 
 export const useCreateBlankDashboard = (): UseCreateBlankDashboardReturn => {
   const [state, setState] = useState<CreateBlankDashboardState>(initState);
+  const create = useSetAtom(createDashboardAtom);
 
   const isFormValid = state.name.trim() !== '';
 
@@ -49,18 +52,15 @@ export const useCreateBlankDashboard = (): UseCreateBlankDashboardReturn => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const result = await importDashboardTemplate({
+      const result = await create({
         dashboardName: state.name,
         templateBase: {
           name: 'landingPage',
           displayName: 'Landing Page',
         },
         templateConfig: blankTemplateConfig,
+        setAsHomepage: state.setAsHomepage,
       });
-
-      if (state.setAsHomepage) {
-        await setDefaultTemplate(result.id);
-      }
 
       setState((prev) => ({ ...prev, isLoading: false }));
       return result;

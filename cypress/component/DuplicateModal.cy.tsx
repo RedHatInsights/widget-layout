@@ -1,13 +1,23 @@
 import React from 'react';
 import { DuplicateModal } from '../../src/Components/DuplicateModal/DuplicateModal';
 import Portal from '@redhat-cloud-services/frontend-components-notifications/Portal';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { notificationsAtom, useRemoveNotification } from '../../src/state/notificationsAtom';
+import { dashboardsAtom } from '../../src/state/dashboardsAtom';
+import { DashboardTemplate } from '../../src/api/dashboard-templates';
 
 const NotificationPortal = () => {
   const notifications = useAtomValue(notificationsAtom);
   const removeNotification = useRemoveNotification();
   return <Portal notifications={notifications} removeNotification={removeNotification} />;
+};
+
+const HydrateDashboards: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const set = useSetAtom(dashboardsAtom);
+  React.useEffect(() => {
+    set(mockDashboards as DashboardTemplate[]);
+  }, []);
+  return <>{children}</>;
 };
 
 const mockDashboards = [
@@ -50,29 +60,29 @@ const mockCopyResponse = {
 describe('DuplicateModal', () => {
 
   it('renders modal with title when isOpen=true', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} />);
     cy.contains('Duplicate existing dashboard').should('be.visible');
   });
 
   it('does not render modal content when isOpen=false', () => {
-    cy.mount(<DuplicateModal isOpen={false} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<DuplicateModal isOpen={false} onClose={cy.stub()} />);
     cy.contains('Duplicate existing dashboard').should('not.exist');
   });
 
   it('shows "Duplicate dashboard" button disabled when form is empty', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} />);
     cy.contains('button', 'Duplicate dashboard').should('be.visible').and('be.disabled');
   });
 
   it('Cancel button calls onClose', () => {
     const onClose = cy.stub().as('onClose');
-    cy.mount(<DuplicateModal isOpen={true} onClose={onClose} dashboards={mockDashboards} />);
+    cy.mount(<DuplicateModal isOpen={true} onClose={onClose} />);
     cy.contains('button', 'Cancel').click();
     cy.get('@onClose').should('have.been.calledOnce');
   });
 
   it('dashboard name input is present and can be typed into', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} />);
     cy.get('#duplicate-dashboard-name')
       .should('be.visible')
       .type('My Duplicate')
@@ -80,14 +90,14 @@ describe('DuplicateModal', () => {
   });
 
   it('form labels are correct', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} />);
     cy.contains('label', 'Select existing dashboard for duplication').should('be.visible');
     cy.contains('label', 'New dashboard name').should('be.visible');
     cy.contains('Set as homepage').should('be.visible');
   });
 
   it('checkbox is unchecked by default and can be toggled', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} />);
     cy.get('#set-as-homepage').should('not.be.checked');
     cy.get('#set-as-homepage').check();
     cy.get('#set-as-homepage').should('be.checked');
@@ -96,7 +106,7 @@ describe('DuplicateModal', () => {
   });
 
   it('dashboard select dropdown shows mocked dashboards', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<HydrateDashboards><DuplicateModal isOpen={true} onClose={cy.stub()} /></HydrateDashboards>);
     cy.get('select[aria-label="Select a dashboard"]').within(() => {
       cy.get('option').should('have.length', 3); // placeholder + 2 dashboards
       cy.contains('option', 'Dashboard One').should('exist');
@@ -105,32 +115,39 @@ describe('DuplicateModal', () => {
   });
 
   it('enables "Duplicate dashboard" button when both dashboard is selected AND name is entered', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<HydrateDashboards><DuplicateModal isOpen={true} onClose={cy.stub()} /></HydrateDashboards>);
     cy.get('select[aria-label="Select a dashboard"]').select('1');
     cy.get('#duplicate-dashboard-name').type('My Duplicate');
     cy.contains('button', 'Duplicate dashboard').should('not.be.disabled');
   });
 
   it('keeps button disabled when only name is entered (no dashboard selected)', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<HydrateDashboards><DuplicateModal isOpen={true} onClose={cy.stub()} /></HydrateDashboards>);
     cy.get('#duplicate-dashboard-name').type('My Duplicate');
     cy.contains('button', 'Duplicate dashboard').should('be.disabled');
   });
 
   it('keeps button disabled when only dashboard is selected (no name)', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<HydrateDashboards><DuplicateModal isOpen={true} onClose={cy.stub()} /></HydrateDashboards>);
     cy.get('select[aria-label="Select a dashboard"]').select('1');
     cy.contains('button', 'Duplicate dashboard').should('be.disabled');
   });
 
   it('keeps button disabled when name is whitespace only', () => {
-    cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+    cy.mount(<HydrateDashboards><DuplicateModal isOpen={true} onClose={cy.stub()} /></HydrateDashboards>);
     cy.get('select[aria-label="Select a dashboard"]').select('1');
     cy.get('#duplicate-dashboard-name').type('   ');
     cy.contains('button', 'Duplicate dashboard').should('be.disabled');
   });
 
   describe('Successful duplication', () => {
+    beforeEach(() => {
+      cy.intercept('GET', '/api/widget-layout/v1/', {
+        statusCode: 200,
+        body: { data: [mockCopyResponse] },
+      }).as('getDashboards');
+    });
+
     it('calls copy API, shows success notification, calls onSuccess and onClose', () => {
       cy.intercept('POST', '/api/widget-layout/v1/1/copy', {
         statusCode: 200,
@@ -141,10 +158,10 @@ describe('DuplicateModal', () => {
       const onSuccess = cy.stub().as('onSuccess');
 
       cy.mount(
-        <>
+        <HydrateDashboards>
           <NotificationPortal />
-          <DuplicateModal isOpen={true} onClose={onClose} onSuccess={onSuccess} dashboards={mockDashboards} />
-        </>
+          <DuplicateModal isOpen={true} onClose={onClose} onSuccess={onSuccess} />
+        </HydrateDashboards>
       );
 
       cy.get('select[aria-label="Select a dashboard"]').select('1');
@@ -172,10 +189,10 @@ describe('DuplicateModal', () => {
       const onClose = cy.stub().as('onClose');
 
       cy.mount(
-        <>
+        <HydrateDashboards>
           <NotificationPortal />
-          <DuplicateModal isOpen={true} onClose={onClose} onSuccess={cy.stub()} dashboards={mockDashboards} />
-        </>
+          <DuplicateModal isOpen={true} onClose={onClose} onSuccess={cy.stub()} />
+        </HydrateDashboards>
       );
 
       cy.get('select[aria-label="Select a dashboard"]').select('1');
@@ -201,10 +218,10 @@ describe('DuplicateModal', () => {
       }).as('setDefault');
 
       cy.mount(
-        <>
+        <HydrateDashboards>
           <NotificationPortal />
-          <DuplicateModal isOpen={true} onClose={cy.stub()} onSuccess={cy.stub()} dashboards={mockDashboards} />
-        </>
+          <DuplicateModal isOpen={true} onClose={cy.stub()} onSuccess={cy.stub()} />
+        </HydrateDashboards>
       );
 
       cy.get('select[aria-label="Select a dashboard"]').select('1');
@@ -226,7 +243,7 @@ describe('DuplicateModal', () => {
         delay: 1000,
       }).as('copyDashboard');
 
-      cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+      cy.mount(<HydrateDashboards><DuplicateModal isOpen={true} onClose={cy.stub()} /></HydrateDashboards>);
 
       cy.get('select[aria-label="Select a dashboard"]').select('1');
       cy.get('#duplicate-dashboard-name').type('My Duplicate');
@@ -245,7 +262,7 @@ describe('DuplicateModal', () => {
         body: 'Internal Server Error',
       }).as('copyDashboard');
 
-      cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+      cy.mount(<HydrateDashboards><DuplicateModal isOpen={true} onClose={cy.stub()} /></HydrateDashboards>);
 
       cy.get('select[aria-label="Select a dashboard"]').select('1');
       cy.get('#duplicate-dashboard-name').type('My Duplicate');
@@ -262,7 +279,7 @@ describe('DuplicateModal', () => {
         body: 'Bad Request',
       }).as('copyDashboard');
 
-      cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+      cy.mount(<HydrateDashboards><DuplicateModal isOpen={true} onClose={cy.stub()} /></HydrateDashboards>);
 
       cy.get('select[aria-label="Select a dashboard"]').select('1');
       cy.get('#duplicate-dashboard-name').type('My Duplicate');
@@ -279,7 +296,7 @@ describe('DuplicateModal', () => {
         body: 'Internal Server Error',
       }).as('copyDashboard');
 
-      cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} dashboards={mockDashboards} />);
+      cy.mount(<HydrateDashboards><DuplicateModal isOpen={true} onClose={cy.stub()} /></HydrateDashboards>);
 
       cy.get('select[aria-label="Select a dashboard"]').select('1');
       cy.get('#duplicate-dashboard-name').type('My Duplicate');
