@@ -24,7 +24,7 @@ import {
 } from '@patternfly/react-core';
 import React, { useRef, useState } from 'react';
 import { CodeIcon, CopyIcon, EditAltIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon } from '@patternfly/react-icons';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { templateIdAtom } from '../../state/templateAtom';
 import { resetDashboardTemplate } from '../../api/dashboard-templates';
@@ -33,13 +33,12 @@ import { WarningModal } from '@patternfly/react-component-groups';
 import { Link } from 'react-router-dom';
 import { useFlag } from '@unleash/proxy-client-react';
 import useGetDashboards from '../../hooks/useGetDashboards';
-import { dashboardsAtom } from '../../state/dashboardsAtom';
 import { CreateModal } from '../CreateModal/CreateModal';
 import { ImportModal } from '../DashboardHub/ImportModal/ImportModal';
 import { DuplicateModal } from '../DuplicateModal/DuplicateModal';
 
 export const KebabDropdown = () => {
-  const dashboards = useAtomValue(dashboardsAtom);
+  const { dashboards } = useGetDashboards();
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -265,7 +264,6 @@ const Header = () => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   const isDashboardHub = useFlag('platform.widget-layout.dashboard-dropdown');
-  useGetDashboards();
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>

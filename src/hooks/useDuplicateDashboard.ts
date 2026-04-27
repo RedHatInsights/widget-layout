@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DashboardTemplate, DashboardTemplatesError, copyDashboardTemplate, setDefaultTemplate } from '../api/dashboard-templates';
+import { DashboardTemplate, DashboardTemplatesError } from '../api/dashboard-templates';
 import { useSetAtom } from 'jotai';
 import { duplicateDashboardAtom } from '../state/dashboardsAtom';
 
@@ -50,7 +50,6 @@ export const useDuplicateDashboard = (): UseDuplicateDashboardReturn => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      //const newDashboard = await copyDashboardTemplate(state.selectedDashboardId, { dashboardName: state.name });
       const newDashboard = await create({ id: state.selectedDashboardId, dashboardName: state.name, setAsHomepage: state.setAsHomepage });
 
       setState((prev) => ({ ...prev, isLoading: false }));
