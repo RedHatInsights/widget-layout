@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { DashboardTemplate, DashboardTemplatesError, copyDashboardTemplate, setDefaultTemplate } from '../api/dashboard-templates';
+import { DashboardTemplate, DashboardTemplatesError } from '../api/dashboard-templates';
+import { useSetAtom } from 'jotai';
+import { duplicateDashboardAtom } from '../state/dashboardsAtom';
 
 interface DuplicateDashboardState {
   name: string;
@@ -28,6 +30,7 @@ type UseDuplicateDashboardReturn = DuplicateDashboardState & {
 
 export const useDuplicateDashboard = (): UseDuplicateDashboardReturn => {
   const [state, setState] = useState<DuplicateDashboardState>(initState);
+  const create = useSetAtom(duplicateDashboardAtom);
 
   const isFormValid = state.name.trim() !== '' && state.selectedDashboardId !== null;
 
@@ -47,11 +50,7 @@ export const useDuplicateDashboard = (): UseDuplicateDashboardReturn => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const newDashboard = await copyDashboardTemplate(state.selectedDashboardId, { dashboardName: state.name });
-
-      if (state.setAsHomepage) {
-        await setDefaultTemplate(newDashboard.id);
-      }
+      const newDashboard = await create({ id: state.selectedDashboardId, dashboardName: state.name, setAsHomepage: state.setAsHomepage });
 
       setState((prev) => ({ ...prev, isLoading: false }));
       return newDashboard;

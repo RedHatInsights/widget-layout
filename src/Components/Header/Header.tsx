@@ -33,10 +33,16 @@ import { WarningModal } from '@patternfly/react-component-groups';
 import { Link } from 'react-router-dom';
 import { useFlag } from '@unleash/proxy-client-react';
 import useGetDashboards from '../../hooks/useGetDashboards';
-import { DashboardTemplate } from '../../api/dashboard-templates';
+import { CreateModal } from '../CreateModal/CreateModal';
+import { ImportModal } from '../DashboardHub/ImportModal/ImportModal';
+import { DuplicateModal } from '../DuplicateModal/DuplicateModal';
 
-export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] }) => {
+export const KebabDropdown = () => {
+  const { dashboards } = useGetDashboards();
   const [isOpen, setIsOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
   const [drilldownState, setDrilldownState] = useState({
     menuDrilledIn: [] as string[],
     drilldownPath: [] as string[],
@@ -100,7 +106,7 @@ export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] 
       onGetMenuHeight={setHeight}
       ref={menuRef}
     >
-      <MenuContent menuHeight={`${menuHeights[drilldownState.activeMenu]}px`}>
+      <MenuContent menuHeight={drilldownState.activeMenu !== 'kebab-rootMenu' ? `${menuHeights[drilldownState.activeMenu]}px` : undefined}>
         <MenuList>
           {dashboards.length > 0 && (
             <>
@@ -137,13 +143,34 @@ export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] 
                   Create new dashboard
                 </MenuItem>
                 <Divider component="li" />
-                <MenuItem itemId="share-dashboard" icon={<ThIcon />} isDisabled>
+                <MenuItem
+                  itemId="create-blank"
+                  icon={<ThIcon />}
+                  onClick={() => {
+                    setIsCreateModalOpen(true);
+                    setIsOpen(false);
+                  }}
+                >
                   Create from blank
                 </MenuItem>
-                <MenuItem itemId="copy-config" icon={<CodeIcon />} isDisabled>
+                <MenuItem
+                  itemId="import-config"
+                  icon={<CodeIcon />}
+                  onClick={() => {
+                    setIsImportModalOpen(true);
+                    setIsOpen(false);
+                  }}
+                >
                   Import from config string
                 </MenuItem>
-                <MenuItem itemId="duplicate-dashboard" icon={<CopyIcon />} isDisabled>
+                <MenuItem
+                  itemId="duplicate-dashboard"
+                  icon={<CopyIcon />}
+                  onClick={() => {
+                    setIsDuplicateModalOpen(true);
+                    setIsOpen(false);
+                  }}
+                >
                   Duplicate existing
                 </MenuItem>
               </DrilldownMenu>
@@ -161,15 +188,20 @@ export const KebabDropdown = ({ dashboards }: { dashboards: DashboardTemplate[] 
   );
 
   return (
-    <MenuContainer
-      isOpen={isOpen}
-      onOpenChange={(isOpen) => setIsOpen(isOpen)}
-      menu={menu}
-      menuRef={menuRef}
-      toggle={toggle}
-      toggleRef={toggleRef}
-      popperProps={{ position: 'end' }}
-    />
+    <>
+      <MenuContainer
+        isOpen={isOpen}
+        onOpenChange={(isOpen) => setIsOpen(isOpen)}
+        menu={menu}
+        menuRef={menuRef}
+        toggle={toggle}
+        toggleRef={toggleRef}
+        popperProps={{ position: 'end' }}
+      />
+      <CreateModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+      <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
+      <DuplicateModal isOpen={isDuplicateModalOpen} onClose={() => setIsDuplicateModalOpen(false)} />
+    </>
   );
 };
 
@@ -232,7 +264,6 @@ const Header = () => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   const isDashboardHub = useFlag('platform.widget-layout.dashboard-dropdown');
-  const { dashboards } = useGetDashboards();
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
@@ -250,7 +281,7 @@ const Header = () => {
               <Controls />
               {isDashboardHub && (
                 <ToolbarItem>
-                  <KebabDropdown dashboards={dashboards} />
+                  <KebabDropdown />
                 </ToolbarItem>
               )}
             </ToolbarContent>

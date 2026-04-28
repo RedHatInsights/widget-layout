@@ -1,7 +1,39 @@
 import React from 'react';
 import { KebabDropdown } from '../../src/Components/Header/Header';
 import { MemoryRouter } from 'react-router-dom';
+import { ScalprumContext, ScalprumState } from '@scalprum/react-core';
 import { DashboardTemplate } from '../../src/api/dashboard-templates';
+import { useSetAtom } from 'jotai';
+import { dashboardsAtom } from '../../src/state/dashboardsAtom';
+
+const scalprumValue = {                                                                                                                                                                                                        
+  initialized: true,                                                                                                                                                                                                           
+  config: {},                                                                                                                                                                                                                  
+  pluginStore: {},
+  api: {                                                                                                                                                                                                                       
+    chrome: {   
+      auth: {
+        getUser: () => Promise.resolve({                                                                                                                                                                                               
+          entitlements: {},  
+          identity: {
+            org_id: '123',
+            type: 'User',                                                                                                                                                                                                              
+            user: {
+              username: 'test-user',                                                                                                                                                                                                   
+              email: 'test@test.com',
+              first_name: 'Test',                                                                                                                                                                                                      
+              last_name: 'User',
+              is_active: true,                                                                                                                                                                                                         
+              is_internal: false,
+              is_org_admin: false,                                                                                                                                                                                                     
+              locale: 'en_US',
+            },                                                                                                                                                                                                                         
+          },
+        }), 
+      },
+    },
+  },
+} as unknown as ScalprumState;
 
 const mockDashboards: DashboardTemplate[] = [
   {
@@ -17,14 +49,26 @@ const mockDashboards: DashboardTemplate[] = [
   },
 ];
 
+const HydrateDashboards: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const set = useSetAtom(dashboardsAtom);
+  React.useEffect(() => {
+    set(mockDashboards);
+  }, []);
+  return <>{children}</>;
+};
+
 describe('KebabDropdown', () => {
   beforeEach(() => {
     cy.mount(
-      <MemoryRouter>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px' }}>
-          <KebabDropdown dashboards={mockDashboards} />
-        </div>
-      </MemoryRouter>
+      <ScalprumContext.Provider value={scalprumValue}>
+        <MemoryRouter>
+          <HydrateDashboards>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px' }}>
+              <KebabDropdown />
+            </div>
+          </HydrateDashboards>
+        </MemoryRouter>
+      </ScalprumContext.Provider>
     );
   });
 

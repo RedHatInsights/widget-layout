@@ -7,6 +7,7 @@ import { dashboardsAtom, setDefaultDashboardAtom } from '../../state/dashboardsA
 import { useExportDashboard } from '../../hooks/useExportDashboard';
 import { useDeleteDashboard } from '../../hooks/useDeleteDashboard';
 import { DeleteDashboardModal } from '../DashboardHub/DeleteDashboardModal/DeleteDashboardModal';
+import { DuplicateModal } from '../DuplicateModal/DuplicateModal';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,6 +18,7 @@ interface GenericHeaderDropdownProps {
 const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
   const dashboards = useAtomValue(dashboardsAtom);
   const isHomepage = dashboards.find((d) => d.id === dashboard.id)?.default ?? dashboard.default;
   const { exportDashboard } = useExportDashboard();
@@ -65,6 +67,7 @@ const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
 
   const handleDuplicate = () => {
     setIsOpen(false);
+    setIsDuplicateModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -103,8 +106,8 @@ const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
           >
             Set as homepage
           </DropdownItem>
-          <DropdownItem icon={<CopyIcon />} isDisabled onClick={handleDuplicate}>
-            Duplicate
+          <DropdownItem icon={<CopyIcon />} onClick={handleDuplicate}>
+            Duplicate dashboard
           </DropdownItem>
           <DropdownItem icon={<CodeIcon />} onClick={handleCopyConfiguration}>
             Copy configuration string
@@ -121,6 +124,7 @@ const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
           </DropdownItem>
         </DropdownList>
       </Dropdown>
+      <DuplicateModal isOpen={isDuplicateModalOpen} onClose={() => setIsDuplicateModalOpen(false)} preselectedDashboardId={dashboard.id} />
       <DeleteDashboardModal
         isOpen={isDeleteModalOpen}
         dashboardName={dashboard.dashboardName}

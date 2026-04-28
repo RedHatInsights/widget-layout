@@ -4,14 +4,12 @@ import { ImportModal } from '../ImportModal/ImportModal';
 import { CreateModal } from '../../CreateModal/CreateModal';
 import { DuplicateModal } from '../../DuplicateModal/DuplicateModal';
 import { CodeIcon, CopyIcon, ExternalLinkAltIcon, ThIcon } from '@patternfly/react-icons';
-import { DashboardTemplate } from '../../../api/dashboard-templates';
 
 interface CreateDashboardDropdownProps {
   onRefetchDashboards: () => void;
-  dashboards: DashboardTemplate[];
 }
 
-const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownProps> = ({ onRefetchDashboards, dashboards }) => {
+const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownProps> = ({ onRefetchDashboards }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -44,12 +42,7 @@ const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownPr
         </DropdownList>
       </Dropdown>
       <CreateModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSuccess={onRefetchDashboards} />
-      <DuplicateModal
-        isOpen={isDuplicateModalOpen}
-        onClose={() => setIsDuplicateModalOpen(false)}
-        onSuccess={onRefetchDashboards}
-        dashboards={dashboards}
-      />
+      <DuplicateModal isOpen={isDuplicateModalOpen} onClose={() => setIsDuplicateModalOpen(false)} onSuccess={onRefetchDashboards} />
       <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onSuccess={onRefetchDashboards} />
     </>
   );
@@ -57,10 +50,9 @@ const CreateDashboardDropdown: React.FunctionComponent<CreateDashboardDropdownPr
 
 interface HeaderProps {
   onRefetchDashboards: () => void;
-  dashboards: DashboardTemplate[];
 }
 
-const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards, dashboards }) => {
+const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards }) => {
   return (
     <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
@@ -77,7 +69,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards, das
         </FlexItem>
 
         <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
-          <CreateDashboardDropdown onRefetchDashboards={onRefetchDashboards} dashboards={dashboards} />
+          <CreateDashboardDropdown onRefetchDashboards={onRefetchDashboards} />
         </FlexItem>
       </Flex>
     </PageSection>

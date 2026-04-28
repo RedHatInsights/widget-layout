@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { importDashboardTemplate } from '../api/dashboard-templates';
 import { DashboardTemplate } from '../api/dashboard-templates';
+import { useSetAtom } from 'jotai';
+import { importDashboardAtom } from '../state/dashboardsAtom';
 
 interface ImportDashboardState {
   configString: string;
@@ -26,6 +27,7 @@ type UseImportDashboardReturn = ImportDashboardState & {
 
 export const useImportDashboard = (): UseImportDashboardReturn => {
   const [state, setState] = useState<ImportDashboardState>(initState);
+  const create = useSetAtom(importDashboardAtom);
 
   const isFormValid = state.configString.trim() !== '' && state.name.trim() !== '';
 
@@ -45,7 +47,7 @@ export const useImportDashboard = (): UseImportDashboardReturn => {
         dashboardName: state.name,
       };
 
-      const result = await importDashboardTemplate(requestData);
+      const result = await create(requestData);
 
       setState((prev) => ({ ...prev, isLoading: false }));
       return result;

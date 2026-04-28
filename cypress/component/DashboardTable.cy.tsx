@@ -215,7 +215,7 @@ describe('DashboardTable', () => {
 
       cy.intercept('GET', '/api/widget-layout/v1/', {
         statusCode: 200,
-        body: mockDashboards,
+        body: { data: mockDashboards },
       }).as('getDashboards');
 
       cy.mount(
@@ -354,6 +354,11 @@ describe('DashboardTable', () => {
         statusCode: 204,
         body: '',
       }).as('deleteDashboard');
+
+      cy.intercept('GET', '/api/widget-layout/v1/', {
+        statusCode: 200,
+        body: { data: mockDashboards },
+      }).as('getDashboards');
 
       const refetchStub = cy.stub();
 
