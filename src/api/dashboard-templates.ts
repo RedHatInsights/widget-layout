@@ -1,326 +1,108 @@
-import { LayoutItem } from 'react-grid-layout';
-import { ScalprumComponentProps } from '@scalprum/react-core';
-import { dropping_elem_id } from '../consts';
-import { VisibilityFunctions } from '@redhat-cloud-services/types';
+// import * as oldApi from './dashboard-templates-old';
+// import * as newApi from './dashboard-templates-new';
 
-const getRequestHeaders = () => ({
-  Accept: 'application/json',
-  'Content-Type': 'application/json',
-});
+// let mode: boolean | null = null;
+// let resolveReady: (value: boolean) => void;
+// const ready = new Promise<boolean>((resolve) => {
+//   resolveReady = resolve;
+// });
 
-export const widgetIdSeparator = '#';
+// export const setBackendMode = (isNew: boolean) => {
+//   mode = isNew;
+//   resolveReady(isNew);
+// };
 
-export type LayoutTypes = 'landingPage' | 'landing-landingPage';
+// const getMode = (): Promise<boolean> => {
+//   if (mode !== null) return Promise.resolve(mode);
+//   return ready;
+// };
 
-export type Variants = 'sm' | 'md' | 'lg' | 'xl';
+// ── Types ──
 
-export type LayoutWithTitle = LayoutItem & { title: string };
+export type {
+  LayoutTypes,
+  Variants,
+  LayoutWithTitle,
+  TemplateConfig,
+  PartialTemplateConfig,
+  ExtendedLayoutItem,
+  ExtendedTemplateConfig,
+  PartialExtendedTemplateConfig,
+  BaseTemplate,
+  DashboardTemplate,
+  ExportDashboardTemplate,
+  WidgetDefaults,
+  WidgetHeaderLink,
+  WidgetPermission,
+  WidgetConfiguration,
+  WidgetMapping,
+} from './dashboard-templates-new';
 
-export type TemplateConfig = {
-  [k in Variants]: LayoutWithTitle[];
-};
+export {
+  widgetIdSeparator,
+  DashboardTemplatesError,
+  getWidgetIdentifier,
+  getDefaultTemplate,
+  mapWidgetDefaults,
+  mapTemplateConfigToExtendedTemplateConfig,
+  extendLayout,
+} from './dashboard-templates-new';
 
-export type PartialTemplateConfig = Partial<TemplateConfig>;
+// // ── Flag-aware API functions ──
 
-// extended type the UI tracks but not the backend
-export type ExtendedLayoutItem = LayoutWithTitle & {
-  widgetType: string;
-  config?: WidgetConfiguration;
-  locked?: boolean;
-};
+// type OldApi = typeof oldApi;
 
-// extended type the UI tracks but not the backend
-export type ExtendedTemplateConfig = {
-  [k in Variants]: ExtendedLayoutItem[];
-};
+// function routed<K extends keyof OldApi>(name: K, isNew: boolean): OldApi[K] {
+//   return (async (...args: unknown[]) => {
+//     // const isNew = await getMode();
+//     const target = isNew ? newApi : oldApi;
+//     return (target as unknown as Record<string, (...a: unknown[]) => unknown>)[name](...args);
+//   }) as unknown as OldApi[K];
+// }
 
-// extended type the UI tracks but not the backend
-export type PartialExtendedTemplateConfig = Partial<ExtendedTemplateConfig>;
+// const layoutTypeMap: Record<string, string> = {
+//   landingPage: 'landing-landingPage',
+// };
 
-export type BaseTemplate = {
-  name: string;
-  displayName: string;
-  templateConfig: TemplateConfig;
-};
+// const mapLayoutType = (type?: oldApi.LayoutTypes): oldApi.LayoutTypes | undefined =>
+//   type ? ((layoutTypeMap[type] ?? type) as oldApi.LayoutTypes) : undefined;
 
-export type DashboardTemplate = {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  userIdentityID: number;
-  default: boolean;
-  templateBase: {
-    name: string;
-    displayName: string;
-  };
-  templateConfig: TemplateConfig;
-  dashboardName: string;
-};
+// export const getDashboardTemplate = routed('getDashboardTemplate');
+// export const getUsersDashboards = routed('getUsersDashboards');
+// export const getWidgetMapping = routed('getWidgetMapping');
+// export const resetDashboardTemplate = routed('resetDashboardTemplate');
+// export const patchDashboardTemplate = routed('patchDashboardTemplate');
+// export const patchDashboardTemplateHub = routed('patchDashboardTemplateHub');
+// export const deleteDashboardTemplate = routed('deleteDashboardTemplate');
+// export const deleteDashboardTemplateFromHub = routed('deleteDashboardTemplateFromHub');
+// export const importDashboardTemplate = routed('importDashboardTemplate');
+// export const exportDashboardTemplate = routed('exportDashboardTemplate');
+// export const copyDashboardTemplate = routed('copyDashboardTemplate');
+// export const setDefaultTemplate = routed('setDefaultTemplate');
 
-export type ExportDashboardTemplate = {
-  templateBase: {
-    name: string;
-    displayName: string;
-  };
-  templateConfig: TemplateConfig;
-};
+// // These two need manual handling for layout type mapping
+// export async function getBaseDashboardTemplate(): Promise<oldApi.BaseTemplate[]>;
+// export async function getBaseDashboardTemplate(type: oldApi.LayoutTypes): Promise<oldApi.BaseTemplate>;
+// export async function getBaseDashboardTemplate(type?: oldApi.LayoutTypes) {
+//   const isNew = await getMode();
+//   const mappedType = mapLayoutType(type);
+//   if (isNew) {
+//     return mappedType ? newApi.getBaseDashboardTemplate(mappedType) : newApi.getBaseDashboardTemplate();
+//   }
+//   return type ? oldApi.getBaseDashboardTemplate(type) : oldApi.getBaseDashboardTemplate();
+// }
 
-// TODO use dynamic-plugin-sdk CustomError as base class instead
-export class DashboardTemplatesError extends Error {
-  constructor(message: string, readonly status: number, readonly response: Response) {
-    super(message);
+// export async function getDashboardTemplates(): Promise<oldApi.DashboardTemplate[]>;
+// export async function getDashboardTemplates(type: oldApi.LayoutTypes): Promise<oldApi.DashboardTemplate[]>;
+// export async function getDashboardTemplates(type?: oldApi.LayoutTypes) {
+//   const isNew = await getMode();
+//   const mappedType = mapLayoutType(type);
+//   if (isNew) {
+//     return mappedType ? newApi.getDashboardTemplates(mappedType) : newApi.getDashboardTemplates();
+//   }
+//   return type ? oldApi.getDashboardTemplates(type) : oldApi.getDashboardTemplates();
+// }
 
-    Object.defineProperty(this, 'name', {
-      value: new.target.name,
-      configurable: true,
-    });
+// // ── New-backend-only functions ──
 
-    if (typeof Error.captureStackTrace === 'function') {
-      Error.captureStackTrace(this, this.constructor);
-    } else {
-      this.stack = new Error(message).stack;
-    }
-  }
-}
-
-export type WidgetDefaults = {
-  w: number;
-  h: number;
-  maxH: number;
-  minH: number;
-  minW?: number;
-};
-
-export type WidgetHeaderLink = {
-  title?: string;
-  href?: string;
-};
-
-type VisibilityFunctionKeys = keyof VisibilityFunctions;
-
-export type WidgetPermission = {
-  method: VisibilityFunctionKeys;
-  args?: Parameters<VisibilityFunctions[VisibilityFunctionKeys]>;
-};
-
-export type WidgetConfiguration = {
-  icon?: string;
-  headerLink?: WidgetHeaderLink;
-  title?: string;
-  permissions?: WidgetPermission[];
-};
-
-export type WidgetMapping = {
-  [key: string]: Pick<ScalprumComponentProps, 'scope' | 'module' | 'importName'> & {
-    defaults: WidgetDefaults;
-    config?: WidgetConfiguration;
-  };
-};
-
-const handleErrors = (resp: Response) => {
-  if (!resp.ok) {
-    throw new DashboardTemplatesError('chrome-service dashboard-templates API fetch error', resp.status, resp);
-  }
-};
-
-export const getWidgetIdentifier = (widgetType: string, uniqueId: string = crypto.randomUUID()) => {
-  return `${widgetType}${widgetIdSeparator}${uniqueId}`;
-};
-
-export const getDashboardTemplate = async (templateId: number): Promise<DashboardTemplate> => {
-  const resp = await fetch(`/api/widget-layout/v1/${templateId}`, {
-    method: 'GET',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json;
-};
-
-export async function getBaseDashboardTemplate(): Promise<BaseTemplate[]>;
-export async function getBaseDashboardTemplate(type: LayoutTypes): Promise<BaseTemplate>;
-export async function getBaseDashboardTemplate(type?: LayoutTypes): Promise<BaseTemplate | BaseTemplate[]> {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/base-template${type ? `?dashboard=${type}` : ''}`, {
-    method: 'GET',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json.data;
-}
-
-// Returns multiple templates for a user (user can have multiple template copies) - we will render the one marked default: true by default
-export async function getDashboardTemplates(): Promise<DashboardTemplate[]>;
-export async function getDashboardTemplates(type: LayoutTypes): Promise<DashboardTemplate[]>;
-export async function getDashboardTemplates(type?: LayoutTypes): Promise<DashboardTemplate | DashboardTemplate[]> {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates${type ? `?dashboard=${type}` : ''}`, {
-    method: 'GET',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json.data;
-}
-
-// Returns user's dashboards
-export async function getUsersDashboards(): Promise<DashboardTemplate[]> {
-  const resp = await fetch(`/api/widget-layout/v1/`, {
-    method: 'GET',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json.data;
-}
-
-export async function getWidgetMapping(): Promise<WidgetMapping> {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/widget-mapping`, {
-    method: 'GET',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json.data;
-}
-
-export const resetDashboardTemplate = async (templateId: number): Promise<DashboardTemplate> => {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}/reset`, {
-    method: 'POST',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json.data;
-};
-
-export const patchDashboardTemplate = async (
-  templateId: DashboardTemplate['id'],
-  data: { templateConfig: PartialTemplateConfig }
-): Promise<DashboardTemplate> => {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}`, {
-    method: 'PATCH',
-    headers: getRequestHeaders(),
-    body: JSON.stringify(data),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json.data;
-};
-
-export const patchDashboardTemplateHub = async (
-  templateId: DashboardTemplate['id'],
-  data: { templateConfig: PartialTemplateConfig }
-): Promise<DashboardTemplate> => {
-  const resp = await fetch(`/api/widget-layout/v1/${templateId}`, {
-    method: 'PATCH',
-    headers: getRequestHeaders(),
-    body: JSON.stringify(data),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json.data;
-};
-
-export const deleteDashboardTemplate = async (templateId: DashboardTemplate['id']): Promise<boolean> => {
-  const resp = await fetch(`/api/chrome-service/v1/dashboard-templates/${templateId}`, {
-    method: 'DELETE',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  return resp.status === 204;
-};
-
-export const deleteDashboardTemplateFromHub = async (templateId: DashboardTemplate['id']): Promise<boolean> => {
-  const resp = await fetch(`/api/widget-layout/v1/${templateId}`, {
-    method: 'DELETE',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  return resp.status === 204;
-};
-
-export const importDashboardTemplate = async (data: {
-  dashboardName: string;
-  templateBase: {
-    name: string;
-    displayName: string;
-  };
-  templateConfig: TemplateConfig;
-}): Promise<DashboardTemplate> => {
-  const resp = await fetch(`/api/widget-layout/v1/import`, {
-    method: 'POST',
-    headers: getRequestHeaders(),
-    body: JSON.stringify(data),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json;
-};
-
-export const exportDashboardTemplate = async (templateId: number): Promise<ExportDashboardTemplate> => {
-  const resp = await fetch(`/api/widget-layout/v1/${templateId}/export`, {
-    method: 'GET',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json;
-};
-
-export const copyDashboardTemplate = async (templateId: DashboardTemplate['id'], data: { dashboardName: string }): Promise<DashboardTemplate> => {
-  const resp = await fetch(`/api/widget-layout/v1/${templateId}/copy`, {
-    method: 'POST',
-    headers: getRequestHeaders(),
-    body: JSON.stringify(data),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json;
-};
-
-export const getDefaultTemplate = (templates: DashboardTemplate[]): DashboardTemplate | undefined => {
-  return templates.find((itm) => itm.default === true);
-};
-
-export const setDefaultTemplate = async (templateId: DashboardTemplate['id']): Promise<DashboardTemplate> => {
-  const resp = await fetch(`/api/widget-layout/v1/${templateId}/default`, {
-    method: 'POST',
-    headers: getRequestHeaders(),
-  });
-  handleErrors(resp);
-  const json = await resp.json();
-  return json;
-};
-
-export const mapWidgetDefaults = (id: string): [string, string] => {
-  const [widgetType, i] = id.split(widgetIdSeparator);
-  return [widgetType, i];
-};
-
-// Returns template enhanced with widgetTypes
-export const mapTemplateConfigToExtendedTemplateConfig = (templateConfig: TemplateConfig): ExtendedTemplateConfig => {
-  const result: ExtendedTemplateConfig = { sm: [], md: [], lg: [], xl: [] };
-  (Object.keys(templateConfig) as Variants[]).forEach((key) => {
-    result[key] = templateConfig[key].map(
-      (layoutWithTitle: LayoutWithTitle): ExtendedLayoutItem => ({
-        ...layoutWithTitle,
-        widgetType: mapWidgetDefaults(layoutWithTitle.i)[0],
-      })
-    );
-  });
-  return result;
-};
-
-export const extendLayout = (extendedTemplateConfig: ExtendedTemplateConfig): ExtendedTemplateConfig => {
-  const result: ExtendedTemplateConfig = { sm: [], md: [], lg: [], xl: [] };
-  (Object.keys(extendedTemplateConfig) as Variants[]).forEach((key) => {
-    result[key] = extendedTemplateConfig[key]
-      .filter(({ i }) => i !== dropping_elem_id)
-      .map((item) => ({
-        ...item,
-        widgetType: mapWidgetDefaults(item.i)[0],
-      }));
-  });
-  return result;
-};
+// export { renameDashboardTemplate } from './dashboard-templates-new';

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 import DebouncePromise from 'awesome-debounce-promise';
 import { templateAtom, templateIdAtom } from '../state/templateAtom';
@@ -8,19 +8,14 @@ import {
   LayoutTypes,
   PartialTemplateConfig,
   Variants,
-  getDashboardTemplates,
   getDefaultTemplate,
   mapTemplateConfigToExtendedTemplateConfig,
-  patchDashboardTemplate,
 } from '../api/dashboard-templates';
 import useCurrentUser from './useCurrentUser';
 import { useAddNotification } from '../state/notificationsAtom';
+import { useApi } from './useApi';
 
 const sidebarBreakpoints = { xl: 1250, lg: 1100, md: 800, sm: 500 };
-
-const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplate, 1500, {
-  onlyResolvesLast: true,
-});
 
 const useDashboardConfig = (layoutType: LayoutTypes = 'landingPage') => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -30,13 +25,16 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landingPage') => {
   const { currentUser } = useCurrentUser();
   const addNotification = useAddNotification();
   const layoutRef = useRef<HTMLDivElement>(null);
+  const api = useApi();
+  const debouncedPatchDashboardTemplate = useMemo(() => DebouncePromise(api.patchDashboardTemplate, 1500, { onlyResolvesLast: true }), [api]);
 
   useEffect(() => {
     if (!currentUser || templateId >= 0) {
       return;
     }
 
-    getDashboardTemplates(layoutType)
+    api
+      .getDashboardTemplates(layoutType)
       .then((templates) => {
         const customDefaultTemplate = getDefaultTemplate(templates);
         if (!customDefaultTemplate) {
@@ -94,7 +92,7 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landingPage') => {
           }));
         });
 
-        await debouncedPatchDashboardTemplate(templateId, { templateConfig } as Parameters<typeof patchDashboardTemplate>[1]);
+        await debouncedPatchDashboardTemplate(templateId, { templateConfig });
       } catch (error) {
         console.error(error);
         addNotification({

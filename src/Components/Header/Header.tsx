@@ -27,7 +27,7 @@ import { CodeIcon, CopyIcon, EditAltIcon, EllipsisVIcon, PlusCircleIcon, PlusIco
 import { useAtom, useSetAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { templateIdAtom } from '../../state/templateAtom';
-import { resetDashboardTemplate } from '../../api/dashboard-templates';
+import { useApi } from '../../hooks/useApi';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { WarningModal } from '@patternfly/react-component-groups';
 import { Link } from 'react-router-dom';
@@ -209,6 +209,7 @@ const Controls = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleOpen = useSetAtom(drawerExpandedAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
+  const api = useApi();
 
   return (
     <>
@@ -223,7 +224,7 @@ const Controls = () => {
         onConfirm={() => {
           setIsOpen(false);
           if (templateId > 0) {
-            resetDashboardTemplate(templateId).then(() => {
+            api.resetDashboardTemplate(templateId).then(() => {
               setTemplateId(NaN);
             });
           }
