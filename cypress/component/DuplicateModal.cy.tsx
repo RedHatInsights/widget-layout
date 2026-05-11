@@ -5,6 +5,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { notificationsAtom, useRemoveNotification } from '../../src/state/notificationsAtom';
 import { dashboardsAtom } from '../../src/state/dashboardsAtom';
 import { DashboardTemplate } from '../../src/api/dashboard-templates';
+import { backendFlagAtom, store } from '../../src/state/store';
 
 const NotificationPortal = () => {
   const notifications = useAtomValue(notificationsAtom);
@@ -58,6 +59,9 @@ const mockCopyResponse = {
 };
 
 describe('DuplicateModal', () => {
+  beforeEach(() => {
+    store.set(backendFlagAtom, true);
+  });
 
   it('renders modal with title when isOpen=true', () => {
     cy.mount(<DuplicateModal isOpen={true} onClose={cy.stub()} />);

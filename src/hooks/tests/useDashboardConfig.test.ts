@@ -2,14 +2,13 @@ import { act, renderHook } from '@testing-library/react';
 import { createElement } from 'react';
 import { Provider, createStore } from 'jotai';
 import useDashboardConfig from '../useDashboardConfig';
+import { DashboardTemplate, ExtendedTemplateConfig } from '../../api/dashboard-templates';
 import {
-  DashboardTemplate,
-  ExtendedTemplateConfig,
   getDashboardTemplates,
   getDefaultTemplate,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplate,
-} from '../../api/dashboard-templates';
+} from '../../api/dashboard-templates-new';
 import useCurrentUser from '../useCurrentUser';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { templateIdAtom } from '../../state/templateAtom';
@@ -20,7 +19,12 @@ jest.mock('awesome-debounce-promise', () => ({
   default: (fn: (...args: any[]) => any) => fn,
 }));
 
-jest.mock('../../api/dashboard-templates', () => ({
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: () => true,
+}));
+
+jest.mock('../../api/dashboard-templates-new', () => ({
+  ...jest.requireActual('../../api/dashboard-templates-new'),
   getDashboardTemplates: jest.fn(),
   getDefaultTemplate: jest.fn(),
   mapTemplateConfigToExtendedTemplateConfig: jest.fn(),
@@ -50,7 +54,7 @@ const createMockDashboardTemplate = (overrides: Partial<DashboardTemplate> = {})
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
   deletedAt: null,
-  userIdentityID: 1,
+  userId: '1',
   default: true,
   templateBase: { name: 'test', displayName: 'Test' },
   templateConfig: { sm: [], md: [], lg: [], xl: [] },
@@ -146,7 +150,7 @@ describe('useDashboardConfig', () => {
       /* flush promises */
     });
 
-    expect(mockedGetDashboardTemplates).toHaveBeenCalledWith('landingPage');
+    expect(mockedGetDashboardTemplates).toHaveBeenCalledWith('landing-landingPage');
     expect(mockedGetDefaultTemplate).toHaveBeenCalledWith(mockTemplates);
     expect(mockedMapTemplateConfig).toHaveBeenCalledWith(mockDefault.templateConfig);
     expect(result.current.isLoaded).toBe(true);

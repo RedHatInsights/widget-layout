@@ -1,8 +1,14 @@
 import { act, renderHook } from '@testing-library/react';
 import { useExportDashboard } from '../useExportDashboard';
-import { ExportDashboardTemplate, exportDashboardTemplate } from '../../api/dashboard-templates';
+import { ExportDashboardTemplate } from '../../api/dashboard-templates';
+import { exportDashboardTemplate } from '../../api/dashboard-templates-new';
 
-jest.mock('../../api/dashboard-templates', () => ({
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: () => true,
+}));
+
+jest.mock('../../api/dashboard-templates-new', () => ({
+  ...jest.requireActual('../../api/dashboard-templates-new'),
   exportDashboardTemplate: jest.fn(),
 }));
 

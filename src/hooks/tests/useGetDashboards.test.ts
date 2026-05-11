@@ -1,8 +1,14 @@
 import { act, renderHook } from '@testing-library/react';
 import useGetDashboards from '../useGetDashboards';
-import { DashboardTemplate, getUsersDashboards } from '../../api/dashboard-templates';
+import { DashboardTemplate } from '../../api/dashboard-templates';
+import { getUsersDashboards } from '../../api/dashboard-templates-new';
 
-jest.mock('../../api/dashboard-templates', () => ({
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: () => true,
+}));
+
+jest.mock('../../api/dashboard-templates-new', () => ({
+  ...jest.requireActual('../../api/dashboard-templates-new'),
   getUsersDashboards: jest.fn(),
 }));
 
@@ -34,7 +40,7 @@ const mockDashboards: DashboardTemplate[] = [
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
     deletedAt: null,
-    userIdentityID: 1,
+    userId: '1',
     default: true,
     templateBase: {
       name: 'dashboard-1',
@@ -46,7 +52,7 @@ const mockDashboards: DashboardTemplate[] = [
     createdAt: '2024-01-02',
     updatedAt: '2024-01-02',
     deletedAt: null,
-    userIdentityID: 1,
+    userId: '1',
     default: false,
     templateBase: {
       name: 'dashboard-2',

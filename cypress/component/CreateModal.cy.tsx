@@ -3,6 +3,7 @@ import { CreateModal } from '../../src/Components/CreateModal/CreateModal';
 import Portal from '@redhat-cloud-services/frontend-components-notifications/Portal';
 import { useAtomValue } from 'jotai';
 import { notificationsAtom, useRemoveNotification } from '../../src/state/notificationsAtom';
+import { backendFlagAtom, store } from '../../src/state/store';
 
 const NotificationPortal = () => {
   const notifications = useAtomValue(notificationsAtom);
@@ -23,6 +24,10 @@ const mockDashboardResponse = {
 };
 
 describe('CreateModal', () => {
+  beforeEach(() => {
+    store.set(backendFlagAtom, true);
+  });
+
   it('renders modal with title when isOpen=true', () => {
     cy.mount(<CreateModal isOpen={true} onClose={cy.stub()} />);
     cy.contains('Create new blank dashboard').should('be.visible');

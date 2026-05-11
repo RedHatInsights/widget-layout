@@ -1,9 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
 import { useDuplicateDashboard } from '../useDuplicateDashboard';
-import { DashboardTemplate, DashboardTemplatesError, copyDashboardTemplate, setDefaultTemplate } from '../../api/dashboard-templates';
+import { DashboardTemplate, DashboardTemplatesError } from '../../api/dashboard-templates';
+import { copyDashboardTemplate, setDefaultTemplate } from '../../api/dashboard-templates-new';
+import { backendFlagAtom, store } from '../../state/store';
 
-jest.mock('../../api/dashboard-templates', () => ({
-  ...jest.requireActual('../../api/dashboard-templates'),
+jest.mock('../../api/dashboard-templates-new', () => ({
+  ...jest.requireActual('../../api/dashboard-templates-new'),
   copyDashboardTemplate: jest.fn(),
   setDefaultTemplate: jest.fn(),
   getUsersDashboards: jest.fn().mockResolvedValue([]),
@@ -17,7 +19,7 @@ const mockDashboard: DashboardTemplate = {
   createdAt: '2024-01-01',
   updatedAt: '2024-01-01',
   deletedAt: null,
-  userIdentityID: 1,
+  userId: '1',
   default: false,
   templateBase: { name: 'test', displayName: 'Test' },
   templateConfig: { sm: [], md: [], lg: [], xl: [] },
@@ -27,6 +29,7 @@ const mockDashboard: DashboardTemplate = {
 describe('useDuplicateDashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    store.set(backendFlagAtom, true);
   });
 
   it('should return initial state with isLoading false, error null, and isFormValid false', () => {
