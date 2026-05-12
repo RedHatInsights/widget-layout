@@ -19,7 +19,7 @@ const mockDashboardTemplate = {
   deletedAt: null,
   userIdentityID: 1,
   default: false,
-  templateBase: { name: 'landingPage', displayName: 'Landing Page' },
+  templateBase: { name: 'custom', displayName: 'Custom' },
   templateConfig: { sm: [], md: [], lg: [], xl: [] },
   dashboardName: 'My Dashboard',
 };
@@ -120,7 +120,7 @@ describe('useCreateBlankDashboard', () => {
 
     expect(mockedImportDashboardTemplate).toHaveBeenCalledWith({
       dashboardName: 'My Dashboard',
-      templateBase: { name: 'landingPage', displayName: 'Landing Page' },
+      templateBase: { name: 'custom', displayName: 'Custom' },
       templateConfig: { sm: [], md: [], lg: [], xl: [] },
     });
     expect(createResult).toEqual(mockDashboardTemplate);
