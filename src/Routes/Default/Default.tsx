@@ -15,7 +15,7 @@ import Portal from '@redhat-cloud-services/frontend-components-notifications/Por
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { resolvedWidgetMappingAtom } from '../../state/widgetMappingAtom';
 
-const DefaultRouteInner = (props: { layoutType?: LayoutTypes }) => {
+const DefaultRouteInner = (props: { layoutType: LayoutTypes }) => {
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
   const notifications = useAtomValue(notificationsAtom);
   const removeNotification = useRemoveNotification();
@@ -48,7 +48,7 @@ const DefaultRouteInner = (props: { layoutType?: LayoutTypes }) => {
   );
 };
 
-const DefaultRoute = (props: { layoutType?: LayoutTypes }) => (
+const DefaultRoute = (props: { layoutType: LayoutTypes }) => (
   <Provider store={store}>
     <DefaultRouteInner {...props} />
   </Provider>

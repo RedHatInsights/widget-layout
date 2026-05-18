@@ -14,10 +14,13 @@ import {
 import useCurrentUser from './useCurrentUser';
 import { useAddNotification } from '../state/notificationsAtom';
 import { useApi } from './useApi';
+import { useFlag } from '@unleash/proxy-client-react';
 
 const sidebarBreakpoints = { xl: 1250, lg: 1100, md: 800, sm: 500 };
 
-const useDashboardConfig = (layoutType: LayoutTypes = 'landingPage') => {
+const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => {
+  const isNewBackend = useFlag('platform.widget-layout.new-backend');
+  const mappedLayoutType = !isNewBackend && layoutType === 'landing-landingPage' ? 'landingPage' : layoutType;
   const [isLoaded, setIsLoaded] = useState(false);
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
@@ -34,7 +37,7 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landingPage') => {
     }
 
     api
-      .getDashboardTemplates(layoutType)
+      .getDashboardTemplates(mappedLayoutType)
       .then((templates) => {
         const customDefaultTemplate = getDefaultTemplate(templates);
         if (!customDefaultTemplate) {
