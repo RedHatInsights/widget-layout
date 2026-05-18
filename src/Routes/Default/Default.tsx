@@ -38,7 +38,7 @@ const DefaultRouteInner = (props: { layoutType: LayoutTypes }) => {
   return (
     <div className="widgetLayout">
       <Portal notifications={notifications} removeNotification={removeNotification} />
-      <Header />
+      <Header layoutType={props.layoutType} />
       <AddWidgetDrawer dismissible={false}>
         <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--grid 6-u-p-md-on-sm">
           <GridLayout template={template} saveTemplate={saveTemplate} isLoaded={isLoaded} isLayoutLocked={isLayoutLocked} layoutRef={layoutRef} />
