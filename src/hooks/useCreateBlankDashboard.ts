@@ -32,7 +32,7 @@ type UseCreateBlankDashboardReturn = CreateBlankDashboardState & {
   reset: () => void;
 };
 
-export const useCreateBlankDashboard = (): UseCreateBlankDashboardReturn => {
+export const useCreateBlankDashboard = (layoutType = 'landing-landingPage'): UseCreateBlankDashboardReturn => {
   const [state, setState] = useState<CreateBlankDashboardState>(initState);
   const create = useSetAtom(createDashboardAtom);
 
@@ -51,12 +51,16 @@ export const useCreateBlankDashboard = (): UseCreateBlankDashboardReturn => {
 
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
+    // layoutType: 'landing-landingPage' → displayName: 'Landing Landing Page'
     try {
       const result = await create({
         dashboardName: state.name,
         templateBase: {
-          name: 'custom',
-          displayName: 'Custom',
+          name: layoutType,
+          displayName: layoutType
+            .split(/[-]|(?=[A-Z])/)
+            .map((w) => w[0].toUpperCase() + w.slice(1))
+            .join(' '),
         },
         templateConfig: blankTemplateConfig,
         setAsHomepage: state.setAsHomepage,

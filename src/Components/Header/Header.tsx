@@ -37,7 +37,7 @@ import { CreateModal } from '../CreateModal/CreateModal';
 import { ImportModal } from '../DashboardHub/ImportModal/ImportModal';
 import { DuplicateModal } from '../DuplicateModal/DuplicateModal';
 
-export const KebabDropdown = () => {
+export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
   const { dashboards } = useGetDashboards();
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -198,7 +198,7 @@ export const KebabDropdown = () => {
         toggleRef={toggleRef}
         popperProps={{ position: 'end' }}
       />
-      <CreateModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+      <CreateModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} layoutType={layoutType} />
       <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
       <DuplicateModal isOpen={isDuplicateModalOpen} onClose={() => setIsDuplicateModalOpen(false)} />
     </>
@@ -261,7 +261,7 @@ const Controls = () => {
   );
 };
 
-const Header = () => {
+const Header = ({ layoutType }: { layoutType?: string }) => {
   const { currentUser } = useCurrentUser();
   const userName = currentUser?.first_name && currentUser?.last_name ? ` ${currentUser.first_name} ${currentUser.last_name}` : currentUser?.username;
   const isDashboardHub = useFlag('platform.widget-layout.dashboard-dropdown');
@@ -282,7 +282,7 @@ const Header = () => {
               <Controls />
               {isDashboardHub && (
                 <ToolbarItem>
-                  <KebabDropdown />
+                  <KebabDropdown layoutType={layoutType} />
                 </ToolbarItem>
               )}
             </ToolbarContent>

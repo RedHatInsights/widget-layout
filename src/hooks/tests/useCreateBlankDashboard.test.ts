@@ -123,7 +123,7 @@ describe('useCreateBlankDashboard', () => {
 
     expect(mockedImportDashboardTemplate).toHaveBeenCalledWith({
       dashboardName: 'My Dashboard',
-      templateBase: { name: 'custom', displayName: 'Custom' },
+      templateBase: { name: 'landing-landingPage', displayName: 'Landing Landing Page' },
       templateConfig: { sm: [], md: [], lg: [], xl: [] },
     });
     expect(createResult).toEqual(mockDashboardTemplate);
