@@ -55,8 +55,8 @@ export const useCreateBlankDashboard = (): UseCreateBlankDashboardReturn => {
       const result = await create({
         dashboardName: state.name,
         templateBase: {
-          name: 'custom',
-          displayName: 'Custom',
+          name: 'landing-landingPage',
+          displayName: 'Landing Page',
         },
         templateConfig: blankTemplateConfig,
         setAsHomepage: state.setAsHomepage,
