@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import type { VisibilityFunctions } from '@redhat-cloud-services/types';
 import type { WidgetMapping, WidgetPermission } from '../api/dashboard-templates';
-import { getWidgetMapping } from '../api/dashboard-templates';
+import { getApi } from './store';
 
 const checkPermissions = async (visibilityFunctions: VisibilityFunctions, permissions: WidgetPermission[]): Promise<boolean> => {
   const results = await Promise.all(
@@ -24,7 +24,8 @@ const checkPermissions = async (visibilityFunctions: VisibilityFunctions, permis
 export const widgetMappingAtom = atom<WidgetMapping>({});
 
 export const resolvedWidgetMappingAtom = atom(null, async (_get, set, visibilityFunctions: VisibilityFunctions) => {
-  const mapping = await getWidgetMapping();
+  const api = getApi();
+  const mapping = await api.getWidgetMapping();
 
   if (!mapping) {
     return;

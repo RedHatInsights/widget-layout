@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { ExportDashboardTemplate, exportDashboardTemplate } from '../api/dashboard-templates';
+import { ExportDashboardTemplate } from '../api/dashboard-templates';
+import { useApi } from './useApi';
 
 export const useExportDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const api = useApi();
 
   const exportDashboard = async (id: number): Promise<ExportDashboardTemplate | null> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const result = await exportDashboardTemplate(id);
+      const result = await api.exportDashboardTemplate(id);
       setIsLoading(false);
       return result;
     } catch (err) {

@@ -1,14 +1,12 @@
 import { act, renderHook } from '@testing-library/react';
 import useDashboardTemplate from '../useDashboardTemplate';
+import { DashboardTemplate, ExtendedTemplateConfig, WidgetMapping } from '../../api/dashboard-templates';
 import {
-  DashboardTemplate,
-  ExtendedTemplateConfig,
-  WidgetMapping,
   getDashboardTemplate,
   getWidgetMapping,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplateHub,
-} from '../../api/dashboard-templates';
+} from '../../api/dashboard-templates-new';
 
 jest.mock('awesome-debounce-promise', () => ({
   __esModule: true,
@@ -16,12 +14,16 @@ jest.mock('awesome-debounce-promise', () => ({
   default: (fn: (...args: any[]) => any) => fn,
 }));
 
-jest.mock('../../api/dashboard-templates', () => ({
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: () => true,
+}));
+
+jest.mock('../../api/dashboard-templates-new', () => ({
+  ...jest.requireActual('../../api/dashboard-templates-new'),
   getDashboardTemplate: jest.fn(),
   getWidgetMapping: jest.fn(),
   mapTemplateConfigToExtendedTemplateConfig: jest.fn(),
   patchDashboardTemplateHub: jest.fn(),
-  widgetIdSeparator: '#',
 }));
 
 const mockedGetDashboardTemplate = getDashboardTemplate as jest.MockedFunction<typeof getDashboardTemplate>;
@@ -36,7 +38,7 @@ const createMockDashboardTemplate = (overrides: Partial<DashboardTemplate> = {})
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
   deletedAt: null,
-  userIdentityID: 1,
+  userId: '1',
   default: true,
   templateBase: { name: 'test', displayName: 'Test' },
   templateConfig: { sm: [], md: [], lg: [], xl: [] },
