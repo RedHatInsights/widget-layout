@@ -1,9 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
 import { useCreateBlankDashboard } from '../useCreateBlankDashboard';
-import { DashboardTemplatesError, importDashboardTemplate, setDefaultTemplate } from '../../api/dashboard-templates';
+import { DashboardTemplatesError } from '../../api/dashboard-templates';
+import { importDashboardTemplate, setDefaultTemplate } from '../../api/dashboard-templates-new';
+import { backendFlagAtom, store } from '../../state/store';
 
-jest.mock('../../api/dashboard-templates', () => ({
-  ...jest.requireActual('../../api/dashboard-templates'),
+jest.mock('../../api/dashboard-templates-new', () => ({
+  ...jest.requireActual('../../api/dashboard-templates-new'),
   importDashboardTemplate: jest.fn(),
   setDefaultTemplate: jest.fn(),
   getUsersDashboards: jest.fn().mockResolvedValue([]),
@@ -17,7 +19,7 @@ const mockDashboardTemplate = {
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
   deletedAt: null,
-  userIdentityID: 1,
+  userId: '1',
   default: false,
   templateBase: { name: 'custom', displayName: 'Custom' },
   templateConfig: { sm: [], md: [], lg: [], xl: [] },
@@ -27,6 +29,7 @@ const mockDashboardTemplate = {
 describe('useCreateBlankDashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    store.set(backendFlagAtom, true);
   });
 
   it('should return initial state', () => {
@@ -120,7 +123,7 @@ describe('useCreateBlankDashboard', () => {
 
     expect(mockedImportDashboardTemplate).toHaveBeenCalledWith({
       dashboardName: 'My Dashboard',
-      templateBase: { name: 'custom', displayName: 'Custom' },
+      templateBase: { name: 'landing-landingPage', displayName: 'Landing Landing Page' },
       templateConfig: { sm: [], md: [], lg: [], xl: [] },
     });
     expect(createResult).toEqual(mockDashboardTemplate);

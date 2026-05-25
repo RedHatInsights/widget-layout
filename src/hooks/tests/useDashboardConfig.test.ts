@@ -2,14 +2,13 @@ import { act, renderHook } from '@testing-library/react';
 import { createElement } from 'react';
 import { Provider, createStore } from 'jotai';
 import useDashboardConfig from '../useDashboardConfig';
+import { DashboardTemplate, ExtendedTemplateConfig } from '../../api/dashboard-templates';
 import {
-  DashboardTemplate,
-  ExtendedTemplateConfig,
   getDashboardTemplates,
   getDefaultTemplate,
   mapTemplateConfigToExtendedTemplateConfig,
   patchDashboardTemplate,
-} from '../../api/dashboard-templates';
+} from '../../api/dashboard-templates-new';
 import useCurrentUser from '../useCurrentUser';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { templateIdAtom } from '../../state/templateAtom';
@@ -20,7 +19,12 @@ jest.mock('awesome-debounce-promise', () => ({
   default: (fn: (...args: any[]) => any) => fn,
 }));
 
-jest.mock('../../api/dashboard-templates', () => ({
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: () => true,
+}));
+
+jest.mock('../../api/dashboard-templates-new', () => ({
+  ...jest.requireActual('../../api/dashboard-templates-new'),
   getDashboardTemplates: jest.fn(),
   getDefaultTemplate: jest.fn(),
   mapTemplateConfigToExtendedTemplateConfig: jest.fn(),
@@ -50,7 +54,7 @@ const createMockDashboardTemplate = (overrides: Partial<DashboardTemplate> = {})
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
   deletedAt: null,
-  userIdentityID: 1,
+  userId: '1',
   default: true,
   templateBase: { name: 'test', displayName: 'Test' },
   templateConfig: { sm: [], md: [], lg: [], xl: [] },
@@ -86,7 +90,7 @@ describe('useDashboardConfig', () => {
 
   it('should return initial state with isLoaded false and empty template', () => {
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useDashboardConfig(), { wrapper });
+    const { result } = renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
     expect(result.current.isLoaded).toBe(false);
     expect(result.current.template).toEqual(emptyTemplate);
@@ -99,7 +103,7 @@ describe('useDashboardConfig', () => {
     mockedUseCurrentUser.mockReturnValue({ currentUser: undefined, isLoaded: false });
     const { wrapper } = createWrapper();
 
-    renderHook(() => useDashboardConfig(), { wrapper });
+    renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
     await act(async () => {
       /* flush */
@@ -118,7 +122,7 @@ describe('useDashboardConfig', () => {
     const { wrapper, store } = createWrapper();
     store.set(templateIdAtom, 5);
 
-    renderHook(() => useDashboardConfig(), { wrapper });
+    renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
     await act(async () => {
       /* flush */
@@ -163,7 +167,7 @@ describe('useDashboardConfig', () => {
     mockedGetDashboardTemplates.mockRejectedValue(new Error('Network error'));
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useDashboardConfig(), { wrapper });
+    const { result } = renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
     await act(async () => {
       /* flush */
@@ -188,7 +192,7 @@ describe('useDashboardConfig', () => {
     mockedGetDefaultTemplate.mockReturnValue(undefined as unknown as ReturnType<typeof getDefaultTemplate>);
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useDashboardConfig(), { wrapper });
+    const { result } = renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
     await act(async () => {
       /* flush */
@@ -221,7 +225,7 @@ describe('useDashboardConfig', () => {
       Object.defineProperty(document.body, 'clientWidth', { value: 1250, configurable: true });
 
       const { wrapper } = createWrapper();
-      renderHook(() => useDashboardConfig(), { wrapper });
+      renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
       await act(async () => {
         /* flush */
@@ -237,7 +241,7 @@ describe('useDashboardConfig', () => {
       Object.defineProperty(document.body, 'clientWidth', { value: 1100, configurable: true });
 
       const { wrapper } = createWrapper();
-      renderHook(() => useDashboardConfig(), { wrapper });
+      renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
       await act(async () => {
         /* flush */
@@ -251,7 +255,7 @@ describe('useDashboardConfig', () => {
       Object.defineProperty(document.body, 'clientWidth', { value: 800, configurable: true });
 
       const { wrapper } = createWrapper();
-      renderHook(() => useDashboardConfig(), { wrapper });
+      renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
       await act(async () => {
         /* flush */
@@ -265,7 +269,7 @@ describe('useDashboardConfig', () => {
       Object.defineProperty(document.body, 'clientWidth', { value: 400, configurable: true });
 
       const { wrapper } = createWrapper();
-      renderHook(() => useDashboardConfig(), { wrapper });
+      renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
       await act(async () => {
         /* flush */
@@ -288,7 +292,7 @@ describe('useDashboardConfig', () => {
       mockedPatchDashboardTemplate.mockResolvedValue(mockDefault);
 
       const { wrapper } = createWrapper();
-      const hookResult = renderHook(() => useDashboardConfig(), { wrapper });
+      const hookResult = renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
       await act(async () => {
         /* flush initial load */
@@ -300,7 +304,7 @@ describe('useDashboardConfig', () => {
     it('should skip patch when templateId < 0', async () => {
       mockedUseCurrentUser.mockReturnValue({ currentUser: undefined, isLoaded: false });
       const { wrapper } = createWrapper();
-      const { result } = renderHook(() => useDashboardConfig(), { wrapper });
+      const { result } = renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 
       await act(async () => {
         await result.current.saveTemplate(emptyTemplate);

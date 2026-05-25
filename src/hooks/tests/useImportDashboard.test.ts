@@ -1,8 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
 import { useImportDashboard } from '../useImportDashboard';
-import { DashboardTemplate, importDashboardTemplate } from '../../api/dashboard-templates';
+import { DashboardTemplate } from '../../api/dashboard-templates';
+import { importDashboardTemplate } from '../../api/dashboard-templates-new';
+import { backendFlagAtom, store } from '../../state/store';
 
-jest.mock('../../api/dashboard-templates', () => ({
+jest.mock('../../api/dashboard-templates-new', () => ({
+  ...jest.requireActual('../../api/dashboard-templates-new'),
   importDashboardTemplate: jest.fn(),
   getUsersDashboards: jest.fn().mockResolvedValue([]),
 }));
@@ -14,7 +17,7 @@ const mockDashboardTemplate: DashboardTemplate = {
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
   deletedAt: null,
-  userIdentityID: 42,
+  userId: '42',
   default: false,
   templateBase: { name: 'test-base', displayName: 'Test Base' },
   templateConfig: {} as DashboardTemplate['templateConfig'],
@@ -24,6 +27,7 @@ const mockDashboardTemplate: DashboardTemplate = {
 describe('useImportDashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    store.set(backendFlagAtom, true);
   });
 
   it('should return correct initial state', () => {

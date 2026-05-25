@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import DebouncePromise from 'awesome-debounce-promise';
 import {
   DashboardTemplate,
@@ -6,16 +6,10 @@ import {
   PartialTemplateConfig,
   Variants,
   WidgetMapping,
-  getDashboardTemplate,
-  getWidgetMapping,
   mapTemplateConfigToExtendedTemplateConfig,
-  patchDashboardTemplateHub,
   widgetIdSeparator,
 } from '../api/dashboard-templates';
-
-const debouncedPatchDashboardTemplate = DebouncePromise(patchDashboardTemplateHub, 1500, {
-  onlyResolvesLast: true,
-});
+import { useApi } from './useApi';
 
 const remapWidgetTypes = (extendedTemplate: ExtendedTemplateConfig, widgetMapping: WidgetMapping): ExtendedTemplateConfig => {
   // Build reverse lookup: "landing-./RhelWidget" -> "rhel"
@@ -48,7 +42,8 @@ const useDashboardTemplate = (id: number) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [dashboard, setDashboard] = useState<DashboardTemplate>();
-  // widget mapping
+  const api = useApi();
+  const debouncedPatchDashboardTemplate = useMemo(() => DebouncePromise(api.patchDashboardTemplateHub, 1500, { onlyResolvesLast: true }), [api]);
 
   useEffect(() => {
     const fetchTemplate = async () => {
@@ -56,10 +51,10 @@ const useDashboardTemplate = (id: number) => {
       setError(null);
 
       try {
-        const result = await getDashboardTemplate(id);
+        const result = await api.getDashboardTemplate(id);
         setDashboard(result);
         const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(result.templateConfig);
-        const widgetMap = await getWidgetMapping();
+        const widgetMap = await api.getWidgetMapping();
         const remappedTemplate = remapWidgetTypes(extendedTemplateConfig, widgetMap);
         setTemplate(remappedTemplate);
       } catch (err) {
@@ -91,7 +86,7 @@ const useDashboardTemplate = (id: number) => {
           }));
         });
 
-        await debouncedPatchDashboardTemplate(id, { templateConfig } as Parameters<typeof patchDashboardTemplateHub>[1]);
+        await debouncedPatchDashboardTemplate(id, { templateConfig });
       } catch (err) {
         console.error(err);
       }

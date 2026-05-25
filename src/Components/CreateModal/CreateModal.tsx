@@ -8,10 +8,12 @@ interface CreateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  layoutType?: string;
 }
 
-export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen, onClose, onSuccess }) => {
-  const { name, setName, setAsHomepage, setSetAsHomepage, isLoading, error, isFormValid, createDashboard, reset } = useCreateBlankDashboard();
+export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen, onClose, onSuccess, layoutType }) => {
+  const { name, setName, setAsHomepage, setSetAsHomepage, isLoading, error, isFormValid, createDashboard, reset } =
+    useCreateBlankDashboard(layoutType);
   const addNotification = useAddNotification();
 
   const handleNameChange = (_event: React.FormEvent<HTMLInputElement>, value: string) => {
