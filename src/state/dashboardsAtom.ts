@@ -11,6 +11,14 @@ export const deleteDashboardAtom = atom(null, async (_get, set, id: DashboardTem
   set(dashboardsAtom, dashboards);
 });
 
+export const renameDashboardAtom = atom(null, async (_get, set, { id, dashboardName }: { id: DashboardTemplate['id']; dashboardName: string }) => {
+  const api = getApi();
+  const updated = await api.renameDashboardTemplate(id, { dashboardName });
+  const dashboards = await api.getUsersDashboards();
+  set(dashboardsAtom, dashboards);
+  return updated;
+});
+
 export const setDefaultDashboardAtom = atom(null, async (_get, set, id: DashboardTemplate['id']) => {
   const api = getApi();
   await api.setDefaultTemplate(id);
