@@ -72,8 +72,8 @@ const useDashboardTemplate = (id: number) => {
 
   const renameDashboard = useCallback(
     async (dashboardName: string) => {
-      await renameDashboardInList({ id, dashboardName });
-      setDashboard((prev) => (prev ? { ...prev, dashboardName } : prev));
+      const updated = await renameDashboardInList({ id, dashboardName });
+      setDashboard((prev) => (prev ? { ...prev, ...updated } : prev));
     },
     [id, renameDashboardInList]
   );
