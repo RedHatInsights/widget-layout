@@ -22,12 +22,14 @@ const sidebarBreakpoints = { xl: 1250, lg: 1100, md: 800, sm: 500 };
 const documentationLink =
   'https://docs.redhat.com/en/documentation/red_hat_hybrid_cloud_console/1-latest/html-single/getting_started_with_the_red_hat_hybrid_cloud_console/index#customizing-main-page_navigating-the-console';
 
-const LayoutEmptyState = () => {
+const LayoutEmptyState = ({ isLoaded = false }: { isLoaded?: boolean }) => {
   const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
 
   useEffect(() => {
-    setDrawerExpanded(true);
-  }, []);
+    if (isLoaded) {
+      setDrawerExpanded(true);
+    }
+  }, [isLoaded]);
 
   return (
     <PageSection hasBodyWrapper={false} className="empty-layout pf-v6-u-p-0">
@@ -110,14 +112,14 @@ const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, 
 
   return (
     <div id="widget-layout-container" style={{ position: 'relative' }} ref={layoutRef}>
-      {activeLayout.length === 0 && isLoaded && <LayoutEmptyState />}
+      {activeLayout.length === 0 && isLoaded && <LayoutEmptyState isLoaded={isLoaded} />}
       {Object.keys(widgetMapping).length > 0 && (
         <PatternFlyGridLayout
           widgetMapping={widgetMapping}
           template={patternFlyTemplate}
           onTemplateChange={handleTemplateChange}
           isLayoutLocked={isLayoutLocked}
-          emptyStateComponent={<LayoutEmptyState />}
+          emptyStateComponent={<LayoutEmptyState isLoaded={isLoaded} />}
           breakpoints={sidebarBreakpoints}
           resizeWidgetConfig={{
             enabled: true,
