@@ -1,7 +1,7 @@
 import { Breadcrumb, BreadcrumbItem, PageSection } from '@patternfly/react-core';
 import React, { useEffect, useRef } from 'react';
 import GridLayout from '../Components/DnDLayout/GridLayout';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { Provider, useAtomValue, useSetAtom } from 'jotai';
 import { lockedLayoutAtom } from '../state/lockedLayoutAtom';
 import { Link, useParams } from 'react-router-dom';
 import useDashboardTemplate from '../hooks/useDashboardTemplate';
@@ -11,8 +11,10 @@ import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { resolvedWidgetMappingAtom } from '../state/widgetMappingAtom';
 import { notificationsAtom, useRemoveNotification } from '../state/notificationsAtom';
 import Portal from '@redhat-cloud-services/frontend-components-notifications/Portal';
+import { backendFlagAtom, store } from '../state/store';
+import { useFlag } from '@unleash/proxy-client-react';
 
-const GenericDashboardPage = () => {
+const GenericDashboardPageInner = () => {
   const { id } = useParams<{ id: string }>();
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
   const { template, saveTemplate, renameDashboard, isLoaded, dashboard } = useDashboardTemplate(Number(id));
@@ -22,6 +24,13 @@ const GenericDashboardPage = () => {
 
   const notifications = useAtomValue(notificationsAtom);
   const removeNotification = useRemoveNotification();
+
+  const setBackendFlag = useSetAtom(backendFlagAtom);
+  const isNewBackend = useFlag('platform.widget-layout.new-backend');
+
+  useEffect(() => {
+    setBackendFlag(isNewBackend);
+  }, [isNewBackend]);
 
   useEffect(() => {
     if (visibilityFunctions) {
@@ -52,5 +61,11 @@ const GenericDashboardPage = () => {
     </div>
   );
 };
+
+const GenericDashboardPage = () => (
+  <Provider store={store}>
+    <GenericDashboardPageInner />
+  </Provider>
+);
 
 export default GenericDashboardPage;
