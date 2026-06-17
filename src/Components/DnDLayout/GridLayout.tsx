@@ -22,31 +22,21 @@ const sidebarBreakpoints = { xl: 1250, lg: 1100, md: 800, sm: 500 };
 const documentationLink =
   'https://docs.redhat.com/en/documentation/red_hat_hybrid_cloud_console/1-latest/html-single/getting_started_with_the_red_hat_hybrid_cloud_console/index#customizing-main-page_navigating-the-console';
 
-const LayoutEmptyState = ({ isLoaded = false }: { isLoaded?: boolean }) => {
-  const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
-
-  useEffect(() => {
-    if (isLoaded) {
-      setDrawerExpanded(true);
-    }
-  }, [isLoaded]);
-
-  return (
-    <PageSection hasBodyWrapper={false} className="empty-layout pf-v6-u-p-0">
-      <EmptyState headingLevel="h2" icon={PlusCircleIcon} titleText="No dashboard content" variant={EmptyStateVariant.lg} className="pf-v6-u-p-sm">
-        <EmptyStateBody>
-          You don&apos;t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to
-          this dashboard body here.
-        </EmptyStateBody>
-        <EmptyStateActions>
-          <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end" component="a" href={documentationLink}>
-            Learn about your widget dashboard
-          </Button>
-        </EmptyStateActions>
-      </EmptyState>
-    </PageSection>
-  );
-};
+const LayoutEmptyState = () => (
+  <PageSection hasBodyWrapper={false} className="empty-layout pf-v6-u-p-0">
+    <EmptyState headingLevel="h2" icon={PlusCircleIcon} titleText="No dashboard content" variant={EmptyStateVariant.lg} className="pf-v6-u-p-sm">
+      <EmptyStateBody>
+        You don&apos;t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to
+        this dashboard body here.
+      </EmptyStateBody>
+      <EmptyStateActions>
+        <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end" component="a" href={documentationLink}>
+          Learn about your widget dashboard
+        </Button>
+      </EmptyStateActions>
+    </EmptyState>
+  </PageSection>
+);
 
 const getResizeHandle = (resizeHandleAxis: string, ref: React.Ref<HTMLDivElement>) => (
   <div ref={ref} className={`react-resizable-handle react-resizable-handle-${resizeHandleAxis}`}>
@@ -97,6 +87,10 @@ const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, 
     const activeLayout = newTemplate[layoutVariant] || [];
     setCurrentlyUsedWidgets(activeLayout.map((item) => item.widgetType));
 
+    if (activeLayout.length === 0) {
+      setDrawerExpanded(true);
+    }
+
     await saveTemplate(newTemplate as LocalExtendedTemplateConfig);
   };
 
@@ -110,16 +104,22 @@ const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, 
 
   const activeLayout = patternFlyTemplate[layoutVariant] || [];
 
+  useEffect(() => {
+    if (isLoaded && activeLayout.length === 0) {
+      setDrawerExpanded(true);
+    }
+  }, [isLoaded]);
+
   return (
     <div id="widget-layout-container" style={{ position: 'relative' }} ref={layoutRef}>
-      {activeLayout.length === 0 && isLoaded && <LayoutEmptyState isLoaded={isLoaded} />}
+      {activeLayout.length === 0 && isLoaded && <LayoutEmptyState />}
       {Object.keys(widgetMapping).length > 0 && (
         <PatternFlyGridLayout
           widgetMapping={widgetMapping}
           template={patternFlyTemplate}
           onTemplateChange={handleTemplateChange}
           isLayoutLocked={isLayoutLocked}
-          emptyStateComponent={<LayoutEmptyState isLoaded={isLoaded} />}
+          emptyStateComponent={<LayoutEmptyState />}
           breakpoints={sidebarBreakpoints}
           resizeWidgetConfig={{
             enabled: true,
