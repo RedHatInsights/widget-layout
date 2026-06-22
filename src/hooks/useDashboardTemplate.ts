@@ -10,9 +10,27 @@ import {
   widgetIdSeparator,
 } from '../api/dashboard-templates';
 import { useApi } from './useApi';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { renameDashboardAtom } from '../state/dashboardsAtom';
 import { templateIdAtom } from '../state/templateAtom';
+import { backendFlagAtom } from '../state/store';
+import { widgetKeyMap } from '../consts';
+
+const remapShortKeys = (config: ExtendedTemplateConfig): ExtendedTemplateConfig => {
+  const result: ExtendedTemplateConfig = { sm: [], md: [], lg: [], xl: [] };
+  (Object.keys(config) as Variants[]).forEach((variant) => {
+    result[variant] = config[variant].map((item) => {
+      const [widgetType, uuid] = item.i.split(widgetIdSeparator);
+      const scopedType = widgetKeyMap[widgetType] ?? widgetType;
+      return {
+        ...item,
+        i: `${scopedType}${widgetIdSeparator}${uuid}`,
+        widgetType: scopedType,
+      };
+    });
+  });
+  return result;
+};
 
 const remapWidgetTypes = (extendedTemplate: ExtendedTemplateConfig, widgetMapping: WidgetMapping): ExtendedTemplateConfig => {
   // Build reverse lookup: "landing-./RhelWidget" -> "rhel"
@@ -46,6 +64,7 @@ const useDashboardTemplate = (id: number) => {
   const [error, setError] = useState<Error | null>(null);
   const [dashboard, setDashboard] = useState<DashboardTemplate>();
   const api = useApi();
+  const isNewBackend = useAtomValue(backendFlagAtom);
   const debouncedPatchDashboardTemplate = useMemo(() => DebouncePromise(api.patchDashboardTemplateHub, 1500, { onlyResolvesLast: true }), [api]);
   const renameDashboardInList = useSetAtom(renameDashboardAtom);
   const invalidateStartPage = useSetAtom(templateIdAtom);
@@ -59,8 +78,9 @@ const useDashboardTemplate = (id: number) => {
         const result = await api.getDashboardTemplate(id);
         setDashboard(result);
         const extendedTemplateConfig = mapTemplateConfigToExtendedTemplateConfig(result.templateConfig);
+        const normalized = isNewBackend ? remapShortKeys(extendedTemplateConfig) : extendedTemplateConfig;
         const widgetMap = await api.getWidgetMapping();
-        const remappedTemplate = remapWidgetTypes(extendedTemplateConfig, widgetMap);
+        const remappedTemplate = remapWidgetTypes(normalized, widgetMap);
         setTemplate(remappedTemplate);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Failed to fetch dashboard template'));
@@ -70,7 +90,7 @@ const useDashboardTemplate = (id: number) => {
     };
 
     fetchTemplate();
-  }, [id]);
+  }, [id, api]);
 
   const renameDashboard = useCallback(
     async (dashboardName: string) => {
