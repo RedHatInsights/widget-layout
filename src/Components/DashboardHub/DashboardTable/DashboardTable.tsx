@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Tbody, Td, Th, ThProps, Thead, Tr } from '@patternfly/react-table';
 import { ActionsColumn } from '@patternfly/react-table';
-import { Button, Content, Tooltip, TooltipPosition } from '@patternfly/react-core';
+import { Alert, Button, Tooltip, TooltipPosition } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
 import { DashboardTemplate } from '../../../api/dashboard-templates';
 import { setDefaultDashboardAtom } from '../../../state/dashboardsAtom';
@@ -154,6 +154,8 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
       : []),
   ];
 
+  const hasHomepage = dashboards.length === 0 || dashboards.some((d) => d.default);
+
   const handleDeleteConfirm = async () => {
     if (dashboardToDelete) {
       const name = dashboardToDelete.name;
@@ -180,6 +182,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
         onClose={() => setDashboardToDelete(null)}
         onDelete={handleDeleteConfirm}
       />
+      {!hasHomepage && <Alert variant="warning" isInline title="No homepage dashboard set. Please set a dashboard as your homepage." />}
       <Table aria-label="Dashboards table" ouiaId="DashboardsTable">
         <Thead>
           <Tr>

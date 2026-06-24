@@ -12,6 +12,7 @@ import {
 import { useApi } from './useApi';
 import { useSetAtom } from 'jotai';
 import { renameDashboardAtom } from '../state/dashboardsAtom';
+import { templateIdAtom } from '../state/templateAtom';
 
 const remapWidgetTypes = (extendedTemplate: ExtendedTemplateConfig, widgetMapping: WidgetMapping): ExtendedTemplateConfig => {
   // Build reverse lookup: "landing-./RhelWidget" -> "rhel"
@@ -47,6 +48,7 @@ const useDashboardTemplate = (id: number) => {
   const api = useApi();
   const debouncedPatchDashboardTemplate = useMemo(() => DebouncePromise(api.patchDashboardTemplateHub, 1500, { onlyResolvesLast: true }), [api]);
   const renameDashboardInList = useSetAtom(renameDashboardAtom);
+  const invalidateStartPage = useSetAtom(templateIdAtom);
 
   useEffect(() => {
     const fetchTemplate = async () => {
@@ -98,11 +100,14 @@ const useDashboardTemplate = (id: number) => {
         });
 
         await debouncedPatchDashboardTemplate(id, { templateConfig });
+        if (dashboard?.default) {
+          invalidateStartPage(-1);
+        }
       } catch (err) {
         console.error(err);
       }
     },
-    [id]
+    [id, dashboard?.default]
   );
 
   return { template, saveTemplate, renameDashboard, isLoaded, dashboard, error };
