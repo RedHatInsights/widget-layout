@@ -81,7 +81,7 @@ jobs:
           path: "**/node_modules"
           key: install-cache-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
       - run: npm i
-      - uses: cypress-io/github-action@v6
+      - uses: cypress-io/github-action@v7.4.0
         with:
           component: true
           install-command: npx cypress install
