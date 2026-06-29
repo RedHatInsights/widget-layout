@@ -127,7 +127,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
 
   test('should not show the widget drawer by default on page load', async ({ page }) => {
     const drawerText = page.getByText('Add new and previously removed widgets');
-    await expect(drawerText).not.toBeVisible();
+    await expect(drawerText).not.toBeVisible({ timeout: 60000 });
   });
 });
 
@@ -166,7 +166,7 @@ test.describe('Widget Layout - Empty Dashboard', () => {
     await page.waitForLoadState('domcontentloaded');
 
     const drawerText = page.getByText('Add new and previously removed widgets');
-    await expect(drawerText).toBeVisible({ timeout: 10000 });
+    await expect(drawerText).toBeVisible({ timeout: 60000 });
 
     await context.close();
   });

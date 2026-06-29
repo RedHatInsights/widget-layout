@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import DebouncePromise from 'awesome-debounce-promise';
 import { templateAtom, templateIdAtom } from '../state/templateAtom';
 import { layoutVariantAtom } from '../state/layoutAtom';
@@ -14,6 +14,7 @@ import {
 import useCurrentUser from './useCurrentUser';
 import { useAddNotification } from '../state/notificationsAtom';
 import { useApi } from './useApi';
+import { drawerExpandedAtom } from '../state/drawerExpandedAtom';
 import { useFlag } from '@unleash/proxy-client-react';
 
 const sidebarBreakpoints = { xl: 1250, lg: 1100, md: 800, sm: 500 };
@@ -30,11 +31,19 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
   const layoutRef = useRef<HTMLDivElement>(null);
   const api = useApi();
   const debouncedPatchDashboardTemplate = useMemo(() => DebouncePromise(api.patchDashboardTemplate, 1500, { onlyResolvesLast: true }), [api]);
+  const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
 
   useEffect(() => {
-    if (!currentUser || templateId >= 0) {
+    if (!currentUser) {
       return;
     }
+
+    if (templateId >= 0) {
+      setIsLoaded(true);
+      return;
+    }
+
+    setDrawerExpanded(false);
 
     api
       .getDashboardTemplates(mappedLayoutType)
