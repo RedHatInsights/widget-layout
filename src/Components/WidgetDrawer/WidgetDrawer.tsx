@@ -87,13 +87,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
   const filteredWidgetMapping = Object.entries(widgetMapping).filter(([type]) => !currentlyUsedWidgets.includes(type));
 
   const panelContent = (
-    <PageSection
-      hasBodyWrapper={false}
-      className="widg-c-page__main-section--drawer pf-v6-u-p-md pf-v6-u-p-lg-on-sm"
-      style={{
-        backgroundColor: 'var(pf-t--global--icon--color--brand--default)',
-      }}
-    >
+    <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--drawer pf-v6-u-p-md pf-v6-u-p-lg-on-sm">
       <Split className="widg-l-split--add-widget">
         <SplitItem isFilled>
           <Title headingLevel="h2" size="md" className="pf-v6-u-pb-sm">
