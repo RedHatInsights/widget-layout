@@ -1,10 +1,15 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import Header from '../../src/Components/DashboardHub/Header/Header';
 
 describe('DashboardHub Header', () => {
   const mountHeader = () => {
     const onRefetchDashboards = cy.stub().as('onRefetchDashboards');
-    cy.mount(<Header onRefetchDashboards={onRefetchDashboards} dashboards={[]} />);
+    cy.mount(
+      <MemoryRouter>
+        <Header onRefetchDashboards={onRefetchDashboards} dashboards={[]} />
+      </MemoryRouter>
+    );
   };
 
   it('renders "Dashboard Hub" heading', () => {
@@ -25,6 +30,13 @@ describe('DashboardHub Header', () => {
   it('"Create dashboard" dropdown button is present', () => {
     mountHeader();
     cy.contains('button', 'Create dashboard').should('be.visible');
+  });
+
+  it('renders breadcrumb navigation', () => {
+    mountHeader();
+    cy.get('.pf-v6-c-breadcrumb').should('be.visible');
+    cy.contains('.pf-v6-c-breadcrumb__item', 'Home').should('be.visible');
+    cy.contains('.pf-v6-c-breadcrumb__item', 'Dashboard Hub').should('be.visible');
   });
 
   describe('Create dashboard dropdown', () => {

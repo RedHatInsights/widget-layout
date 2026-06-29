@@ -1,5 +1,18 @@
-import { Content, Dropdown, DropdownItem, DropdownList, Flex, FlexItem, MenuToggle, MenuToggleElement, PageSection } from '@patternfly/react-core';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Content,
+  Dropdown,
+  DropdownItem,
+  DropdownList,
+  Flex,
+  FlexItem,
+  MenuToggle,
+  MenuToggleElement,
+  PageSection,
+} from '@patternfly/react-core';
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ImportModal } from '../ImportModal/ImportModal';
 import { CreateModal } from '../../CreateModal/CreateModal';
 import { DuplicateModal } from '../../DuplicateModal/DuplicateModal';
@@ -54,25 +67,35 @@ interface HeaderProps {
 
 const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards }) => {
   return (
-    <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
-      <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
-        <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
-          <Content>
-            <Content component="h1">Dashboard Hub</Content>
-            <Content component="dd" className="pf-v6-u-mt-0">
-              Page description
+    <>
+      <PageSection className="pf-v6-u-pb-0">
+        <Breadcrumb>
+          <BreadcrumbItem>
+            <Link to="/">Home</Link>
+          </BreadcrumbItem>
+          <BreadcrumbItem isActive>Dashboard Hub</BreadcrumbItem>
+        </Breadcrumb>
+      </PageSection>
+      <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
+        <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
+          <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
+            <Content>
+              <Content component="h1">Dashboard Hub</Content>
+              <Content component="dd" className="pf-v6-u-mt-0">
+                Page description
+              </Content>
+              <Content component="a" className="pf-v6-u-mt-0">
+                Learn more about dashboards <ExternalLinkAltIcon />
+              </Content>
             </Content>
-            <Content component="a" className="pf-v6-u-mt-0">
-              Learn more about dashboards <ExternalLinkAltIcon />
-            </Content>
-          </Content>
-        </FlexItem>
+          </FlexItem>
 
-        <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
-          <CreateDashboardDropdown onRefetchDashboards={onRefetchDashboards} />
-        </FlexItem>
-      </Flex>
-    </PageSection>
+          <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
+            <CreateDashboardDropdown onRefetchDashboards={onRefetchDashboards} />
+          </FlexItem>
+        </Flex>
+      </PageSection>
+    </>
   );
 };
 
