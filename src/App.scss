@@ -11,10 +11,8 @@
   max-width: 1550px;
 }
 .widg-l-gallery {
-  display: flex;
-  flex-wrap: wrap;
+  --pf-v6-l-gallery--GridTemplateColumns--min: 380px;
   .grid-tile {
-    min-width: 380px;
     .pf-v6-c-icon__content {
       padding-right: var(--pf-t--global--spacer--md);
       padding-top: var(--pf-t--global--spacer--sm);
