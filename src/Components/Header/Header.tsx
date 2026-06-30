@@ -48,7 +48,6 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
     drilldownPath: [] as string[],
     activeMenu: 'kebab-rootMenu',
   });
-  const [menuHeights, setMenuHeights] = useState<Record<string, number>>({});
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -77,12 +76,6 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
     }));
   };
 
-  const setHeight = (menuId: string, height: number) => {
-    if (menuHeights[menuId] === undefined || (menuId !== 'kebab-rootMenu' && menuHeights[menuId] !== height)) {
-      setMenuHeights({ ...menuHeights, [menuId]: height });
-    }
-  };
-
   const toggle = (
     <MenuToggle
       ref={toggleRef}
@@ -103,10 +96,9 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
       activeMenu={drilldownState.activeMenu}
       onDrillIn={drillIn}
       onDrillOut={drillOut}
-      onGetMenuHeight={setHeight}
       ref={menuRef}
     >
-      <MenuContent menuHeight={drilldownState.activeMenu !== 'kebab-rootMenu' ? `${menuHeights[drilldownState.activeMenu]}px` : undefined}>
+      <MenuContent>
         <MenuList>
           {dashboards.length > 0 && (
             <>

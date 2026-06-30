@@ -2,7 +2,7 @@
 // Matches the old grid-tile card header styling
 
 .pf-v6-widget-grid-tile {
-  overflow: hidden;
+  overflow: visible;
 
   // Header padding and background (matches old .pf-v6-c-card__header)
   .pf-v6-widget-grid-tile__header {
