@@ -108,7 +108,7 @@ const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, 
     if (isLoaded && activeLayout.length === 0) {
       setDrawerExpanded(true);
     }
-  }, [isLoaded]);
+  }, [isLoaded, activeLayout.length, setDrawerExpanded]);
 
   return (
     <div id="widget-layout-container" style={{ position: 'relative' }} ref={layoutRef}>

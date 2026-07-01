@@ -156,53 +156,79 @@ test.describe('Widget Layout - Integration Tests', () => {
   test('[Integration] should auto-open drawer when loading empty dashboard from API', async ({ page }) => {
     await disableCookiePrompt(page);
 
-    // Setup: Create an empty dashboard via API
+    // First navigate to the page to establish auth context
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+
+    // Setup: Create an empty dashboard via API using browser's fetch (includes auth cookies)
     // Note: This is integration test style - we're testing that the frontend correctly
     // handles an empty dashboard response from the backend, not simulating user actions
-    const emptyDashboard = await page.request.post('/api/widget-layout/v1/import', {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      data: {
-        dashboardName: `Integration Test Empty Dashboard ${Date.now()}`,
-        templateBase: {
-          name: 'landing-landingPage',
-          displayName: 'Landing Page',
+    const createResult = await page.evaluate(async () => {
+      const response = await fetch('/api/widget-layout/v1/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        templateConfig: {
-          sm: [],
-          md: [],
-          lg: [],
-          xl: [],
-        },
-      },
+        body: JSON.stringify({
+          dashboardName: `Integration Test Empty Dashboard ${Date.now()}`,
+          templateBase: {
+            name: 'landing-landingPage',
+            displayName: 'Landing Page',
+          },
+          templateConfig: {
+            sm: [],
+            md: [],
+            lg: [],
+            xl: [],
+          },
+        }),
+      });
+
+      const responseText = await response.text();
+      return {
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText,
+        body: responseText,
+      };
     });
 
-    if (!emptyDashboard.ok()) {
-      const errorBody = await emptyDashboard.text();
-      console.error('Failed to create dashboard:', {
-        status: emptyDashboard.status(),
-        statusText: emptyDashboard.statusText(),
-        body: errorBody,
-        headers: emptyDashboard.headers(),
-      });
-      throw new Error(`Failed to create empty dashboard: ${emptyDashboard.status()} ${emptyDashboard.statusText()}\nResponse: ${errorBody}`);
+    if (!createResult.ok) {
+      console.error('Failed to create dashboard:', createResult);
+      throw new Error(`Failed to create empty dashboard: ${createResult.status} ${createResult.statusText}\nResponse: ${createResult.body}`);
     }
 
-    const dashboard = await emptyDashboard.json();
+    const dashboard = JSON.parse(createResult.body);
     console.log('Created dashboard:', dashboard);
     const templateId = dashboard.id;
 
     if (!templateId) {
-      throw new Error(`Dashboard created but no ID returned. Response: ${JSON.stringify(dashboard)}`);
+      throw new Error(`Dashboard created but no ID returned. Response: ${createResult.body}`);
     }
 
     // Set as default so it loads on the landing page
-    const setDefaultResponse = await page.request.post(`/api/widget-layout/v1/${templateId}/default`);
-    if (!setDefaultResponse.ok()) {
-      const errorBody = await setDefaultResponse.text();
-      throw new Error(`Failed to set default dashboard: ${setDefaultResponse.status()} ${setDefaultResponse.statusText()}\nResponse: ${errorBody}`);
+    const setDefaultResult = await page.evaluate(async (id) => {
+      const response = await fetch(`/api/widget-layout/v1/${id}/default`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+      const responseText = await response.text();
+      return {
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText,
+        body: responseText,
+      };
+    }, templateId);
+
+    if (!setDefaultResult.ok) {
+      console.error('Failed to set default:', setDefaultResult);
+      throw new Error(`Failed to set default dashboard: ${setDefaultResult.status} ${setDefaultResult.statusText}\nResponse: ${setDefaultResult.body}`);
     }
 
     try {
@@ -221,8 +247,21 @@ test.describe('Widget Layout - Integration Tests', () => {
       const drawerCards = page.locator('.widg-c-drawer__card');
       await expect(drawerCards.first()).toBeVisible({ timeout: 5000 });
     } finally {
-      // Cleanup: delete the test dashboard
-      await page.request.delete(`/api/widget-layout/v1/${templateId}/hub`).catch(() => {
+      // Cleanup: delete the test dashboard using browser fetch (includes auth)
+      await page.evaluate(async (id) => {
+        try {
+          await fetch(`/api/widget-layout/v1/${id}/hub`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          });
+        } catch (e) {
+          // Ignore cleanup errors
+          console.warn('Failed to cleanup test dashboard:', e);
+        }
+      }, templateId).catch(() => {
         // Ignore cleanup errors
       });
     }
