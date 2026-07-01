@@ -138,33 +138,45 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
 test.describe('Widget Layout - Empty Dashboard', () => {
   test('should auto-open the widget drawer when dashboard has no widgets', async ({ page }) => {
     await disableCookiePrompt(page);
-    await page.addInitScript(() => {
-      const originalFetch = window.fetch;
-      window.fetch = async (...args) => {
-        const url = typeof args[0] === 'string' ? args[0] : args[0] instanceof Request ? args[0].url : '';
-        if (url.includes('/api/widget-layout/v1/') && url.includes('dashboardType=')) {
-          return new Response(JSON.stringify({
-            data: [{
-              id: 1,
-              default: true,
-              templateBase: { name: 'landing-landingPage', displayName: 'Landing Page' },
-              templateConfig: { sm: [], md: [], lg: [], xl: [] },
-              dashboardName: 'Test Dashboard',
-              createdAt: '2024-01-01T00:00:00Z',
-              updatedAt: '2024-01-01T00:00:00Z',
-              deletedAt: null,
-              userId: 'test-user',
-            }],
-          }), { status: 200, headers: { 'Content-Type': 'application/json' } });
-        }
-        return originalFetch(...args);
-      };
+
+    // Create an empty dashboard via API and set it as default
+    const emptyDashboard = await page.request.post('/api/widget-layout/v1/import', {
+      data: {
+        dashboardName: `E2E Empty Dashboard ${Date.now()}`,
+        templateBase: {
+          name: 'landing-landingPage',
+          displayName: 'Landing Page',
+        },
+        templateConfig: {
+          sm: [],
+          md: [],
+          lg: [],
+          xl: [],
+        },
+      },
     });
 
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 180000 });
+    const dashboard = await emptyDashboard.json();
+    const templateId = dashboard.id;
 
-    const drawerText = page.getByText('Add new and previously removed widgets');
-    await expect(drawerText).toBeVisible({ timeout: 180000 });
+    // Set as default so it loads on the landing page
+    await page.request.post(`/api/widget-layout/v1/${templateId}/default`);
+
+    try {
+      // Navigate to the landing page
+      await page.goto('/');
+
+      // Wait for the page to load
+      await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
+
+      // Verify the drawer auto-opens for empty dashboard
+      const drawerText = page.getByText('Add new and previously removed widgets');
+      await expect(drawerText).toBeVisible({ timeout: 10000 });
+    } finally {
+      // Cleanup: delete the test dashboard
+      await page.request.delete(`/api/widget-layout/v1/${templateId}/hub`).catch(() => {
+        // Ignore cleanup errors
+      });
+    }
   });
 });

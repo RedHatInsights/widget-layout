@@ -15,7 +15,8 @@ export default defineConfig({
   testDir: './playwright',
 
   // Global setup: authenticate once and reuse session across all tests
-  globalSetup: require.resolve('@redhat-cloud-services/playwright-test-auth/global-setup'),
+  // Note: Requires E2E_USER and E2E_PASSWORD environment variables
+  globalSetup: process.env.E2E_USER ? '@redhat-cloud-services/playwright-test-auth/global-setup' : undefined,
 
   // Maximum time one test can run (increased for stage environment)
   timeout: 180 * 1000,
@@ -37,8 +38,8 @@ export default defineConfig({
     // Base URL for navigation
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://stage.foo.redhat.com:1337/',
 
-    // Reuse authentication state from global setup
-    storageState: 'playwright/.auth/user.json',
+    // Reuse authentication state from global setup (if available)
+    storageState: process.env.E2E_USER ? 'playwright/.auth/user.json' : undefined,
 
     // Skip TLS certificate verification (self-signed certs)
     ignoreHTTPSErrors: true,
