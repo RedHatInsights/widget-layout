@@ -1,3 +1,17 @@
+/**
+ * Widget Layout Playwright Tests
+ *
+ * Test Types:
+ * - E2E Tests: Simulate real user journeys using only UI interactions (clicking, typing, dragging)
+ * - Integration Tests: Use API calls for setup/teardown to test frontend-backend integration
+ *
+ * Prefer E2E for user workflows. Use integration tests when:
+ * - API setup is needed to create specific test conditions
+ * - Pure UI setup would be too complex or fragile
+ * - Testing edge cases that are hard to reproduce via UI
+ *
+ * Mark integration tests with "[Integration]" prefix in test name.
+ */
 import { test, expect } from '@playwright/test';
 import { disableCookiePrompt } from '@redhat-cloud-services/playwright-test-auth';
 
@@ -135,14 +149,19 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 });
 
-test.describe('Widget Layout - Empty Dashboard', () => {
-  test('should auto-open the widget drawer when dashboard has no widgets', async ({ page }) => {
+test.describe('Widget Layout - Integration Tests', () => {
+  // Integration tests use API calls for setup/teardown to test frontend-backend integration
+  // Pure E2E tests should only use UI interactions
+
+  test('[Integration] should auto-open drawer when loading empty dashboard from API', async ({ page }) => {
     await disableCookiePrompt(page);
 
-    // Create an empty dashboard via API before page load
+    // Setup: Create an empty dashboard via API
+    // Note: This is integration test style - we're testing that the frontend correctly
+    // handles an empty dashboard response from the backend, not simulating user actions
     const emptyDashboard = await page.request.post('/api/widget-layout/v1/import', {
       data: {
-        dashboardName: `E2E Empty Dashboard ${Date.now()}`,
+        dashboardName: `Integration Test Empty Dashboard ${Date.now()}`,
         templateBase: {
           name: 'landing-landingPage',
           displayName: 'Landing Page',
@@ -165,20 +184,18 @@ test.describe('Widget Layout - Empty Dashboard', () => {
     expect(setDefaultResponse.ok()).toBeTruthy();
 
     try {
-      // Navigate to the landing page - it should load the empty dashboard
+      // Act: Navigate to the landing page - it should load the empty dashboard
       await page.goto('/');
 
-      // Wait for the page to fully load
+      // Assert: Page loads and shows empty state
       await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
-
-      // Verify the empty state message is shown
       await expect(page.getByText('No dashboard content')).toBeVisible({ timeout: 10000 });
 
-      // Verify the drawer auto-opens for empty dashboard
+      // Assert: Drawer auto-opens for empty dashboard
       const drawerText = page.getByText(/Add new and previously removed widgets/);
       await expect(drawerText).toBeVisible({ timeout: 10000 });
 
-      // Verify the drawer contains widgets to add
+      // Assert: Drawer contains widgets to add
       const drawerCards = page.locator('.widg-c-drawer__card');
       await expect(drawerCards.first()).toBeVisible({ timeout: 5000 });
     } finally {
