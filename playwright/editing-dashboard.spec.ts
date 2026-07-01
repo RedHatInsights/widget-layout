@@ -11,7 +11,7 @@ const navigateToDashboardHub = async (page: Page) => {
 
 const navigateToGenericDashboard = async (page: Page, dashboardName: string) => {
   await navigateToDashboardHub(page);
-  await page.getByRole('link', { name: dashboardName }).click();
+  await page.getByRole('link', { name: dashboardName, exact: true }).click();
   await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
 };
 
@@ -123,6 +123,7 @@ test.describe('Set Dashboard as Homepage from Generic Page', () => {
     await page.getByText(`'${nonDefaultName}' has been set as homepage`).waitFor({ state: 'visible', timeout: 10000 });
 
     await navigateToDashboardHub(page);
+    await page.getByRole('link', { name: nonDefaultName, exact: true }).waitFor({ state: 'visible', timeout: 10000 });
 
     expect(await hasHomeIcon(page, nonDefaultName)).toBe(true);
     expect(await hasHomeIcon(page, defaultName)).toBe(false);
