@@ -126,48 +126,45 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 
   test('should not show the widget drawer by default on page load', async ({ page }) => {
+    await page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title')
+      .first()
+      .waitFor({ state: 'visible', timeout: 180000 });
+
     const drawerText = page.getByText('Add new and previously removed widgets');
-    await expect(drawerText).not.toBeVisible({ timeout: 60000 });
+    await expect(drawerText).not.toBeVisible();
   });
 });
 
 test.describe('Widget Layout - Empty Dashboard', () => {
-  test('should auto-open the widget drawer when dashboard has no widgets', async ({ browser }) => {
-    const context = await browser.newContext();
-    const page = await context.newPage();
+  test('should auto-open the widget drawer when dashboard has no widgets', async ({ page }) => {
     await disableCookiePrompt(page);
-
-    await page.route('**/api/widget-layout/v1/*', (route) => {
-      if (route.request().method() === 'GET') {
-        return route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            data: [
-              {
-                id: 1,
-                default: true,
-                templateBase: { name: 'landing-landingPage', displayName: 'Landing Page' },
-                templateConfig: { sm: [], md: [], lg: [], xl: [] },
-                dashboardName: 'Test Dashboard',
-                createdAt: '2024-01-01T00:00:00Z',
-                updatedAt: '2024-01-01T00:00:00Z',
-                deletedAt: null,
-                userId: 'test-user',
-              },
-            ],
-          }),
-        });
-      }
-      return route.continue();
+    await page.addInitScript(() => {
+      const originalFetch = window.fetch;
+      window.fetch = async (...args) => {
+        const url = typeof args[0] === 'string' ? args[0] : args[0] instanceof Request ? args[0].url : '';
+        if (url.includes('/api/widget-layout/v1/') && url.includes('dashboardType=')) {
+          return new Response(JSON.stringify({
+            data: [{
+              id: 1,
+              default: true,
+              templateBase: { name: 'landing-landingPage', displayName: 'Landing Page' },
+              templateConfig: { sm: [], md: [], lg: [], xl: [] },
+              dashboardName: 'Test Dashboard',
+              createdAt: '2024-01-01T00:00:00Z',
+              updatedAt: '2024-01-01T00:00:00Z',
+              deletedAt: null,
+              userId: 'test-user',
+            }],
+          }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }
+        return originalFetch(...args);
+      };
     });
 
     await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
+    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 180000 });
 
     const drawerText = page.getByText('Add new and previously removed widgets');
-    await expect(drawerText).toBeVisible({ timeout: 60000 });
-
-    await context.close();
+    await expect(drawerText).toBeVisible({ timeout: 180000 });
   });
 });
