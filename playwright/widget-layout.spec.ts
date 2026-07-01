@@ -160,6 +160,10 @@ test.describe('Widget Layout - Integration Tests', () => {
     // Note: This is integration test style - we're testing that the frontend correctly
     // handles an empty dashboard response from the backend, not simulating user actions
     const emptyDashboard = await page.request.post('/api/widget-layout/v1/import', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
       data: {
         dashboardName: `Integration Test Empty Dashboard ${Date.now()}`,
         templateBase: {
@@ -175,13 +179,31 @@ test.describe('Widget Layout - Integration Tests', () => {
       },
     });
 
-    expect(emptyDashboard.ok()).toBeTruthy();
+    if (!emptyDashboard.ok()) {
+      const errorBody = await emptyDashboard.text();
+      console.error('Failed to create dashboard:', {
+        status: emptyDashboard.status(),
+        statusText: emptyDashboard.statusText(),
+        body: errorBody,
+        headers: emptyDashboard.headers(),
+      });
+      throw new Error(`Failed to create empty dashboard: ${emptyDashboard.status()} ${emptyDashboard.statusText()}\nResponse: ${errorBody}`);
+    }
+
     const dashboard = await emptyDashboard.json();
+    console.log('Created dashboard:', dashboard);
     const templateId = dashboard.id;
+
+    if (!templateId) {
+      throw new Error(`Dashboard created but no ID returned. Response: ${JSON.stringify(dashboard)}`);
+    }
 
     // Set as default so it loads on the landing page
     const setDefaultResponse = await page.request.post(`/api/widget-layout/v1/${templateId}/default`);
-    expect(setDefaultResponse.ok()).toBeTruthy();
+    if (!setDefaultResponse.ok()) {
+      const errorBody = await setDefaultResponse.text();
+      throw new Error(`Failed to set default dashboard: ${setDefaultResponse.status()} ${setDefaultResponse.statusText()}\nResponse: ${errorBody}`);
+    }
 
     try {
       // Act: Navigate to the landing page - it should load the empty dashboard
