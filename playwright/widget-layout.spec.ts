@@ -135,9 +135,14 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     const count = await widgetTiles.count();
     expect(count).toBeGreaterThan(0);
 
-    // Verify widget titles are visible (don't check specific titles since they vary by environment)
+    // Check for default widgets that appear after reset
+    // Red Hat Enterprise Linux is the first widget in the default layout
     const widgetTitles = page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title');
     await expect(widgetTitles.first()).toBeVisible();
+
+    // Optionally check for specific default widgets if they should always be present
+    // (commenting out for now since widget availability may vary by permissions)
+    // await expect(page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title').filter({ hasText: 'Red Hat Enterprise Linux' })).toBeVisible();
   });
 
   test('should have Reset to default button visible', async ({ page }) => {

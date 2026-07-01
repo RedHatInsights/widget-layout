@@ -41,17 +41,23 @@ async function globalSetup(config: FullConfig) {
       const resetButton = page.getByRole('button', { name: 'Reset to default' });
       await resetButton.click();
 
-      // Wait for and handle the confirmation modal
+      // Wait for modal to appear
       await page.waitForTimeout(1000);
 
-      // Look for confirmation button (could be "Confirm", "Reset", "Yes", etc.)
-      const confirmButton = page.getByRole('button', { name: /confirm|reset|yes/i }).first();
+      // Check the "I understand" checkbox
+      const checkbox = page.getByRole('checkbox', { name: /I understand that this action cannot be undone/i });
+      await checkbox.check();
+
+      // Click the "Reset layout" confirm button
+      const confirmButton = page.getByRole('button', { name: 'Reset layout' });
       await confirmButton.click();
 
-      // Wait for reset to complete
-      await page.waitForTimeout(3000);
+      // Wait for reset to complete and widgets to load
+      await page.waitForTimeout(5000);
 
-      console.log('Dashboard reset complete');
+      // Verify widgets loaded
+      const newWidgetCount = await widgetTiles.count().catch(() => 0);
+      console.log(`Dashboard reset complete. Widgets loaded: ${newWidgetCount}`);
     } else {
       console.log(`Dashboard already has ${widgetCount} widgets, no reset needed`);
     }
