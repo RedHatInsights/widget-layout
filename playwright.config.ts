@@ -14,9 +14,9 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './playwright',
 
-  // Global setup: authenticate once and reuse session across all tests
-  // Note: Requires E2E_USER and E2E_PASSWORD environment variables
-  globalSetup: process.env.E2E_USER ? '@redhat-cloud-services/playwright-test-auth/global-setup' : undefined,
+  // Global setup: authenticate and reset dashboard state
+  // Auth setup runs first (if credentials provided), then dashboard reset
+  globalSetup: require.resolve('./playwright/global-setup'),
 
   // Maximum time one test can run (increased for stage environment)
   timeout: 180 * 1000,
