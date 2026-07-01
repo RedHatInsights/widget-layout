@@ -150,16 +150,51 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
 });
 
 test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
-  // Note: This test is skipped because widgets on the landing page cannot be
-  // removed via UI interactions (no kebab menu/remove button on individual widgets).
-  // The drawer auto-open behavior for empty dashboards is tested in unit tests.
-  // To test this E2E, we would need either:
-  // 1. API setup to create an empty dashboard (requires solving auth issues)
-  // 2. UI to remove widgets (not currently available on landing page)
-  // 3. Navigate to a different dashboard type that allows widget removal
+  test('should auto-open drawer after user removes all widgets', async ({ page }) => {
+    await disableCookiePrompt(page);
+    await page.goto('/');
 
-  test.skip('should auto-open drawer after user removes all widgets', async ({ page }) => {
-    // Placeholder for future implementation when widget removal UI is available
-    // or when we solve the API authentication issue for dashboard setup
+    // Wait for the page to load with widgets
+    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
+
+    // Find all widget tiles
+    const widgetTiles = page.locator('.pf-v6-widget-grid-tile');
+    const initialCount = await widgetTiles.count();
+
+    // Skip test if dashboard is already empty
+    if (initialCount === 0) {
+      test.skip(true, 'Dashboard is already empty, cannot test removal flow');
+      return;
+    }
+
+    // Remove all widgets one by one
+    for (let i = 0; i < initialCount; i++) {
+      // Always target the first widget since the list updates after each removal
+      const firstWidget = widgetTiles.first();
+
+      // Click the widget menu toggle (three vertical dots)
+      // The toggle is a plain button with EllipsisVIcon, class pf-v6-widget-grid-tile__menu-toggle
+      const menuToggle = firstWidget.locator('button.pf-v6-widget-grid-tile__menu-toggle');
+      await menuToggle.click();
+
+      // Click the "Remove" option in the dropdown menu
+      // The menu item has ouiaId="remove-widget"
+      const removeButton = page.getByRole('menuitem', { name: 'Remove' });
+      await removeButton.click();
+
+      // Wait for the widget to be removed
+      await page.waitForTimeout(500);
+    }
+
+    // Verify all widgets were removed and empty state is shown
+    await expect(page.getByText('No dashboard content')).toBeVisible({ timeout: 10000 });
+
+    // Verify the drawer auto-opens when all widgets are removed
+    const drawerText = page.getByText(/Add new and previously removed widgets/);
+    await expect(drawerText).toBeVisible({ timeout: 10000 });
+
+    // Verify the drawer contains widgets the user can add back
+    const drawerCards = page.locator('.widg-c-drawer__card');
+    await expect(drawerCards.first()).toBeVisible({ timeout: 5000 });
   });
 });
