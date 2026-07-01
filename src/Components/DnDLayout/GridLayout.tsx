@@ -2,7 +2,7 @@ import '@patternfly/widgetized-dashboard/dist/esm/styles.css';
 import './GridLayout.scss';
 import './WidgetHeader.scss';
 import '../Icons/HeaderIcon.scss';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import ResizeHandleSVG from './resize-handle.svg';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
@@ -103,10 +103,16 @@ const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, 
   };
 
   const activeLayout = patternFlyTemplate[layoutVariant] || [];
+  const hasCheckedInitialState = useRef(false);
 
   useEffect(() => {
-    if (isLoaded && activeLayout.length === 0) {
-      setDrawerExpanded(true);
+    // Only auto-open drawer once on initial load if dashboard is empty
+    // Don't re-run when layout changes after initial load
+    if (isLoaded && !hasCheckedInitialState.current) {
+      hasCheckedInitialState.current = true;
+      if (activeLayout.length === 0) {
+        setDrawerExpanded(true);
+      }
     }
   }, [isLoaded, activeLayout.length, setDrawerExpanded]);
 
