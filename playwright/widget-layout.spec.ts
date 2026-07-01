@@ -101,22 +101,22 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 
   test('should close the drawer when clicking Add widgets button again', async ({ page }) => {
+    const addWidgetsButton = page.getByRole('button', { name: 'Add widgets' });
     const drawerText = page.getByText('Add new and previously removed widgets');
 
     // Ensure drawer is open first
     const isDrawerVisible = await drawerText.isVisible().catch(() => false);
     if (!isDrawerVisible) {
       // Open the drawer
-      await page.getByRole('button', { name: 'Add widgets' }).click();
-      await page.waitForTimeout(1000);
+      await addWidgetsButton.click();
       await expect(drawerText).toBeVisible({ timeout: 5000 });
     }
 
     // Click Add widgets again to close
-    await page.getByRole('button', { name: 'Add widgets' }).click();
+    await addWidgetsButton.click();
 
-    // Wait for drawer to close
-    await page.waitForTimeout(1000);
+    // Wait for drawer close animation to complete
+    await page.waitForTimeout(1500);
 
     // Verify the instruction text is no longer visible
     await expect(drawerText).not.toBeVisible({ timeout: 5000 });
@@ -194,7 +194,8 @@ test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
     await expect(drawerText).toBeVisible({ timeout: 10000 });
 
     // Verify the drawer contains widgets the user can add back
-    const drawerCards = page.locator('.widg-c-drawer__card');
+    // Widget cards in the drawer have ouiaId="add-widget-card-{title}"
+    const drawerCards = page.locator('[data-ouia-component-id^="add-widget-card-"]');
     await expect(drawerCards.first()).toBeVisible({ timeout: 5000 });
   });
 });
