@@ -11,6 +11,10 @@
  * - Testing edge cases that are hard to reproduce via UI
  *
  * Mark integration tests with "[Integration]" prefix in test name.
+ *
+ * ⚠️ CRITICAL: Always call disableCookiePrompt(page) BEFORE navigation
+ * The TrustArc cookie consent popup WILL block clicks and cause mysterious test failures.
+ * Every beforeEach must call it first!
  */
 import { test, expect } from '@playwright/test';
 import { disableCookiePrompt } from '@redhat-cloud-services/playwright-test-auth';
