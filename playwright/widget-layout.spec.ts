@@ -175,18 +175,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
 });
 
 test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
-  // SKIPPED: This test removes all widgets from the dashboard, which affects
-  // subsequent tests in the same run (they fail because dashboard is empty).
-  //
-  // To properly test this, we need one of:
-  // 1. Test isolation via beforeEach that resets dashboard (requires API auth fix)
-  // 2. Run this test in a separate worker/file
-  // 3. Add cleanup that clicks "Reset to default" and handles the confirmation modal
-  //
-  // The drawer auto-open behavior IS working (verified manually and in unit tests).
-  // This test validates the full E2E flow but needs isolation to run in CI.
-
-  test.skip('should auto-open drawer after user removes all widgets', async ({ page }) => {
+  test('should auto-open drawer after user removes all widgets', async ({ page }) => {
     await disableCookiePrompt(page);
     await page.goto('/');
 
@@ -202,22 +191,53 @@ test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
       return;
     }
 
-    // Remove all widgets
-    for (let i = 0; i < initialCount; i++) {
-      const firstWidget = widgetTiles.first();
-      const menuToggle = firstWidget.locator('button.pf-v6-widget-grid-tile__menu-toggle');
-      await menuToggle.click();
+    try {
+      // Remove all widgets one by one
+      for (let i = 0; i < initialCount; i++) {
+        const firstWidget = widgetTiles.first();
+        const menuToggle = firstWidget.locator('button.pf-v6-widget-grid-tile__menu-toggle');
+        await menuToggle.click();
 
-      const removeButton = page.getByRole('menuitem', { name: 'Remove' });
-      await removeButton.click();
-      await page.waitForTimeout(500);
+        const removeButton = page.getByRole('menuitem', { name: 'Remove' });
+        await removeButton.click();
+        await page.waitForTimeout(500);
+      }
+
+      // Verify empty state appears
+      await expect(page.getByText('No dashboard content')).toBeVisible({ timeout: 10000 });
+
+      // Verify drawer auto-opens when all widgets removed
+      await expect(page.getByText(/Add new and previously removed widgets/)).toBeVisible({ timeout: 10000 });
+
+      // Verify drawer contains widgets to add back
+      const drawerCards = page.locator('[data-ouia-component-id^="add-widget-card-"]');
+      await expect(drawerCards.first()).toBeVisible({ timeout: 5000 });
+    } finally {
+      // Cleanup: Reset dashboard to default state for subsequent tests
+      // This uses the same reset flow that works in global setup
+      console.log('Resetting dashboard to default state after widget removal test...');
+
+      const resetButton = page.getByRole('button', { name: 'Reset to default' });
+      await resetButton.click();
+
+      // Wait for modal to appear
+      await page.waitForTimeout(1000);
+
+      // Check the "I understand" checkbox
+      const checkbox = page.getByRole('checkbox', { name: /I understand that this action cannot be undone/i });
+      await checkbox.check();
+
+      // Click the "Reset layout" confirm button
+      const confirmButton = page.getByRole('button', { name: 'Reset layout' });
+      await confirmButton.click();
+
+      // Wait for reset to complete and widgets to load
+      await page.waitForTimeout(5000);
+
+      // Verify widgets are restored
+      const restoredWidgets = page.locator('.pf-v6-widget-grid-tile');
+      const restoredCount = await restoredWidgets.count().catch(() => 0);
+      console.log(`Dashboard reset complete. Widgets restored: ${restoredCount}`);
     }
-
-    // Verify empty state and drawer auto-open
-    await expect(page.getByText('No dashboard content')).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/Add new and previously removed widgets/)).toBeVisible({ timeout: 10000 });
-
-    const drawerCards = page.locator('[data-ouia-component-id^="add-widget-card-"]');
-    await expect(drawerCards.first()).toBeVisible({ timeout: 5000 });
   });
 });
