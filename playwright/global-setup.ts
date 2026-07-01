@@ -1,4 +1,5 @@
 import { chromium, FullConfig } from '@playwright/test';
+import { disableCookiePrompt } from '@redhat-cloud-services/playwright-test-auth';
 
 async function globalSetup(config: FullConfig) {
   // Run auth setup first if credentials are provided
@@ -23,6 +24,9 @@ async function globalSetup(config: FullConfig) {
 
   try {
     console.log('Global Setup: Resetting dashboard to default state...');
+
+    // Disable cookie consent popup before navigation
+    await disableCookiePrompt(page);
 
     // Navigate to the landing page
     await page.goto('/');
