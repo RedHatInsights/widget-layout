@@ -149,121 +149,58 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 });
 
-test.describe('Widget Layout - Integration Tests', () => {
-  // Integration tests use API calls for setup/teardown to test frontend-backend integration
-  // Pure E2E tests should only use UI interactions
+test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
+  // E2E test using only UI interactions to simulate real user behavior
 
-  test('[Integration] should auto-open drawer when loading empty dashboard from API', async ({ page }) => {
+  test('should auto-open drawer after user removes all widgets', async ({ page }) => {
     await disableCookiePrompt(page);
-
-    // First navigate to the page to establish auth context
     await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
 
-    // Setup: Create an empty dashboard via API using browser's fetch (includes auth cookies)
-    // Note: This is integration test style - we're testing that the frontend correctly
-    // handles an empty dashboard response from the backend, not simulating user actions
-    const createResult = await page.evaluate(async () => {
-      const response = await fetch('/api/widget-layout/v1/import', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          dashboardName: `Integration Test Empty Dashboard ${Date.now()}`,
-          templateBase: {
-            name: 'landing-landingPage',
-            displayName: 'Landing Page',
-          },
-          templateConfig: {
-            sm: [],
-            md: [],
-            lg: [],
-            xl: [],
-          },
-        }),
-      });
+    // Wait for the page to load with widgets
+    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
 
-      const responseText = await response.text();
-      return {
-        ok: response.ok,
-        status: response.status,
-        statusText: response.statusText,
-        body: responseText,
-      };
-    });
+    // Verify we start with widgets on the page
+    const widgetContainer = page.locator('#widget-layout-container');
+    await expect(widgetContainer).toBeVisible();
 
-    if (!createResult.ok) {
-      console.error('Failed to create dashboard:', createResult);
-      throw new Error(`Failed to create empty dashboard: ${createResult.status} ${createResult.statusText}\nResponse: ${createResult.body}`);
+    // Find all widget tiles
+    const widgetTiles = page.locator('.pf-v6-widget-grid-tile');
+    const initialCount = await widgetTiles.count();
+
+    // Skip test if dashboard is already empty
+    if (initialCount === 0) {
+      test.skip(true, 'Dashboard is already empty, cannot test removal flow');
+      return;
     }
 
-    const dashboard = JSON.parse(createResult.body);
-    console.log('Created dashboard:', dashboard);
-    const templateId = dashboard.id;
+    // Remove all widgets one by one using the kebab menu
+    for (let i = 0; i < initialCount; i++) {
+      // Always target the first widget since the list updates after each removal
+      const firstWidget = widgetTiles.first();
 
-    if (!templateId) {
-      throw new Error(`Dashboard created but no ID returned. Response: ${createResult.body}`);
+      // Find and click the kebab menu button (Actions menu)
+      // TODO: Refine to use semantic selector once we identify the accessible name
+      const kebabButton = firstWidget.locator('button[aria-label*="Actions"], button[aria-label*="kebab"]').first();
+      await kebabButton.click();
+
+      // Click the remove option in the dropdown
+      const removeButton = page.getByRole('menuitem', { name: /remove|delete/i });
+      await removeButton.click();
+
+      // Wait a moment for the widget to be removed and layout to update
+      await page.waitForTimeout(500);
     }
 
-    // Set as default so it loads on the landing page
-    const setDefaultResult = await page.evaluate(async (id) => {
-      const response = await fetch(`/api/widget-layout/v1/${id}/default`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      });
+    // Verify all widgets were removed and empty state is shown
+    await expect(page.getByText('No dashboard content')).toBeVisible({ timeout: 10000 });
 
-      const responseText = await response.text();
-      return {
-        ok: response.ok,
-        status: response.status,
-        statusText: response.statusText,
-        body: responseText,
-      };
-    }, templateId);
+    // Verify the drawer auto-opens when all widgets are removed
+    const drawerText = page.getByText(/Add new and previously removed widgets/);
+    await expect(drawerText).toBeVisible({ timeout: 10000 });
 
-    if (!setDefaultResult.ok) {
-      console.error('Failed to set default:', setDefaultResult);
-      throw new Error(`Failed to set default dashboard: ${setDefaultResult.status} ${setDefaultResult.statusText}\nResponse: ${setDefaultResult.body}`);
-    }
-
-    try {
-      // Act: Navigate to the landing page - it should load the empty dashboard
-      await page.goto('/');
-
-      // Assert: Page loads and shows empty state
-      await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
-      await expect(page.getByText('No dashboard content')).toBeVisible({ timeout: 10000 });
-
-      // Assert: Drawer auto-opens for empty dashboard
-      const drawerText = page.getByText(/Add new and previously removed widgets/);
-      await expect(drawerText).toBeVisible({ timeout: 10000 });
-
-      // Assert: Drawer contains widgets to add
-      const drawerCards = page.locator('.widg-c-drawer__card');
-      await expect(drawerCards.first()).toBeVisible({ timeout: 5000 });
-    } finally {
-      // Cleanup: delete the test dashboard using browser fetch (includes auth)
-      await page.evaluate(async (id) => {
-        try {
-          await fetch(`/api/widget-layout/v1/${id}/hub`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          });
-        } catch (e) {
-          // Ignore cleanup errors
-          console.warn('Failed to cleanup test dashboard:', e);
-        }
-      }, templateId).catch(() => {
-        // Ignore cleanup errors
-      });
-    }
+    // Verify the drawer contains widgets the user can add back
+    // TODO: Refine to use semantic selector for widget cards
+    const drawerCards = page.locator('.widg-c-drawer__card');
+    await expect(drawerCards.first()).toBeVisible({ timeout: 5000 });
   });
 });
