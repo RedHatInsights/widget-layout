@@ -97,6 +97,47 @@ These tests run automatically in the Konflux pipeline on every pull request. The
 4. Runs Playwright tests against the test environment
 5. Reports results back to the PR
 
+## Troubleshooting
+
+### Tests failing with "element not found" or timeouts
+
+**Dashboard is empty from previous test run:**
+- The global setup (`playwright/global-setup.ts`) automatically resets the dashboard
+- If it fails, manually visit the app and click "Reset to default"
+
+**Authentication issues:**
+- Verify `E2E_USER` and `E2E_PASSWORD` are set correctly
+- Test credentials by logging into https://stage.foo.redhat.com manually
+- Delete `playwright/.auth/user.json` to force re-authentication
+
+**Stage environment is slow:**
+- Tests default to 180s timeout for this reason
+- Check https://status.redhat.com for outages
+
+### Running Specific Tests
+
+```bash
+# Run one test file
+npm run test:playwright -- widget-layout.spec.ts
+
+# Run one test by name
+npm run test:playwright -- -g "should open the widget drawer"
+
+# Run with more verbose output
+npm run test:playwright -- --reporter=line
+
+# Generate HTML report after run
+npx playwright show-report
+```
+
+### Viewing Test Results
+
+After tests run, reports are available:
+- **HTML Report**: `npx playwright show-report`
+- **Screenshots**: `test-results/` directory (on failure)
+- **Videos**: `test-results/` directory (on failure)
+- **Traces**: Enable with `--trace on` flag
+
 ## Resources
 
 - [Playwright Documentation](https://playwright.dev)
