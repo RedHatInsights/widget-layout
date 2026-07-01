@@ -103,16 +103,12 @@ const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, 
   };
 
   const activeLayout = patternFlyTemplate[layoutVariant] || [];
-  const hasCheckedInitialState = useRef(false);
 
   useEffect(() => {
-    // Only auto-open drawer once on initial load if dashboard is empty
-    // Don't re-run when layout changes after initial load
-    if (isLoaded && !hasCheckedInitialState.current) {
-      hasCheckedInitialState.current = true;
-      if (activeLayout.length === 0) {
-        setDrawerExpanded(true);
-      }
+    // Auto-open drawer when dashboard becomes empty after loading completes
+    // This handles both: 1) initial load with empty dashboard, 2) user removes all widgets
+    if (isLoaded && activeLayout.length === 0) {
+      setDrawerExpanded(true);
     }
   }, [isLoaded, activeLayout.length, setDrawerExpanded]);
 
