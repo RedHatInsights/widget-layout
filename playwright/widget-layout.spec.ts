@@ -53,13 +53,17 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 
   test('should open the widget drawer when clicking Add widgets button', async ({ page }) => {
+    // Verify page is loaded with widgets before testing drawer
+    const widgetTiles = page.locator('.pf-v6-widget-grid-tile');
+    await expect(widgetTiles.first()).toBeVisible({ timeout: 10000 });
+
     const addWidgetButton = page.getByRole('button', { name: 'Add widgets' });
     await expect(addWidgetButton).toBeVisible();
 
     const drawerText = page.getByText('Add new and previously removed widgets');
 
-    // Check if drawer is already open
-    const isDrawerVisible = await drawerText.isVisible().catch(() => false);
+    // Check current drawer state (don't swallow errors)
+    const isDrawerVisible = await drawerText.isVisible();
 
     if (isDrawerVisible) {
       // Drawer is already open, close it first to test the opening action
@@ -101,13 +105,18 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 
   test('should close the drawer when clicking Add widgets button again', async ({ page }) => {
+    // Verify page is loaded with widgets before testing drawer
+    const widgetTiles = page.locator('.pf-v6-widget-grid-tile');
+    await expect(widgetTiles.first()).toBeVisible({ timeout: 10000 });
+
     const addWidgetsButton = page.getByRole('button', { name: 'Add widgets' });
     const drawerText = page.getByText('Add new and previously removed widgets');
 
-    // Ensure drawer is open first
-    const isDrawerVisible = await drawerText.isVisible().catch(() => false);
+    // Check current drawer state (don't swallow errors)
+    const isDrawerVisible = await drawerText.isVisible();
+
     if (!isDrawerVisible) {
-      // Open the drawer
+      // Open the drawer first
       await addWidgetsButton.click();
       await expect(drawerText).toBeVisible({ timeout: 5000 });
     }
