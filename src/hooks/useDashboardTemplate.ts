@@ -14,6 +14,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { renameDashboardAtom } from '../state/dashboardsAtom';
 import { templateIdAtom } from '../state/templateAtom';
 import { backendFlagAtom } from '../state/store';
+import { drawerExpandedAtom } from '../state/drawerExpandedAtom';
 import { widgetKeyMap } from '../consts';
 
 const remapShortKeys = (config: ExtendedTemplateConfig): ExtendedTemplateConfig => {
@@ -68,8 +69,10 @@ const useDashboardTemplate = (id: number) => {
   const debouncedPatchDashboardTemplate = useMemo(() => DebouncePromise(api.patchDashboardTemplateHub, 1500, { onlyResolvesLast: true }), [api]);
   const renameDashboardInList = useSetAtom(renameDashboardAtom);
   const invalidateStartPage = useSetAtom(templateIdAtom);
+  const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
 
   useEffect(() => {
+    setDrawerExpanded(false);
     const fetchTemplate = async () => {
       setIsLoaded(false);
       setError(null);
