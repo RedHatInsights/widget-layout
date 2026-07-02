@@ -19,6 +19,11 @@
 import { test, expect } from '@playwright/test';
 import { disableCookiePrompt } from '@redhat-cloud-services/playwright-test-auth';
 
+// Animation and interaction timing constants
+// These account for drawer animations and modal transitions in CI environments
+const DRAWER_ANIMATION_MS = 1000;
+const MODAL_TRANSITION_MS = 500;
+
 test.describe('Widget Layout - Basic Rendering', () => {
   test.beforeEach(async ({ page }) => {
     await disableCookiePrompt(page);
@@ -72,15 +77,11 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     if (isDrawerVisible) {
       // Drawer is already open, close it first to test the opening action
       await addWidgetButton.click();
-      await page.waitForTimeout(1000);
       await expect(drawerText).not.toBeVisible({ timeout: 5000 });
     }
 
     // Now open the drawer
     await addWidgetButton.click();
-
-    // Wait for drawer animation to complete
-    await page.waitForTimeout(1000);
 
     // Verify the drawer opens by checking for the instruction text
     await expect(drawerText).toBeVisible({ timeout: 10000 });
@@ -97,7 +98,6 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     if (!isDrawerVisible) {
       // Open the drawer
       await page.getByRole('button', { name: 'Add widgets' }).click();
-      await page.waitForTimeout(1000);
     }
 
     // Wait for drawer to be visible
@@ -127,9 +127,6 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
 
     // Click Add widgets again to close
     await addWidgetsButton.click();
-
-    // Wait for drawer close animation to complete
-    await page.waitForTimeout(1500);
 
     // Verify the instruction text is no longer visible
     await expect(drawerText).not.toBeVisible({ timeout: 5000 });
@@ -200,7 +197,9 @@ test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
 
         const removeButton = page.getByRole('menuitem', { name: 'Remove' });
         await removeButton.click();
-        await page.waitForTimeout(500);
+
+        // Wait for widget to be removed from DOM
+        await page.waitForTimeout(MODAL_TRANSITION_MS);
       }
 
       // Verify empty state appears
@@ -220,10 +219,7 @@ test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
       const resetButton = page.getByRole('button', { name: 'Reset to default' });
       await resetButton.click();
 
-      // Wait for modal to appear
-      await page.waitForTimeout(1000);
-
-      // Check the "I understand" checkbox
+      // Check the "I understand" checkbox (waiting for it to be visible ensures modal is loaded)
       const checkbox = page.getByRole('checkbox', { name: /I understand that this action cannot be undone/i });
       await checkbox.check();
 
@@ -231,12 +227,11 @@ test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
       const confirmButton = page.getByRole('button', { name: 'Reset layout' });
       await confirmButton.click();
 
-      // Wait for reset to complete and widgets to load
-      await page.waitForTimeout(5000);
-
-      // Verify widgets are restored
+      // Wait for reset to complete - verify widgets are restored
       const restoredWidgets = page.locator('.pf-v6-widget-grid-tile');
-      const restoredCount = await restoredWidgets.count().catch(() => 0);
+      await expect(restoredWidgets.first()).toBeVisible({ timeout: 10000 });
+
+      const restoredCount = await restoredWidgets.count();
       console.log(`Dashboard reset complete. Widgets restored: ${restoredCount}`);
     }
   });
