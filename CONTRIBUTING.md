@@ -65,6 +65,21 @@ npm run verify         # All of the above + build
 
 See [Testing Guidelines](docs/testing-guidelines.md) for patterns and conventions.
 
+### E2E Test Checklist
+
+When writing or modifying Playwright tests:
+
+- [ ] **Cookie consent disabled** - Call `disableCookiePrompt(page)` before `page.goto()`
+- [ ] **Pure E2E** - Use UI interactions only, not API calls
+- [ ] **Symbolic constants** - No hardcoded timeouts (use `WIDGET_LOAD_TIMEOUT_MS`, etc.)
+- [ ] **State verification** - Verify page loaded before testing drawer/modal behavior
+- [ ] **No error suppression** - Avoid `.catch(() => false)` patterns
+- [ ] **Cleanup in finally** - Reset dashboard state if test modifies it
+- [ ] **Semantic selectors** - Prefer `getByRole()` over class selectors
+- [ ] **Reasonable timeouts** - If you need >30s, fix the root cause instead
+
+**Golden rule**: If tests pass locally but fail in CI with timeouts, check cookie consent first.
+
 ## PR Guidelines
 
 - Keep PRs focused on a single concern
