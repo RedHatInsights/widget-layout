@@ -44,7 +44,6 @@ test.describe('Widget Layout - Basic Rendering', () => {
 
     // Verify authenticated page elements are present
     await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
-    await expect(page.getByRole('button', { name: 'Add widgets' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Reset to default' })).toBeVisible();
 
     // Verify main content is rendered
@@ -91,9 +90,14 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 
   test('should display available widgets in the drawer', async ({ page }) => {
-    // Check if drawer is already open, if not, open it
+    // Verify page is loaded with widgets before testing drawer
+    const widgetTiles = page.locator('.pf-v6-widget-grid-tile');
+    await expect(widgetTiles.first()).toBeVisible({ timeout: 10000 });
+
     const drawerText = page.getByText('Add new and previously removed widgets');
-    const isDrawerVisible = await drawerText.isVisible().catch(() => false);
+
+    // Check if drawer is already open, if not, open it
+    const isDrawerVisible = await drawerText.isVisible();
 
     if (!isDrawerVisible) {
       // Open the drawer
@@ -103,9 +107,9 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     // Wait for drawer to be visible
     await expect(drawerText).toBeVisible({ timeout: 5000 });
 
-    // Check for example draggable widgets in the drawer
-    const drawerSection = page.locator('text=Add new and previously removed widgets').locator('..');
-    await expect(drawerSection).toBeVisible();
+    // Verify drawer contains widget cards to add
+    const drawerCards = page.locator('[data-ouia-component-id^="add-widget-card-"]');
+    await expect(drawerCards.first()).toBeVisible();
   });
 
   test('should close the drawer when clicking Add widgets button again', async ({ page }) => {
@@ -145,14 +149,9 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     const count = await widgetTiles.count();
     expect(count).toBeGreaterThan(0);
 
-    // Check for default widgets that appear after reset
-    // Red Hat Enterprise Linux is the first widget in the default layout
+    // Verify widget titles are visible
     const widgetTitles = page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title');
     await expect(widgetTitles.first()).toBeVisible();
-
-    // Optionally check for specific default widgets if they should always be present
-    // (commenting out for now since widget availability may vary by permissions)
-    // await expect(page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title').filter({ hasText: 'Red Hat Enterprise Linux' })).toBeVisible();
   });
 
   test('should have Reset to default button visible', async ({ page }) => {
