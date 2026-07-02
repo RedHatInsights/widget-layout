@@ -30,7 +30,6 @@ const MODAL_TRANSITION_MS = 500;
 const PAGE_LOAD_TIMEOUT_MS = 30000;      // 30s - Initial page load with auth
 const WIDGET_LOAD_TIMEOUT_MS = 10000;    // 10s - Widget tiles appearing
 const DRAWER_TIMEOUT_MS = 5000;          // 5s - Drawer open/close
-const EXTENDED_TIMEOUT_MS = 180000;      // 3min - For exceptionally slow operations
 
 test.describe('Widget Layout - Basic Rendering', () => {
   test.beforeEach(async ({ page }) => {
@@ -169,10 +168,12 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 
   test('should not show the widget drawer by default on page load', async ({ page }) => {
+    // Wait for widgets to load
     await page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title')
       .first()
-      .waitFor({ state: 'visible', timeout: EXTENDED_TIMEOUT_MS });
+      .waitFor({ state: 'visible', timeout: WIDGET_LOAD_TIMEOUT_MS });
 
+    // Verify drawer is closed
     const drawerText = page.getByText('Add new and previously removed widgets');
     await expect(drawerText).not.toBeVisible();
   });
