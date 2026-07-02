@@ -19,10 +19,18 @@
 import { test, expect } from '@playwright/test';
 import { disableCookiePrompt } from '@redhat-cloud-services/playwright-test-auth';
 
-// Animation and interaction timing constants
-// These account for drawer animations and modal transitions in CI environments
+// Timing constants - all timeouts in milliseconds
+// These account for CI environment constraints and network latency
+
+// Animation/transition waits
 const DRAWER_ANIMATION_MS = 1000;
 const MODAL_TRANSITION_MS = 500;
+
+// Element visibility timeouts
+const PAGE_LOAD_TIMEOUT_MS = 30000;      // 30s - Initial page load with auth
+const WIDGET_LOAD_TIMEOUT_MS = 10000;    // 10s - Widget tiles appearing
+const DRAWER_TIMEOUT_MS = 5000;          // 5s - Drawer open/close
+const EXTENDED_TIMEOUT_MS = 180000;      // 3min - For exceptionally slow operations
 
 test.describe('Widget Layout - Basic Rendering', () => {
   test.beforeEach(async ({ page }) => {
@@ -43,7 +51,7 @@ test.describe('Widget Layout - Basic Rendering', () => {
     expect(title.length).toBeGreaterThan(0);
 
     // Verify authenticated page elements are present
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
+    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
     await expect(page.getByRole('button', { name: 'Reset to default' })).toBeVisible();
 
     // Verify main content is rendered
@@ -57,13 +65,13 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     await disableCookiePrompt(page);
     await page.goto('/');
     // Wait for dashboard to be ready
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
+    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
   });
 
   test('should open the widget drawer when clicking Add widgets button', async ({ page }) => {
     // Verify page is loaded with widgets before testing drawer
     const widgetTiles = page.locator('.pf-v6-widget-grid-tile');
-    await expect(widgetTiles.first()).toBeVisible({ timeout: 10000 });
+    await expect(widgetTiles.first()).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
     const addWidgetButton = page.getByRole('button', { name: 'Add widgets' });
     await expect(addWidgetButton).toBeVisible();
@@ -76,14 +84,14 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     if (isDrawerVisible) {
       // Drawer is already open, close it first to test the opening action
       await addWidgetButton.click();
-      await expect(drawerText).not.toBeVisible({ timeout: 5000 });
+      await expect(drawerText).not.toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
     }
 
     // Now open the drawer
     await addWidgetButton.click();
 
     // Verify the drawer opens by checking for the instruction text
-    await expect(drawerText).toBeVisible({ timeout: 10000 });
+    await expect(drawerText).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
     // Verify the instruction about drag and drop is visible
     await expect(page.getByText(/drag and drop to a new location/i)).toBeVisible();
@@ -92,7 +100,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   test('should display available widgets in the drawer', async ({ page }) => {
     // Verify page is loaded with widgets before testing drawer
     const widgetTiles = page.locator('.pf-v6-widget-grid-tile');
-    await expect(widgetTiles.first()).toBeVisible({ timeout: 10000 });
+    await expect(widgetTiles.first()).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
     const drawerText = page.getByText('Add new and previously removed widgets');
 
@@ -105,7 +113,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     }
 
     // Wait for drawer to be visible
-    await expect(drawerText).toBeVisible({ timeout: 5000 });
+    await expect(drawerText).toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
 
     // Verify drawer contains widget cards to add
     const drawerCards = page.locator('[data-ouia-component-id^="add-widget-card-"]');
@@ -115,7 +123,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   test('should close the drawer when clicking Add widgets button again', async ({ page }) => {
     // Verify page is loaded with widgets before testing drawer
     const widgetTiles = page.locator('.pf-v6-widget-grid-tile');
-    await expect(widgetTiles.first()).toBeVisible({ timeout: 10000 });
+    await expect(widgetTiles.first()).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
     const addWidgetsButton = page.getByRole('button', { name: 'Add widgets' });
     const drawerText = page.getByText('Add new and previously removed widgets');
@@ -126,14 +134,14 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     if (!isDrawerVisible) {
       // Open the drawer first
       await addWidgetsButton.click();
-      await expect(drawerText).toBeVisible({ timeout: 5000 });
+      await expect(drawerText).toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
     }
 
     // Click Add widgets again to close
     await addWidgetsButton.click();
 
     // Verify the instruction text is no longer visible
-    await expect(drawerText).not.toBeVisible({ timeout: 5000 });
+    await expect(drawerText).not.toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
   });
 
   test('should display main widget cards on the page', async ({ page }) => {
@@ -143,7 +151,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
 
     // Verify widget tiles are present on the page (at least one)
     const widgetTiles = page.locator('#widget-layout-container .pf-v6-widget-grid-tile');
-    await expect(widgetTiles.first()).toBeVisible({ timeout: 10000 });
+    await expect(widgetTiles.first()).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
     // Verify we have multiple widgets
     const count = await widgetTiles.count();
@@ -163,7 +171,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   test('should not show the widget drawer by default on page load', async ({ page }) => {
     await page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title')
       .first()
-      .waitFor({ state: 'visible', timeout: 180000 });
+      .waitFor({ state: 'visible', timeout: EXTENDED_TIMEOUT_MS });
 
     const drawerText = page.getByText('Add new and previously removed widgets');
     await expect(drawerText).not.toBeVisible();
@@ -176,7 +184,7 @@ test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
     await page.goto('/');
 
     // Wait for the page to load with widgets
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
+    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
 
     // Find all widget tiles
     const widgetTiles = page.locator('.pf-v6-widget-grid-tile');
@@ -202,14 +210,14 @@ test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
       }
 
       // Verify empty state appears
-      await expect(page.getByText('No dashboard content')).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText('No dashboard content')).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
       // Verify drawer auto-opens when all widgets removed
-      await expect(page.getByText(/Add new and previously removed widgets/)).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText(/Add new and previously removed widgets/)).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
       // Verify drawer contains widgets to add back
       const drawerCards = page.locator('[data-ouia-component-id^="add-widget-card-"]');
-      await expect(drawerCards.first()).toBeVisible({ timeout: 5000 });
+      await expect(drawerCards.first()).toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
     } finally {
       // Cleanup: Reset dashboard to default state for subsequent tests
       // This uses the same reset flow that works in global setup
@@ -228,7 +236,7 @@ test.describe('Widget Layout - Empty Dashboard Auto-Open', () => {
 
       // Wait for reset to complete - verify widgets are restored
       const restoredWidgets = page.locator('.pf-v6-widget-grid-tile');
-      await expect(restoredWidgets.first()).toBeVisible({ timeout: 10000 });
+      await expect(restoredWidgets.first()).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
       const restoredCount = await restoredWidgets.count();
       console.log(`Dashboard reset complete. Widgets restored: ${restoredCount}`);
