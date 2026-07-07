@@ -264,7 +264,7 @@ export const renameDashboardTemplate = async (templateId: DashboardTemplate['id'
   });
   handleErrors(resp);
   const json = await resp.json();
-  return json.data;
+  return json;
 };
 
 // POST /api/widget-layout/v1/{id}/copy
