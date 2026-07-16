@@ -34,7 +34,7 @@ const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetT
   const headerActions = (
     <Tooltip content={<p>Move widget</p>}>
       <Icon className="pf-v6-u-pt-md widg-c-drawer__drag-handle">
-        <GripVerticalIcon style={{ fill: 'var(--pf-t--global--icon--color--subtle)' }} />
+        <GripVerticalIcon style={{ fill: 'var(--pf-t--global--icon--color--regular)' }} />
       </Icon>
     </Tooltip>
   );
