@@ -249,7 +249,7 @@ const Controls = () => {
             onClick={() => {
               toggleOpen((prev) => !prev);
             }}
-            variant="secondary"
+            variant="primary"
             icon={<PlusCircleIcon />}
             ouiaId="add-widget-button"
           >
