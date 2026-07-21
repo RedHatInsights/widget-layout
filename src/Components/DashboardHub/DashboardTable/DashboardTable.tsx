@@ -18,7 +18,6 @@ import { useSetAtom } from 'jotai';
 interface Dashboard {
   id: number;
   name: string;
-  description: string; // TODO
   lastModified: string;
   isDefault: boolean;
 }
@@ -45,14 +44,12 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
   const tableData: Dashboard[] = dashboards.map((dashboard) => ({
     id: dashboard.id,
     name: dashboard.dashboardName,
-    description: dashboard.templateBase.name, // TODO: Update when description field is available
     lastModified: dashboard.updatedAt,
     isDefault: dashboard.default,
   }));
 
   const columnNames = {
     name: 'Name',
-    description: 'Description',
     lastModified: 'Last Modified',
     actions: '',
   };
@@ -188,7 +185,6 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
           <Tr>
             <Th screenReaderText="Homepage" modifier="fitContent" />
             <Th sort={getSortParams()}>{columnNames.name}</Th>
-            <Th>{columnNames.description}</Th>
             <Th>{columnNames.lastModified}</Th>
             <Th screenReaderText="Actions" />
           </Tr>
@@ -200,7 +196,6 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
               <Td dataLabel={columnNames.name}>
                 <Link to={`/dashboard-hub/${dashboard.id}`}>{dashboard.name}</Link>
               </Td>
-              <Td dataLabel={columnNames.description}>{dashboard.description}</Td>
               <Td dataLabel={columnNames.lastModified}>
                 <DateFormat date={dashboard.lastModified} />
               </Td>
