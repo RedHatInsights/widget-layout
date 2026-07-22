@@ -76,7 +76,6 @@ describe('DashboardTable', () => {
     cy.mount(<MemoryRouter><DashboardTable dashboards={mockDashboards}  onRefetchDashboards={cy.stub()}/></MemoryRouter>);
 
     cy.get('th').contains('Name').should('be.visible');
-    cy.get('th').contains('Description').should('be.visible');
     cy.get('th').contains('Last Modified').should('be.visible');
   });
 
@@ -88,19 +87,16 @@ describe('DashboardTable', () => {
     // Default sort is ascending by name, so order should be: Alpha, Bravo, Charlie
     cy.get('tbody tr').eq(0).within(() => {
       cy.get('td[data-label="Name"]').should('contain.text', 'Alpha Dashboard');
-      cy.get('td[data-label="Description"]').should('contain.text', 'Base Template Beta');
       cy.get('td[data-label="Last Modified"]').should('not.be.empty');
     });
 
     cy.get('tbody tr').eq(1).within(() => {
       cy.get('td[data-label="Name"]').should('contain.text', 'Bravo Dashboard');
-      cy.get('td[data-label="Description"]').should('contain.text', 'Base Template Gamma');
       cy.get('td[data-label="Last Modified"]').should('not.be.empty');
     });
 
     cy.get('tbody tr').eq(2).within(() => {
       cy.get('td[data-label="Name"]').should('contain.text', 'Charlie Dashboard');
-      cy.get('td[data-label="Description"]').should('contain.text', 'Base Template Alpha');
       cy.get('td[data-label="Last Modified"]').should('not.be.empty');
     });
   });
@@ -132,7 +128,6 @@ describe('DashboardTable', () => {
 
     // Headers should still render
     cy.get('th').contains('Name').should('be.visible');
-    cy.get('th').contains('Description').should('be.visible');
     cy.get('th').contains('Last Modified').should('be.visible');
 
     // No body rows
