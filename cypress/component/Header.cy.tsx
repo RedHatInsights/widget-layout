@@ -1,13 +1,27 @@
 import React from 'react';
+import FlagProvider from '@unleash/proxy-client-react';
+import { UnleashClient } from 'unleash-proxy-client';
 import { MemoryRouter } from 'react-router-dom';
 import Header from '../../src/Components/DashboardHub/Header/Header';
 
+const createMockClient = (flagEnabled: boolean) => {
+  const client = new UnleashClient({
+    url: 'http://api/frontend',
+    clientKey: 'test',
+    appName: 'test',
+  });
+  client.isEnabled = () => flagEnabled;
+  return client;
+};
+
 describe('DashboardHub Header', () => {
-  const mountHeader = () => {
+  const mountHeader = (flagEnabled = false) => {
     const onRefetchDashboards = cy.stub().as('onRefetchDashboards');
     cy.mount(
       <MemoryRouter>
-        <Header onRefetchDashboards={onRefetchDashboards} dashboards={[]} />
+        <FlagProvider unleashClient={createMockClient(flagEnabled)} startClient={false}>
+          <Header onRefetchDashboards={onRefetchDashboards} dashboards={[]} />
+        </FlagProvider>
       </MemoryRouter>
     );
   };
@@ -22,9 +36,14 @@ describe('DashboardHub Header', () => {
     cy.contains('Page description').should('be.visible');
   });
 
-  it('shows "Learn more about dashboards" link', () => {
-    mountHeader();
+  it('shows "Learn more about dashboards" link when feature flag is enabled', () => {
+    mountHeader(true);
     cy.contains('a', 'Learn more about dashboards').should('be.visible');
+  });
+
+  it('hides "Learn more about dashboards" link when feature flag is disabled', () => {
+    mountHeader();
+    cy.contains('a', 'Learn more about dashboards').should('not.exist');
   });
 
   it('"Create dashboard" dropdown button is present', () => {
