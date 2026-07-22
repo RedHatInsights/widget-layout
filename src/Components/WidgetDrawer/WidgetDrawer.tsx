@@ -19,7 +19,6 @@ import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { CloseIcon, GripVerticalIcon } from '@patternfly/react-icons';
 import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
-import { getWidget } from '../Widgets/widgetDefaults';
 import HeaderIcon from '../Icons/HeaderIcon';
 import { WidgetConfiguration } from '../../api/dashboard-templates';
 import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
@@ -87,18 +86,17 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
   const filteredWidgetMapping = Object.entries(widgetMapping).filter(([type]) => !currentlyUsedWidgets.includes(type));
 
   const panelContent = (
-    <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--drawer pf-v6-u-p-md pf-v6-u-p-lg-on-sm">
-      <Split className="widg-l-split--add-widget">
+    <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--drawer">
+      <Split className="widg-l-split--add-widget pf-v6-u-align-items-center">
         <SplitItem isFilled>
-          <Title headingLevel="h2" size="md" className="pf-v6-u-pb-sm">
+          <Title headingLevel="h2" size="md">
             Add new and previously removed widgets by clicking the <GripVerticalIcon /> icon, then drag and drop to a new location. Drag the corners
             of the cards to resize widgets.
           </Title>
         </SplitItem>
-        <SplitItem>
+        <SplitItem className="pf-v6-u-align-self-flex-start">
           <Button
             variant="plain"
-            className="pf-v6-u-pt-0 pf-v6-u-pr-0"
             onClick={() => {
               toggleOpen((prev) => !prev);
             }}
