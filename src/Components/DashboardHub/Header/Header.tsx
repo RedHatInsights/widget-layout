@@ -13,6 +13,7 @@ import {
 } from '@patternfly/react-core';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useFlag } from '@unleash/proxy-client-react';
 import { ImportModal } from '../ImportModal/ImportModal';
 import { CreateModal } from '../../CreateModal/CreateModal';
 import { DuplicateModal } from '../../DuplicateModal/DuplicateModal';
@@ -66,6 +67,7 @@ interface HeaderProps {
 }
 
 const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards }) => {
+  const isLearnMoreLink = useFlag('platform.widget-layout.learn-more-link');
   return (
     <>
       <PageSection className="pf-v6-u-pb-0">
@@ -84,9 +86,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards }) =
               <Content component="dd" className="pf-v6-u-mt-0">
                 Page description
               </Content>
-              <Content component="a" className="pf-v6-u-mt-0">
-                Learn more about dashboards <ExternalLinkAltIcon />
-              </Content>
+              {isLearnMoreLink && (
+                <Content component="a" className="pf-v6-u-mt-0">
+                  Learn more about dashboards <ExternalLinkAltIcon />
+                </Content>
+              )}
             </Content>
           </FlexItem>
 
