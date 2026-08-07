@@ -96,5 +96,5 @@ Backend (JSON)          ConvertWidgetMapping.tsx       PatternFly GridLayout
 
 - **Frontend CRD**: `deploy/frontend.yaml` defines the Kubernetes `Frontend` custom resource
 - **Build**: `fec build` produces static assets
-- **CI**: `pr_check.sh` and `build_deploy.sh` scripts for Konflux/Jenkins pipelines
+- **CI**: Konflux `.tekton/` pipelines handle PR checks and image builds
 - **Proxy**: Dev server uses `fec dev-proxy` with optional local chrome-service-backend routing
