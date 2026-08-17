@@ -26,6 +26,38 @@ jest.mock('../../api/dashboard-templates-new', () => ({
   patchDashboardTemplateHub: jest.fn(),
 }));
 
+let mockIsNewBackend = false;
+const mockRenameDashboardInList = jest.fn();
+const mockInvalidateStartPage = jest.fn();
+const mockSetDrawerExpanded = jest.fn();
+
+jest.mock('../../state/dashboardsAtom', () => ({
+  renameDashboardAtom: { __test_id: 'rename' },
+}));
+jest.mock('../../state/templateAtom', () => ({
+  templateIdAtom: { __test_id: 'templateId' },
+}));
+jest.mock('../../state/store', () => ({
+  backendFlagAtom: { __test_id: 'backendFlag' },
+}));
+jest.mock('../../state/drawerExpandedAtom', () => ({
+  drawerExpandedAtom: { __test_id: 'drawerExpanded' },
+}));
+
+jest.mock('jotai', () => ({
+  ...jest.requireActual('jotai'),
+  useAtomValue: (atom: { __test_id?: string }) => {
+    if (atom?.__test_id === 'backendFlag') return mockIsNewBackend;
+    return undefined;
+  },
+  useSetAtom: (atom: { __test_id?: string }) => {
+    if (atom?.__test_id === 'rename') return mockRenameDashboardInList;
+    if (atom?.__test_id === 'templateId') return mockInvalidateStartPage;
+    if (atom?.__test_id === 'drawerExpanded') return mockSetDrawerExpanded;
+    return jest.fn();
+  },
+}));
+
 const mockedGetDashboardTemplate = getDashboardTemplate as jest.MockedFunction<typeof getDashboardTemplate>;
 const mockedGetWidgetMapping = getWidgetMapping as jest.MockedFunction<typeof getWidgetMapping>;
 const mockedMapTemplateConfig = mapTemplateConfigToExtendedTemplateConfig as jest.MockedFunction<typeof mapTemplateConfigToExtendedTemplateConfig>;
@@ -54,7 +86,7 @@ const mockWidgetMapping: WidgetMapping = {
   },
   openshift: {
     scope: 'landing',
-    module: './OpenshiftWidget',
+    module: './OpenShiftWidget',
     defaults: { w: 1, h: 1, maxH: 1, minH: 1 },
   },
 };
@@ -64,7 +96,7 @@ const mockExtendedTemplate: ExtendedTemplateConfig = {
   md: [],
   lg: [
     { i: 'landing-./RhelWidget#0', x: 0, y: 0, w: 1, h: 1, maxH: 1, minH: 1, title: 'RHEL', widgetType: 'landing-./RhelWidget' },
-    { i: 'landing-./OpenshiftWidget#1', x: 1, y: 0, w: 1, h: 1, maxH: 1, minH: 1, title: 'OpenShift', widgetType: 'landing-./OpenshiftWidget' },
+    { i: 'landing-./OpenShiftWidget#1', x: 1, y: 0, w: 1, h: 1, maxH: 1, minH: 1, title: 'OpenShift', widgetType: 'landing-./OpenShiftWidget' },
   ],
   xl: [],
 };
@@ -82,6 +114,7 @@ const mockRemappedTemplate: ExtendedTemplateConfig = {
 describe('useDashboardTemplate', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsNewBackend = false;
   });
 
   it('should return initial state with empty template, isLoaded false, no error and no dashboardName', () => {
@@ -275,5 +308,129 @@ describe('useDashboardTemplate', () => {
 
     // The unknown widget should remain unchanged
     expect(result.current.template.lg[1]).toEqual(mixedTemplate.lg[1]);
+  });
+
+  it('should apply remapShortKeys when isNewBackend is true', async () => {
+    mockIsNewBackend = true;
+
+    const shortKeyTemplate: ExtendedTemplateConfig = {
+      sm: [],
+      md: [],
+      lg: [
+        { i: 'rhel#0', x: 0, y: 0, w: 1, h: 1, maxH: 1, minH: 1, title: 'RHEL', widgetType: 'rhel' },
+        { i: 'openshift#1', x: 1, y: 0, w: 1, h: 1, maxH: 1, minH: 1, title: 'OpenShift', widgetType: 'openshift' },
+      ],
+      xl: [],
+    };
+
+    mockedGetDashboardTemplate.mockResolvedValue(createMockDashboardTemplate());
+    mockedMapTemplateConfig.mockReturnValue(shortKeyTemplate);
+    mockedGetWidgetMapping.mockResolvedValue(mockWidgetMapping);
+
+    const { result } = await act(async () => renderHook(() => useDashboardTemplate(1)));
+
+    expect(result.current.template).toEqual(mockRemappedTemplate);
+  });
+
+  it('should keep unknown widget types unchanged during remapShortKeys', async () => {
+    mockIsNewBackend = true;
+
+    const templateWithUnknown: ExtendedTemplateConfig = {
+      sm: [],
+      md: [],
+      lg: [{ i: 'unknownWidget#0', x: 0, y: 0, w: 1, h: 1, maxH: 1, minH: 1, title: 'Unknown', widgetType: 'unknownWidget' }],
+      xl: [],
+    };
+
+    mockedGetDashboardTemplate.mockResolvedValue(createMockDashboardTemplate());
+    mockedMapTemplateConfig.mockReturnValue(templateWithUnknown);
+    mockedGetWidgetMapping.mockResolvedValue({});
+
+    const { result } = await act(async () => renderHook(() => useDashboardTemplate(1)));
+
+    expect(result.current.template.lg[0].i).toBe('unknownWidget#0');
+    expect(result.current.template.lg[0].widgetType).toBe('unknownWidget');
+  });
+
+  it('should call renameDashboardInList and update local dashboard state', async () => {
+    const initial = createMockDashboardTemplate({ id: 5, dashboardName: 'Old Name' });
+    const updated = { ...initial, dashboardName: 'New Name' };
+
+    mockedGetDashboardTemplate.mockResolvedValue(initial);
+    mockedMapTemplateConfig.mockReturnValue(emptyTemplate);
+    mockedGetWidgetMapping.mockResolvedValue({});
+    mockRenameDashboardInList.mockResolvedValue(updated);
+
+    const { result } = await act(async () => renderHook(() => useDashboardTemplate(5)));
+
+    expect(result.current.dashboard?.dashboardName).toBe('Old Name');
+
+    await act(async () => {
+      await result.current.renameDashboard('New Name');
+    });
+
+    expect(mockRenameDashboardInList).toHaveBeenCalledWith({ id: 5, dashboardName: 'New Name' });
+    expect(result.current.dashboard?.dashboardName).toBe('New Name');
+  });
+
+  it('should invalidate start page when saving template for a default dashboard', async () => {
+    mockedGetDashboardTemplate.mockResolvedValue(createMockDashboardTemplate({ default: true }));
+    mockedMapTemplateConfig.mockReturnValue(emptyTemplate);
+    mockedGetWidgetMapping.mockResolvedValue({});
+    mockedPatchDashboardTemplate.mockResolvedValue(createMockDashboardTemplate());
+
+    const { result } = await act(async () => renderHook(() => useDashboardTemplate(1)));
+
+    await act(async () => {
+      await result.current.saveTemplate(emptyTemplate);
+    });
+
+    expect(mockInvalidateStartPage).toHaveBeenCalledWith(-1);
+  });
+
+  it('should not invalidate start page when saving template for a non-default dashboard', async () => {
+    mockedGetDashboardTemplate.mockResolvedValue(createMockDashboardTemplate({ default: false }));
+    mockedMapTemplateConfig.mockReturnValue(emptyTemplate);
+    mockedGetWidgetMapping.mockResolvedValue({});
+    mockedPatchDashboardTemplate.mockResolvedValue(createMockDashboardTemplate());
+
+    const { result } = await act(async () => renderHook(() => useDashboardTemplate(1)));
+
+    await act(async () => {
+      await result.current.saveTemplate(emptyTemplate);
+    });
+
+    expect(mockInvalidateStartPage).not.toHaveBeenCalled();
+  });
+
+  it('should log error to console when saveTemplate patch fails', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    const patchError = new Error('Patch failed');
+
+    mockedGetDashboardTemplate.mockResolvedValue(createMockDashboardTemplate());
+    mockedMapTemplateConfig.mockReturnValue(emptyTemplate);
+    mockedGetWidgetMapping.mockResolvedValue({});
+    mockedPatchDashboardTemplate.mockRejectedValue(patchError);
+
+    const { result } = await act(async () => renderHook(() => useDashboardTemplate(1)));
+
+    await act(async () => {
+      await result.current.saveTemplate(emptyTemplate);
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith(patchError);
+    consoleSpy.mockRestore();
+  });
+
+  it('should reset drawer expanded state on mount', async () => {
+    mockedGetDashboardTemplate.mockReturnValue(
+      new Promise(() => {
+        /* never resolves */
+      })
+    );
+
+    renderHook(() => useDashboardTemplate(1));
+
+    expect(mockSetDrawerExpanded).toHaveBeenCalledWith(false);
   });
 });
