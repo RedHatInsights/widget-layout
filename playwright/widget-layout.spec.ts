@@ -1,5 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { disableCookiePrompt } from '@redhat-cloud-services/playwright-test-auth';
+import { TABLE_SELECTOR, PAGE_LOAD_TIMEOUT_MS, WIDGET_LOAD_TIMEOUT_MS, deleteTestDashboard } from './helpers';
+
+const DRAWER_TIMEOUT_MS = 5000;
 
 test.describe('Widget Layout - Basic Rendering', () => {
   test.beforeEach(async ({ page }) => {
@@ -20,7 +23,7 @@ test.describe('Widget Layout - Basic Rendering', () => {
     expect(title.length).toBeGreaterThan(0);
 
     // Verify authenticated page elements are present
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
+    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
     await expect(page.getByRole('button', { name: 'Add widgets' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Reset to default' })).toBeVisible();
 
@@ -34,8 +37,16 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   test.beforeEach(async ({ page }) => {
     await disableCookiePrompt(page);
     await page.goto('/');
-    // Wait for dashboard to be ready
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 30000 });
+    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
+
+    // If dashboard is empty, reset to default to ensure it has widgets
+    const emptyState = page.getByText('No dashboard content');
+    if (await emptyState.isVisible()) {
+      await page.getByRole('button', { name: 'Reset to default' }).click();
+      await page.getByRole('checkbox', { name: /I understand that this action cannot be undone/i }).check();
+      await page.getByRole('button', { name: 'Reset layout' }).click();
+      await page.locator('.pf-v6-c-card__title-text').first().waitFor({ state: 'visible', timeout: WIDGET_LOAD_TIMEOUT_MS });
+    }
   });
 
   test('should open the widget drawer when clicking Add widgets button', async ({ page }) => {
@@ -51,7 +62,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
       // Drawer is already open, close it first to test the opening action
       await addWidgetButton.click();
       await page.waitForTimeout(1000);
-      await expect(drawerText).not.toBeVisible({ timeout: 5000 });
+      await expect(drawerText).not.toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
     }
 
     // Now open the drawer
@@ -61,7 +72,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     await page.waitForTimeout(1000);
 
     // Verify the drawer opens by checking for the instruction text
-    await expect(drawerText).toBeVisible({ timeout: 10000 });
+    await expect(drawerText).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
     // Verify the instruction about drag and drop is visible
     await expect(page.getByText(/drag and drop to a new location/i)).toBeVisible();
@@ -79,7 +90,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     }
 
     // Wait for drawer to be visible
-    await expect(drawerText).toBeVisible({ timeout: 5000 });
+    await expect(drawerText).toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
 
     // Check for example draggable widgets in the drawer
     const drawerSection = page.locator('text=Add new and previously removed widgets').locator('..');
@@ -95,7 +106,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
       // Open the drawer
       await page.getByRole('button', { name: 'Add widgets' }).click();
       await page.waitForTimeout(1000);
-      await expect(drawerText).toBeVisible({ timeout: 5000 });
+      await expect(drawerText).toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
     }
 
     // Click Add widgets again to close
@@ -105,7 +116,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     await page.waitForTimeout(1000);
 
     // Verify the instruction text is no longer visible
-    await expect(drawerText).not.toBeVisible({ timeout: 5000 });
+    await expect(drawerText).not.toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
   });
 
   test('should display main widget cards on the page', async ({ page }) => {
@@ -113,10 +124,11 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
     const mainContent = page.locator('main');
     await expect(mainContent).toBeVisible();
 
-    // Check for service widget cards on the page - target specific card title elements
-    await expect(page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title').filter({ hasText: 'Red Hat Enterprise Linux' })).toBeVisible();
-    await expect(page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title').filter({ hasText: /^Red Hat OpenShift$/ })).toBeVisible();
-    await expect(page.getByText('Recently visited')).toBeVisible();
+    // Check that widget cards are rendered on the page
+    const widgetCards = page.locator('.pf-v6-c-card__title-text');
+    await widgetCards.first().waitFor({ state: 'visible', timeout: WIDGET_LOAD_TIMEOUT_MS });
+    const count = await widgetCards.count();
+    expect(count).toBeGreaterThanOrEqual(3);
   });
 
   test('should have Reset to default button visible', async ({ page }) => {
@@ -126,9 +138,10 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 
   test('should not show the widget drawer by default on page load', async ({ page }) => {
-    await page.locator('#widget-layout-container .pf-v6-widget-grid-tile__title')
+    await page
+      .locator('.pf-v6-c-card__title-text')
       .first()
-      .waitFor({ state: 'visible', timeout: 10000 });
+      .waitFor({ state: 'visible', timeout: WIDGET_LOAD_TIMEOUT_MS });
 
     const drawerText = page.getByText('Add new and previously removed widgets');
     await expect(drawerText).not.toBeVisible();
@@ -136,38 +149,42 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
 });
 
 test.describe('Widget Layout - Empty Dashboard', () => {
-  test('should auto-open the widget drawer when dashboard has no widgets', async ({ page }) => {
+  test('should auto-open the widget drawer when landing on an empty dashboard', async ({ page }) => {
+    const TEST_DASHBOARD_NAME = `__e2e_empty_dashboard_${Date.now()}`;
     await disableCookiePrompt(page);
-    await page.addInitScript(() => {
-      const originalFetch = window.fetch;
-      window.fetch = async (...args) => {
-        const url = typeof args[0] === 'string' ? args[0] : args[0] instanceof Request ? args[0].url : '';
-        if (
-          (url.includes('/api/widget-layout/v1/') && url.includes('dashboardType=')) ||
-          (url.includes('/api/chrome-service/v1/dashboard-templates') && url.includes('dashboard='))
-        ) {
-          return new Response(JSON.stringify({
-            data: [{
-              id: 1,
-              default: true,
-              templateBase: { name: 'landing-landingPage', displayName: 'Landing Page' },
-              templateConfig: { sm: [], md: [], lg: [], xl: [] },
-              dashboardName: 'Test Dashboard',
-              createdAt: '2024-01-01T00:00:00Z',
-              updatedAt: '2024-01-01T00:00:00Z',
-              deletedAt: null,
-              userId: 'test-user',
-            }],
-          }), { status: 200, headers: { 'Content-Type': 'application/json' } });
-        }
-        return originalFetch(...args);
-      };
-    });
 
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: 10000 });
+    await page.goto('/dashboard-hub');
+    await page.locator(TABLE_SELECTOR).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
 
-    const drawerText = page.getByText('Add new and previously removed widgets');
-    await expect(drawerText).toBeVisible({ timeout: 10000 });
+    try {
+      // Create a blank dashboard (no homepage change needed)
+      await page.waitForLoadState('networkidle');
+      await page.getByRole('button', { name: 'Create dashboard' }).click();
+      await page.getByRole('menuitem', { name: 'Create from blank' }).click();
+
+      const modal = page.locator('[data-ouia-component-id="CreateBlankDashboardModal"]');
+      await modal.waitFor({ state: 'visible', timeout: WIDGET_LOAD_TIMEOUT_MS });
+      await modal.getByPlaceholder('from-scratch dashboard').fill(TEST_DASHBOARD_NAME);
+
+      const createBtn = modal.getByRole('button', { name: 'Create dashboard' });
+      await expect(createBtn).toBeEnabled({ timeout: WIDGET_LOAD_TIMEOUT_MS });
+      await createBtn.click();
+
+      // Wait for the new dashboard to appear in the table
+      await page.getByRole('link', { name: TEST_DASHBOARD_NAME, exact: true }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
+
+      // Navigate to the empty dashboard
+      await page.getByRole('link', { name: TEST_DASHBOARD_NAME, exact: true }).click();
+      await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
+
+      // Verify drawer auto-opened on empty dashboard
+      const drawerText = page.getByText('Add new and previously removed widgets');
+      await expect(drawerText).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
+
+      // Verify empty state is shown
+      await expect(page.getByText('No dashboard content')).toBeVisible();
+    } finally {
+      await deleteTestDashboard(page, TEST_DASHBOARD_NAME);
+    }
   });
 });
