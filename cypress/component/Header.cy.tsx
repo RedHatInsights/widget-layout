@@ -31,9 +31,9 @@ describe('DashboardHub Header', () => {
     cy.contains('h1', 'Dashboard Hub').should('be.visible');
   });
 
-  it('shows "Page description" text', () => {
+  it('shows page description text', () => {
     mountHeader();
-    cy.contains('Page description').should('be.visible');
+    cy.contains('Manage, customize, and organize your dashboards').should('be.visible');
   });
 
   it('shows "Learn more about dashboards" link when feature flag is enabled', () => {
