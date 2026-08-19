@@ -84,7 +84,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards }) =
             <Content>
               <Content component="h1">Dashboard Hub</Content>
               <Content component="dd" className="pf-v6-u-mt-0">
-                Page description
+                Manage, customize, and organize your dashboards to keep the most relevant insights front and center across your Hybrid Cloud Console.
               </Content>
               {isLearnMoreLink && (
                 <Content component="a" className="pf-v6-u-mt-0">
