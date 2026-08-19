@@ -37,6 +37,8 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
   const [dashboardToDelete, setDashboardToDelete] = useState<Dashboard | null>(null);
   const [duplicateDashboardId, setDuplicateDashboardId] = useState<number | null>(null);
   const isEnabledDelete = useFlag('platform.widget-layout.delete-dashboard');
+  const isEnabledShare = useFlag('platform.widget-layout.share');
+  const isEnabledEdit = useFlag('platform.widget-layout.edit_from_hub');
   const addNotification = useAddNotification();
   const setDefaultDashboard = useSetAtom(setDefaultDashboardAtom);
 
@@ -113,12 +115,16 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
 
   // Row actions for each dashboard
   const getRowActions = (dashboard: Dashboard) => [
-    {
-      icon: <EditAltIcon />,
-      title: 'Edit dashboard',
-      isDisabled: true,
-      onClick: () => console.log(`Edit dashboard ${dashboard.id}`),
-    },
+    ...(isEnabledEdit
+      ? [
+          {
+            icon: <EditAltIcon />,
+            title: 'Edit dashboard',
+            isDisabled: true,
+            onClick: () => console.log(`Edit dashboard ${dashboard.id}`),
+          },
+        ]
+      : []),
     {
       icon: <HomeIcon />,
       title: 'Set as homepage',
@@ -131,12 +137,16 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
       title: 'Copy configuration string',
       onClick: () => handleCopyConfiguration(dashboard),
     },
-    {
-      icon: <UsersIcon />,
-      title: 'Share dashboard',
-      isDisabled: true,
-      onClick: () => console.log(`Share dashboard ${dashboard.id}`),
-    },
+    ...(isEnabledShare
+      ? [
+          {
+            icon: <UsersIcon />,
+            title: 'Share dashboard',
+            isDisabled: true,
+            onClick: () => console.log(`Share dashboard ${dashboard.id}`),
+          },
+        ]
+      : []),
     ...(isEnabledDelete
       ? [
           {
