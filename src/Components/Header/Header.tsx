@@ -23,8 +23,8 @@ import {
   ToolbarItem,
 } from '@patternfly/react-core';
 import React, { useRef, useState } from 'react';
-import { CodeIcon, CopyIcon, EditAltIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon } from '@patternfly/react-icons';
-import { useAtom, useSetAtom } from 'jotai';
+import { CodeIcon, CopyIcon, EditAltIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon, TimesIcon } from '@patternfly/react-icons';
+import { useAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { templateIdAtom } from '../../state/templateAtom';
 import { useApi } from '../../hooks/useApi';
@@ -207,7 +207,7 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
 
 const Controls = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const toggleOpen = useSetAtom(drawerExpandedAtom);
+  const [isDrawerExpanded, toggleOpen] = useAtom(drawerExpandedAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
   const api = useApi();
 
@@ -250,10 +250,10 @@ const Controls = () => {
               toggleOpen((prev) => !prev);
             }}
             variant="primary"
-            icon={<PlusCircleIcon />}
+            icon={isDrawerExpanded ? <TimesIcon /> : <PlusCircleIcon />}
             ouiaId="add-widget-button"
           >
-            Add widgets
+            {isDrawerExpanded ? 'Close widget panel' : 'Add widgets'}
           </Button>
         </ToolbarItem>
       </ToolbarGroup>
