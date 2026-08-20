@@ -86,6 +86,7 @@ test.describe('Set Dashboard as Homepage from Generic Page', () => {
     await page.getByText(`'${nonDefaultName}' has been set as homepage`).waitFor({ state: 'visible', timeout: 10000 });
 
     await navigateToDashboardHub(page);
+    await page.getByRole('link', { name: nonDefaultName, exact: true }).waitFor({ state: 'visible', timeout: 10000 });
 
     expect(await hasHomeIcon(page, nonDefaultName)).toBe(true);
   });
