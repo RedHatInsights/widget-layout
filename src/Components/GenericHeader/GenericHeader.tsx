@@ -4,7 +4,7 @@ import { ActionList, ActionListItem, Button, Flex, FlexItem, TextInput } from '@
 import PageHeader from '@patternfly/react-component-groups/dist/dynamic/PageHeader';
 import React, { useState } from 'react';
 import { CheckIcon, PencilAltIcon, PlusCircleIcon, TimesIcon } from '@patternfly/react-icons';
-import { useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
 import { DashboardTemplate } from '../../api/dashboard-templates';
 import GenericHeaderDropdown from './GenericHeaderDropdown';
@@ -16,7 +16,7 @@ interface GenericHeaderProps {
 }
 
 const GenericHeader = ({ dashboard, onRenameDashboard }: GenericHeaderProps) => {
-  const toggleOpen = useSetAtom(drawerExpandedAtom);
+  const [isDrawerExpanded, toggleOpen] = useAtom(drawerExpandedAtom);
   const addNotification = useAddNotification();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState('');
@@ -90,8 +90,13 @@ const GenericHeader = ({ dashboard, onRenameDashboard }: GenericHeaderProps) => 
       actionMenu={
         <ActionList>
           <ActionListItem>
-            <Button onClick={() => toggleOpen((prev) => !prev)} variant="secondary" icon={<PlusCircleIcon />} ouiaId="add-widget-button">
-              Add widgets
+            <Button
+              onClick={() => toggleOpen((prev) => !prev)}
+              variant="secondary"
+              icon={isDrawerExpanded ? <TimesIcon /> : <PlusCircleIcon />}
+              ouiaId="add-widget-button"
+            >
+              {isDrawerExpanded ? 'Close widget panel' : 'Add widgets'}
             </Button>
           </ActionListItem>
           {dashboard && (
