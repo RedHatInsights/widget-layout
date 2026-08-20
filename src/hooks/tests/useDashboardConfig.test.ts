@@ -199,12 +199,11 @@ describe('useDashboardConfig', () => {
     });
 
     expect(result.current.isLoaded).toBe(true);
-    expect(mockAddNotification).toHaveBeenCalledWith(
-      expect.objectContaining({
-        variant: 'danger',
-        title: 'Failed to fetch dashboard template',
-      })
-    );
+    expect(mockAddNotification).toHaveBeenCalledWith({
+      variant: 'warning',
+      title: 'No homepage dashboard set',
+      description: 'Set a dashboard as your homepage in the Dashboard Hub, or create a new one.',
+    });
     consoleSpy.mockRestore();
   });
 

@@ -70,11 +70,19 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
       })
       .catch((err) => {
         console.error(err);
-        addNotification({
-          variant: 'danger',
-          title: 'Failed to fetch dashboard template',
-          description: 'Try reloading the page.',
-        });
+        if (err instanceof Error && err.message === 'No custom default template found') {
+          addNotification({
+            variant: 'warning',
+            title: 'No homepage dashboard set',
+            description: 'Set a dashboard as your homepage in the Dashboard Hub, or create a new one.',
+          });
+        } else {
+          addNotification({
+            variant: 'danger',
+            title: 'Failed to fetch dashboard template',
+            description: 'Try reloading the page.',
+          });
+        }
       })
       .finally(() => {
         setIsLoaded(true);
