@@ -38,7 +38,6 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
   const [duplicateDashboardId, setDuplicateDashboardId] = useState<number | null>(null);
   const isEnabledDelete = useFlag('platform.widget-layout.delete-dashboard');
   const isEnabledShare = useFlag('platform.widget-layout.share');
-  const isEnabledEdit = useFlag('platform.widget-layout.edit_from_hub');
   const addNotification = useAddNotification();
   const setDefaultDashboard = useSetAtom(setDefaultDashboardAtom);
 
@@ -115,16 +114,13 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
 
   // Row actions for each dashboard
   const getRowActions = (dashboard: Dashboard) => [
-    ...(isEnabledEdit
-      ? [
-          {
-            icon: <EditAltIcon />,
-            title: 'Edit dashboard',
-            isDisabled: true,
-            onClick: () => console.log(`Edit dashboard ${dashboard.id}`),
-          },
-        ]
-      : []),
+    {
+      icon: <EditAltIcon />,
+      title: 'Edit dashboard',
+      component: (props: React.HTMLProps<HTMLAnchorElement>) => (
+        <Link {...props} to={`/dashboard-hub/${dashboard.id}`} style={{ color: 'inherit', textDecoration: 'inherit' }} />
+      ),
+    },
     {
       icon: <HomeIcon />,
       title: 'Set as homepage',
