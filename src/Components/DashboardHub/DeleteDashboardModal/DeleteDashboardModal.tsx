@@ -51,6 +51,7 @@ export const DeleteDashboardModal: React.FunctionComponent<DeleteDashboardModalP
       <ModalBody id="delete-dashboard-modal-body">
         <span id="delete-dashboard-modal-description">
           Deleting the dashboard will remove this dashboard from your Dashboard Hub and any customizations made to it will need to be reconfigured if
+          you want to remake it.
         </span>
         <br />
         <br />
