@@ -11,7 +11,10 @@ const navigateToDashboardHub = async (page: Page) => {
 const navigateToGenericDashboard = async (page: Page, dashboardName: string) => {
   await navigateToDashboardHub(page);
   await page.getByRole('link', { name: dashboardName, exact: true }).click();
-  await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
+  await page
+    .getByRole('button', { name: 'Add widgets' })
+    .or(page.getByRole('button', { name: 'Close widget panel' }))
+    .waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
 };
 
 const openKebabDropdown = async (page: Page) => {
@@ -318,7 +321,10 @@ test.describe('Dashboard Hub - Delete Dashboard', () => {
 
     // Navigate to the dashboard
     await page.getByRole('link', { name: DELETE_NAME, exact: true }).click();
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
+    await page
+      .getByRole('button', { name: 'Add widgets' })
+      .or(page.getByRole('button', { name: 'Close widget panel' }))
+      .waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
 
     // Delete it
     await page.waitForLoadState('networkidle');
@@ -355,7 +361,10 @@ test.describe('Dashboard Hub - Navigation', () => {
 
     // Navigate to the dashboard
     await firstLink.click();
-    await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
+    await page
+      .getByRole('button', { name: 'Add widgets' })
+      .or(page.getByRole('button', { name: 'Close widget panel' }))
+      .waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
 
     // Verify breadcrumb shows dashboard name
     const breadcrumb = page.getByRole('navigation', { name: 'Breadcrumb' });
@@ -394,7 +403,9 @@ test.describe('Generic Dashboard Page - Rendering', () => {
     // Header controls
     await expect(page.locator('h1').filter({ hasText: dashboardName })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Edit dashboard name' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add widgets' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Add widgets' }).or(page.getByRole('button', { name: 'Close widget panel' }))
+    ).toBeVisible();
     await expect(page.getByRole('button', { name: 'kebab dropdown toggle' })).toBeVisible();
 
     // Breadcrumb

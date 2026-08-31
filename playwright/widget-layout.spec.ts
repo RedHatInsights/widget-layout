@@ -109,8 +109,8 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
       await expect(drawerText).toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
     }
 
-    // Click Add widgets again to close
-    await page.getByRole('button', { name: 'Add widgets' }).click();
+    // Click button again to close (text changes to "Close widget panel" when open)
+    await page.getByRole('button', { name: 'Close widget panel' }).click();
 
     // Wait for drawer to close
     await page.waitForTimeout(1000);
