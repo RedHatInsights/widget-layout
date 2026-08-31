@@ -79,7 +79,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({ onRefetchDashboards }) =
         </Breadcrumb>
       </PageSection>
       <PageSection hasBodyWrapper={false} className="widg-c-page__main-section--header pf-v6-u-p-lg pf-v6-u-p-r-0-on-sm">
-        <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
+        <Flex direction={{ default: 'column', lg: 'row' }}>
           <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
             <Content>
               <Content component="h1">Dashboard Hub</Content>
