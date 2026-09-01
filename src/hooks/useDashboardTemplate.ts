@@ -15,6 +15,7 @@ import { renameDashboardAtom } from '../state/dashboardsAtom';
 import { templateIdAtom } from '../state/templateAtom';
 import { backendFlagAtom } from '../state/store';
 import { drawerExpandedAtom } from '../state/drawerExpandedAtom';
+import { currentlyUsedWidgetsAtom } from '../state/currentlyUsedWidgetsAtom';
 import { widgetKeyMap } from '../consts';
 
 const remapShortKeys = (config: ExtendedTemplateConfig): ExtendedTemplateConfig => {
@@ -70,9 +71,11 @@ const useDashboardTemplate = (id: number) => {
   const renameDashboardInList = useSetAtom(renameDashboardAtom);
   const invalidateStartPage = useSetAtom(templateIdAtom);
   const setDrawerExpanded = useSetAtom(drawerExpandedAtom);
+  const setCurrentlyUsedWidgets = useSetAtom(currentlyUsedWidgetsAtom);
 
   useEffect(() => {
     setDrawerExpanded(false);
+    setCurrentlyUsedWidgets([]);
     const fetchTemplate = async () => {
       setIsLoaded(false);
       setError(null);
