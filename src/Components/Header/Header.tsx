@@ -30,7 +30,7 @@ import { templateIdAtom } from '../../state/templateAtom';
 import { useApi } from '../../hooks/useApi';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { WarningModal } from '@patternfly/react-component-groups';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFlag } from '@unleash/proxy-client-react';
 import useGetDashboards from '../../hooks/useGetDashboards';
 import { CreateModal } from '../CreateModal/CreateModal';
@@ -38,6 +38,7 @@ import { ImportModal } from '../DashboardHub/ImportModal/ImportModal';
 import { DuplicateModal } from '../DuplicateModal/DuplicateModal';
 
 export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
+  const navigate = useNavigate();
   const { dashboards } = useGetDashboards();
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -119,10 +120,8 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
                     <MenuItemAction
                       icon={<EditAltIcon />}
                       actionId="edit"
-                      // eslint-disable-next-line no-console
-                      onClick={() => console.log('clicked on edit icon')}
+                      onClick={() => navigate(`/dashboard-hub/${dashboard.id}`)}
                       aria-label="Edit"
-                      isDisabled
                     />
                   }
                   component={(props) => <Link {...props} to={`/dashboard-hub/${dashboard.id}`} />}
