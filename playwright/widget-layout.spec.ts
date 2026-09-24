@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { disableCookiePrompt } from '@redhat-cloud-services/playwright-test-auth';
-import { TABLE_SELECTOR, PAGE_LOAD_TIMEOUT_MS, WIDGET_LOAD_TIMEOUT_MS, deleteTestDashboard } from './helpers';
+import { PAGE_LOAD_TIMEOUT_MS, TABLE_SELECTOR, WIDGET_LOAD_TIMEOUT_MS, deleteTestDashboard } from './helpers';
 
 const DRAWER_TIMEOUT_MS = 5000;
 
@@ -79,22 +79,16 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 
   test('should display available widgets in the drawer', async ({ page }) => {
-    // Check if drawer is already open, if not, open it
-    const drawerText = page.getByText('Add new and previously removed widgets');
-    const isDrawerVisible = await drawerText.isVisible().catch(() => false);
+    const drawer = page.locator('.widg-c-page__main-section--drawer');
+    const isDrawerVisible = await drawer.isVisible();
 
     if (!isDrawerVisible) {
-      // Open the drawer
       await page.getByRole('button', { name: 'Add widgets' }).click();
-      await page.waitForTimeout(1000);
     }
 
-    // Wait for drawer to be visible
-    await expect(drawerText).toBeVisible({ timeout: DRAWER_TIMEOUT_MS });
+    await expect(drawer).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
 
-    // Check for example draggable widgets in the drawer
-    const drawerSection = page.locator('text=Add new and previously removed widgets').locator('..');
-    await expect(drawerSection).toBeVisible();
+    await expect(drawer.locator('.grid-tile').first()).toBeVisible({ timeout: WIDGET_LOAD_TIMEOUT_MS });
   });
 
   test('should close the drawer when clicking Add widgets button again', async ({ page }) => {
@@ -138,10 +132,7 @@ test.describe('Widget Layout - Add Widget from Drawer', () => {
   });
 
   test('should not show the widget drawer by default on page load', async ({ page }) => {
-    await page
-      .locator('.pf-v6-c-card__title-text')
-      .first()
-      .waitFor({ state: 'visible', timeout: WIDGET_LOAD_TIMEOUT_MS });
+    await page.locator('.pf-v6-c-card__title-text').first().waitFor({ state: 'visible', timeout: WIDGET_LOAD_TIMEOUT_MS });
 
     const drawerText = page.getByText('Add new and previously removed widgets');
     await expect(drawerText).not.toBeVisible();
