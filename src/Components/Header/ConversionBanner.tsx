@@ -56,7 +56,7 @@ const ConversionBanner = () => {
 
   const isOrgAdmin = Boolean(currentUser?.is_org_admin);
 
-  if (isConversionOptInEnabled || !isOrgAdmin) {
+  if (!isConversionOptInEnabled || !isOrgAdmin) {
     return null;
   }
 
