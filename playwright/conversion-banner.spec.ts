@@ -35,11 +35,11 @@ const GET_STARTED = 'Get started now';
 const LEARN_MORE = 'Learn more about the benefits';
 
 /**
- * PatternFly's `variant="custom"` Alert does not expose `role="alert"`, so the banner has to
- * be located by its container class. The title lands in a level-4 heading prefixed with
- * "Custom alert:", which is why assertions on it match by regex rather than exact text.
+ * PatternFly renders `variant="custom"` alerts without `role="alert"`, and puts the title in
+ * a heading whose accessible name is prefixed with "Custom alert:" — hence the regex rather
+ * than an exact name match.
  */
-const bannerLocator = (page: Page) => page.locator('.pf-v6-c-alert').filter({ hasText: BANNER_TITLE });
+const bannerHeading = (page: Page) => page.getByRole('heading', { name: new RegExp(BANNER_TITLE) });
 
 /** Reads the toggle straight from the Unleash proxy Chrome itself uses. */
 const isConversionFlagEnabled = async (page: Page): Promise<boolean> => {
@@ -64,6 +64,10 @@ const isOrgAdmin = async (page: Page): Promise<boolean> => {
 test.describe('Widget Layout - Conversion Opt-In Banner', () => {
   test.beforeEach(async ({ page }) => {
     await disableCookiePrompt(page);
+
+    // Checked before navigating: when the flag is off there is nothing to test, and loading
+    // the page first would make the skip hostage to how fast the environment responds.
+    test.skip(!FORCE_FLAG && !(await isConversionFlagEnabled(page)), `${CONVERSION_FLAG} is not enabled in this environment`);
 
     // Must be registered before the first navigation, or Chrome's initial flag fetch escapes it.
     if (FORCE_FLAG) {
@@ -92,7 +96,6 @@ test.describe('Widget Layout - Conversion Opt-In Banner', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Add widgets' }).waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
 
-    test.skip(!FORCE_FLAG && !(await isConversionFlagEnabled(page)), `${CONVERSION_FLAG} is not enabled in this environment`);
     test.skip(!(await isOrgAdmin(page)), 'test account is not an org admin, so the banner is gated off');
   });
 
@@ -103,22 +106,18 @@ test.describe('Widget Layout - Conversion Opt-In Banner', () => {
   });
 
   test('should show the conversion banner in the header for org admins', async ({ page }) => {
-    const banner = bannerLocator(page);
-    await expect(banner).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT_MS });
-
     // Content comes from the RBAC remote, so this doubles as proof the module resolved.
-    await expect(banner.getByRole('heading', { name: new RegExp(BANNER_TITLE) })).toBeVisible();
-    await expect(banner.getByText(BANNER_BODY)).toBeVisible();
+    await expect(bannerHeading(page)).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT_MS });
+    await expect(page.getByText(BANNER_BODY)).toBeVisible();
   });
 
   test('should offer both banner actions', async ({ page }) => {
-    const banner = bannerLocator(page);
-    await expect(banner).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT_MS });
+    await expect(bannerHeading(page)).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT_MS });
 
     // "Get started now" is a button, not a link — it opens the wizard in place.
-    await expect(banner.getByRole('button', { name: GET_STARTED })).toBeVisible();
+    await expect(page.getByRole('button', { name: GET_STARTED })).toBeVisible();
 
-    const learnMore = banner.getByRole('link', { name: new RegExp(LEARN_MORE) });
+    const learnMore = page.getByRole('link', { name: new RegExp(LEARN_MORE) });
     await expect(learnMore).toBeVisible();
     await expect(learnMore).toHaveAttribute('href', /Hybrid-Cloud-Console-Access-Management-with-Workspaces\.pdf/);
     await expect(learnMore).toHaveAttribute('target', '_blank');
@@ -126,15 +125,16 @@ test.describe('Widget Layout - Conversion Opt-In Banner', () => {
   });
 
   test('should render the banner above the dashboard widgets', async ({ page }) => {
-    const banner = bannerLocator(page);
-    await expect(banner).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT_MS });
+    const heading = bannerHeading(page);
+    await expect(heading).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT_MS });
 
     // The banner belongs to the header, so it must sit above the widget grid rather than
-    // being injected into the dashboard itself.
-    const firstWidget = page.locator('.pf-v6-c-card__title-text').first();
-    await firstWidget.waitFor({ state: 'visible', timeout: PAGE_LOAD_TIMEOUT_MS });
+    // being injected into the dashboard itself. Every widget card carries a "Widget actions"
+    // menu, so the first one marks the top of the grid.
+    const firstWidget = page.getByRole('button', { name: 'Widget actions' }).first();
+    await expect(firstWidget).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT_MS });
 
-    const bannerBox = await banner.boundingBox();
+    const bannerBox = await heading.boundingBox();
     const widgetBox = await firstWidget.boundingBox();
 
     expect(bannerBox).not.toBeNull();
