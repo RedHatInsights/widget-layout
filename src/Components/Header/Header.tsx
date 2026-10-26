@@ -36,6 +36,7 @@ import useGetDashboards from '../../hooks/useGetDashboards';
 import { CreateModal } from '../CreateModal/CreateModal';
 import { ImportModal } from '../DashboardHub/ImportModal/ImportModal';
 import { DuplicateModal } from '../DuplicateModal/DuplicateModal';
+import ConversionBanner from './ConversionBanner';
 
 export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
   const navigate = useNavigate();
@@ -288,6 +289,7 @@ const Header = ({ layoutType }: { layoutType?: string }) => {
           </Toolbar>
         </FlexItem>
       </Flex>
+      <ConversionBanner />
     </PageSection>
   );
 };
