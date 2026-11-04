@@ -3,6 +3,7 @@ import './GridLayout.scss';
 import './WidgetHeader.scss';
 import '../Icons/HeaderIcon.scss';
 import React, { useEffect, useMemo } from 'react';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import { useAtomValue, useSetAtom } from 'jotai';
 import ResizeHandleSVG from './resize-handle.svg';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
@@ -24,14 +25,19 @@ const documentationLink =
 
 const LayoutEmptyState = () => (
   <PageSection hasBodyWrapper={false} className="empty-layout pf-v6-u-p-0">
-    <EmptyState headingLevel="h2" icon={PlusCircleIcon} titleText="No dashboard content" variant={EmptyStateVariant.lg} className="pf-v6-u-p-sm">
+    <EmptyState
+      headingLevel="h2"
+      icon={PlusCircleIcon}
+      titleText={<FormattedMessage {...messages.noContentTitle} />}
+      variant={EmptyStateVariant.lg}
+      className="pf-v6-u-p-sm"
+    >
       <EmptyStateBody>
-        You don&apos;t have any widgets on your dashboard. To populate your dashboard, drag <GripVerticalIcon /> items from the blue widget bank to
-        this dashboard body here.
+        <FormattedMessage {...messages.noContentBody} values={{ gripIcon: <GripVerticalIcon /> }} />
       </EmptyStateBody>
       <EmptyStateActions>
         <Button variant="link" icon={<ExternalLinkAltIcon />} iconPosition="end" component="a" href={documentationLink}>
-          Learn about your widget dashboard
+          <FormattedMessage {...messages.learnMore} />
         </Button>
       </EmptyStateActions>
     </EmptyState>
@@ -51,6 +57,25 @@ interface GridLayoutProps {
   isLayoutLocked?: boolean;
   layoutRef?: React.Ref<HTMLDivElement>;
 }
+
+const messages = defineMessages({
+  noContentTitle: {
+    id: 'widgetLayout.gridLayout.noContentTitle',
+    description: 'Empty dashboard state title',
+    defaultMessage: 'No dashboard content',
+  },
+  noContentBody: {
+    id: 'widgetLayout.gridLayout.noContentBody',
+    description: 'Empty dashboard state body',
+    defaultMessage:
+      "You don't have any widgets on your dashboard. To populate your dashboard, drag {gripIcon} items from the blue widget bank to this dashboard body here.",
+  },
+  learnMore: {
+    id: 'widgetLayout.gridLayout.learnMore',
+    description: 'Learn about your widget dashboard link',
+    defaultMessage: 'Learn about your widget dashboard',
+  },
+});
 
 const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, layoutRef }: GridLayoutProps) => {
   const layoutVariant = useAtomValue(layoutVariantAtom);

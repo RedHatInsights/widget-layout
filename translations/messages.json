@@ -1,0 +1,510 @@
+{
+  "widgetLayout.codeEditor.clearCode": {
+    "defaultMessage": "Clear code",
+    "description": "Clear code control aria label and tooltip"
+  },
+  "widgetLayout.createModal.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label"
+  },
+  "widgetLayout.createModal.create": {
+    "defaultMessage": "Create dashboard",
+    "description": "Create dashboard button label"
+  },
+  "widgetLayout.createModal.createdNotification": {
+    "defaultMessage": "Dashboard ''{name}'' created successfully",
+    "description": "Dashboard created success notification"
+  },
+  "widgetLayout.createModal.creating": {
+    "defaultMessage": "Creating...",
+    "description": "Creating in-progress button label"
+  },
+  "widgetLayout.createModal.creatingAria": {
+    "defaultMessage": "Creating dashboard",
+    "description": "Creating dashboard spinner aria label"
+  },
+  "widgetLayout.createModal.creationFailed": {
+    "defaultMessage": "Creation failed",
+    "description": "Create blank dashboard error alert title"
+  },
+  "widgetLayout.createModal.nameLabel": {
+    "defaultMessage": "New dashboard name",
+    "description": "New dashboard name field label"
+  },
+  "widgetLayout.createModal.namePlaceholder": {
+    "defaultMessage": "from-scratch dashboard",
+    "description": "New dashboard name field placeholder"
+  },
+  "widgetLayout.createModal.setAsHomepage": {
+    "defaultMessage": "Set as homepage",
+    "description": "Set as homepage checkbox label"
+  },
+  "widgetLayout.createModal.title": {
+    "defaultMessage": "Create new blank dashboard",
+    "description": "Create blank dashboard modal title"
+  },
+  "widgetLayout.dashboardHub.breadcrumbHome": {
+    "defaultMessage": "Home",
+    "description": "Home breadcrumb item"
+  },
+  "widgetLayout.dashboardHub.createDashboard": {
+    "defaultMessage": "Create dashboard",
+    "description": "Create dashboard dropdown toggle label"
+  },
+  "widgetLayout.dashboardHub.createFromBlank": {
+    "defaultMessage": "Create from blank",
+    "description": "Menu item to create a dashboard from blank"
+  },
+  "widgetLayout.dashboardHub.description": {
+    "defaultMessage": "Manage, customize, and organize your dashboards to keep the most relevant insights front and center across your Hybrid Cloud Console.",
+    "description": "Dashboard Hub page description"
+  },
+  "widgetLayout.dashboardHub.duplicateExisting": {
+    "defaultMessage": "Duplicate existing",
+    "description": "Menu item to duplicate an existing dashboard"
+  },
+  "widgetLayout.dashboardHub.importFromConfigString": {
+    "defaultMessage": "Import from config string",
+    "description": "Menu item to import a dashboard from a config string"
+  },
+  "widgetLayout.dashboardHub.learnMore": {
+    "defaultMessage": "Learn more about dashboards",
+    "description": "Learn more about dashboards link"
+  },
+  "widgetLayout.dashboardHub.title": {
+    "defaultMessage": "Dashboard Hub",
+    "description": "Dashboard Hub page title"
+  },
+  "widgetLayout.dashboardTable.actionsColumn": {
+    "defaultMessage": "Actions",
+    "description": "Actions column screen reader text"
+  },
+  "widgetLayout.dashboardTable.alreadyHomepage": {
+    "defaultMessage": "This dashboard is already set as your homepage",
+    "description": "Set as homepage row action tooltip"
+  },
+  "widgetLayout.dashboardTable.alreadyHomepageTooltip": {
+    "defaultMessage": "This dashboard is already set to your homepage",
+    "description": "Tooltip when the dashboard is already the homepage"
+  },
+  "widgetLayout.dashboardTable.column.lastModified": {
+    "defaultMessage": "Last Modified",
+    "description": "Dashboards table Last Modified column"
+  },
+  "widgetLayout.dashboardTable.column.name": {
+    "defaultMessage": "Name",
+    "description": "Dashboards table Name column"
+  },
+  "widgetLayout.dashboardTable.copiedToClipboard": {
+    "defaultMessage": "''{name}'' has been copied to clipboard",
+    "description": "Dashboard copied to clipboard notification"
+  },
+  "widgetLayout.dashboardTable.copyConfiguration": {
+    "defaultMessage": "Copy configuration string",
+    "description": "Copy configuration string row action"
+  },
+  "widgetLayout.dashboardTable.copyFailed": {
+    "defaultMessage": "Failed to copy ''{name}'' to clipboard",
+    "description": "Dashboard copy to clipboard failure notification"
+  },
+  "widgetLayout.dashboardTable.deleteDashboard": {
+    "defaultMessage": "Delete dashboard",
+    "description": "Delete dashboard row action"
+  },
+  "widgetLayout.dashboardTable.deletedNotification": {
+    "defaultMessage": "''{name}'' has been deleted and removed from Dashboard Hub",
+    "description": "Dashboard deleted notification"
+  },
+  "widgetLayout.dashboardTable.duplicateAria": {
+    "defaultMessage": "Duplicate",
+    "description": "Duplicate button aria label"
+  },
+  "widgetLayout.dashboardTable.duplicateDashboard": {
+    "defaultMessage": "Duplicate dashboard",
+    "description": "Duplicate dashboard tooltip"
+  },
+  "widgetLayout.dashboardTable.editDashboard": {
+    "defaultMessage": "Edit dashboard",
+    "description": "Edit dashboard row action"
+  },
+  "widgetLayout.dashboardTable.homepageColumn": {
+    "defaultMessage": "Homepage",
+    "description": "Homepage column screen reader text"
+  },
+  "widgetLayout.dashboardTable.noHomepageAlert": {
+    "defaultMessage": "No homepage dashboard set. Please set a dashboard as your homepage.",
+    "description": "Warning shown when no homepage dashboard is set"
+  },
+  "widgetLayout.dashboardTable.setAsHomepage": {
+    "defaultMessage": "Set as homepage",
+    "description": "Set as homepage row action"
+  },
+  "widgetLayout.dashboardTable.setAsHomepageFailed": {
+    "defaultMessage": "Failed to set ''{name}'' as homepage",
+    "description": "Dashboard set as homepage failure notification"
+  },
+  "widgetLayout.dashboardTable.setAsHomepageSuccess": {
+    "defaultMessage": "''{name}'' has been set as homepage",
+    "description": "Dashboard set as homepage notification"
+  },
+  "widgetLayout.dashboardTable.shareDashboard": {
+    "defaultMessage": "Share dashboard",
+    "description": "Share dashboard row action"
+  },
+  "widgetLayout.dashboardTable.tableAria": {
+    "defaultMessage": "Dashboards table",
+    "description": "Dashboards table aria label"
+  },
+  "widgetLayout.deleteModal.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label"
+  },
+  "widgetLayout.deleteModal.confirm": {
+    "defaultMessage": "I understand that this action cannot be undone.",
+    "description": "Delete confirmation checkbox label"
+  },
+  "widgetLayout.deleteModal.delete": {
+    "defaultMessage": "Delete dashboard",
+    "description": "Delete dashboard button label"
+  },
+  "widgetLayout.deleteModal.description": {
+    "defaultMessage": "Deleting the dashboard will remove this dashboard from your Dashboard Hub and any customizations made to it will need to be reconfigured if you want to remake it.",
+    "description": "Delete dashboard modal body"
+  },
+  "widgetLayout.deleteModal.title": {
+    "defaultMessage": "Delete ''{name}'' dashboard",
+    "description": "Delete dashboard modal title"
+  },
+  "widgetLayout.drawer.drawerTitle": {
+    "defaultMessage": "Add new and previously removed widgets by clicking the {gripIcon} icon, then drag and drop to a new location. Drag the corners of the cards to resize widgets.",
+    "description": "Widget drawer usage instructions"
+  },
+  "widgetLayout.drawer.moveWidget": {
+    "defaultMessage": "Move widget",
+    "description": "Move widget tooltip"
+  },
+  "widgetLayout.duplicateModal.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label"
+  },
+  "widgetLayout.duplicateModal.duplicate": {
+    "defaultMessage": "Duplicate dashboard",
+    "description": "Duplicate dashboard button label"
+  },
+  "widgetLayout.duplicateModal.duplicatedNotification": {
+    "defaultMessage": "Dashboard ''{name}'' duplicated successfully",
+    "description": "Dashboard duplicated success notification"
+  },
+  "widgetLayout.duplicateModal.duplicating": {
+    "defaultMessage": "Duplicating...",
+    "description": "Duplicating in-progress button label"
+  },
+  "widgetLayout.duplicateModal.duplicatingAria": {
+    "defaultMessage": "Duplicating dashboard",
+    "description": "Duplicating dashboard spinner aria label"
+  },
+  "widgetLayout.duplicateModal.duplicationFailed": {
+    "defaultMessage": "Duplication failed",
+    "description": "Duplication error alert title"
+  },
+  "widgetLayout.duplicateModal.nameLabel": {
+    "defaultMessage": "New dashboard name",
+    "description": "New dashboard name field label"
+  },
+  "widgetLayout.duplicateModal.namePlaceholder": {
+    "defaultMessage": "duplicate dashboard",
+    "description": "New dashboard name field placeholder"
+  },
+  "widgetLayout.duplicateModal.selectAria": {
+    "defaultMessage": "Select a dashboard",
+    "description": "Dashboard select aria label"
+  },
+  "widgetLayout.duplicateModal.selectLabel": {
+    "defaultMessage": "Select existing dashboard for duplication",
+    "description": "Select dashboard for duplication field label"
+  },
+  "widgetLayout.duplicateModal.selectPlaceholder": {
+    "defaultMessage": "Select a dashboard",
+    "description": "Dashboard select placeholder option"
+  },
+  "widgetLayout.duplicateModal.setAsHomepage": {
+    "defaultMessage": "Set as homepage",
+    "description": "Set as homepage checkbox label"
+  },
+  "widgetLayout.duplicateModal.title": {
+    "defaultMessage": "Duplicate existing dashboard",
+    "description": "Duplicate dashboard modal title"
+  },
+  "widgetLayout.genericDashboardPage.breadcrumbDashboardHub": {
+    "defaultMessage": "Dashboard Hub",
+    "description": "Dashboard Hub breadcrumb item"
+  },
+  "widgetLayout.genericDashboardPage.breadcrumbHome": {
+    "defaultMessage": "Home",
+    "description": "Home breadcrumb item"
+  },
+  "widgetLayout.genericDropdown.alreadyHomepage": {
+    "defaultMessage": "This dashboard is already set as your homepage",
+    "description": "Tooltip when the dashboard is already the homepage"
+  },
+  "widgetLayout.genericDropdown.copiedToClipboard": {
+    "defaultMessage": "''{name}'' has been copied to clipboard",
+    "description": "Dashboard copied to clipboard notification"
+  },
+  "widgetLayout.genericDropdown.copyConfiguration": {
+    "defaultMessage": "Copy configuration string",
+    "description": "Copy configuration string menu item"
+  },
+  "widgetLayout.genericDropdown.copyFailed": {
+    "defaultMessage": "Failed to copy ''{name}'' to clipboard",
+    "description": "Dashboard copy to clipboard failure notification"
+  },
+  "widgetLayout.genericDropdown.deleteDashboard": {
+    "defaultMessage": "Delete dashboard",
+    "description": "Delete dashboard menu item"
+  },
+  "widgetLayout.genericDropdown.deletedNotification": {
+    "defaultMessage": "''{name}'' has been deleted and removed from Dashboard Hub",
+    "description": "Dashboard deleted notification"
+  },
+  "widgetLayout.genericDropdown.duplicateDashboard": {
+    "defaultMessage": "Duplicate dashboard",
+    "description": "Duplicate dashboard menu item"
+  },
+  "widgetLayout.genericDropdown.kebabToggleAria": {
+    "defaultMessage": "kebab dropdown toggle",
+    "description": "Kebab dropdown toggle aria label"
+  },
+  "widgetLayout.genericDropdown.setAsHomepage": {
+    "defaultMessage": "Set as homepage",
+    "description": "Set as homepage menu item"
+  },
+  "widgetLayout.genericDropdown.setAsHomepageFailed": {
+    "defaultMessage": "Failed to set ''{name}'' as homepage",
+    "description": "Dashboard set as homepage failure notification"
+  },
+  "widgetLayout.genericDropdown.setAsHomepageSuccess": {
+    "defaultMessage": "''{name}'' has been set as homepage",
+    "description": "Dashboard set as homepage notification"
+  },
+  "widgetLayout.genericHeader.addWidgets": {
+    "defaultMessage": "Add widgets",
+    "description": "Add widgets button label"
+  },
+  "widgetLayout.genericHeader.cancelEditingAria": {
+    "defaultMessage": "Cancel editing",
+    "description": "Cancel editing button aria label"
+  },
+  "widgetLayout.genericHeader.closeWidgetPanel": {
+    "defaultMessage": "Close widget panel",
+    "description": "Close widget panel button label"
+  },
+  "widgetLayout.genericHeader.confirmNameAria": {
+    "defaultMessage": "Confirm name",
+    "description": "Confirm name button aria label"
+  },
+  "widgetLayout.genericHeader.dashboardNameAria": {
+    "defaultMessage": "Dashboard name",
+    "description": "Dashboard name input aria label"
+  },
+  "widgetLayout.genericHeader.editNameAria": {
+    "defaultMessage": "Edit dashboard name",
+    "description": "Edit dashboard name button aria label"
+  },
+  "widgetLayout.genericHeader.renameFailed": {
+    "defaultMessage": "Failed to rename dashboard",
+    "description": "Dashboard rename failure notification"
+  },
+  "widgetLayout.gridLayout.learnMore": {
+    "defaultMessage": "Learn about your widget dashboard",
+    "description": "Learn about your widget dashboard link"
+  },
+  "widgetLayout.gridLayout.noContentBody": {
+    "defaultMessage": "You don't have any widgets on your dashboard. To populate your dashboard, drag {gripIcon} items from the blue widget bank to this dashboard body here.",
+    "description": "Empty dashboard state body"
+  },
+  "widgetLayout.gridLayout.noContentTitle": {
+    "defaultMessage": "No dashboard content",
+    "description": "Empty dashboard state title"
+  },
+  "widgetLayout.header.addWidgets": {
+    "defaultMessage": "Add widgets",
+    "description": "Add widgets button label"
+  },
+  "widgetLayout.header.closeWidgetPanel": {
+    "defaultMessage": "Close widget panel",
+    "description": "Close widget panel button label"
+  },
+  "widgetLayout.header.createFromBlank": {
+    "defaultMessage": "Create from blank",
+    "description": "Menu item to create a dashboard from blank"
+  },
+  "widgetLayout.header.createNewDashboard": {
+    "defaultMessage": "Create new dashboard",
+    "description": "Menu item to create a new dashboard"
+  },
+  "widgetLayout.header.dashboardHub": {
+    "defaultMessage": "Dashboard Hub",
+    "description": "Dashboard Hub link label"
+  },
+  "widgetLayout.header.dashboardHubDescription": {
+    "defaultMessage": "Create, manage, share dashboards",
+    "description": "Dashboard Hub link description"
+  },
+  "widgetLayout.header.duplicateExisting": {
+    "defaultMessage": "Duplicate existing",
+    "description": "Menu item to duplicate an existing dashboard"
+  },
+  "widgetLayout.header.edit": {
+    "defaultMessage": "Edit",
+    "description": "Edit dashboard action aria label"
+  },
+  "widgetLayout.header.greeting": {
+    "defaultMessage": "Hi!",
+    "description": "Header greeting without a user name"
+  },
+  "widgetLayout.header.greetingNamed": {
+    "defaultMessage": "Hi, {name}",
+    "description": "Header greeting with the user name"
+  },
+  "widgetLayout.header.importFromConfigString": {
+    "defaultMessage": "Import from config string",
+    "description": "Menu item to import a dashboard from a config string"
+  },
+  "widgetLayout.header.kebabDropdownToggle": {
+    "defaultMessage": "kebab dropdown toggle",
+    "description": "Kebab dropdown toggle aria label"
+  },
+  "widgetLayout.header.resetLayoutBody": {
+    "defaultMessage": "All your widget customizations will be discarded.",
+    "description": "Reset layout confirmation modal body"
+  },
+  "widgetLayout.header.resetLayoutCheckbox": {
+    "defaultMessage": "I understand that this action cannot be undone",
+    "description": "Reset layout confirmation checkbox label"
+  },
+  "widgetLayout.header.resetLayoutConfirm": {
+    "defaultMessage": "Reset layout",
+    "description": "Reset layout confirmation button label"
+  },
+  "widgetLayout.header.resetLayoutTitle": {
+    "defaultMessage": "Reset layout?",
+    "description": "Reset layout confirmation modal title"
+  },
+  "widgetLayout.header.resetToDefault": {
+    "defaultMessage": "Reset to default",
+    "description": "Reset to default button label"
+  },
+  "widgetLayout.header.welcome": {
+    "defaultMessage": "Welcome to your Hybrid Cloud Console.",
+    "description": "Header welcome subtitle"
+  },
+  "widgetLayout.hooks.createFailed": {
+    "defaultMessage": "Failed to create dashboard. Please try again.",
+    "description": "Dashboard creation failure error"
+  },
+  "widgetLayout.hooks.deleteFailed": {
+    "defaultMessage": "Failed to delete dashboard",
+    "description": "Dashboard deletion failure error fallback"
+  },
+  "widgetLayout.hooks.duplicateFailed": {
+    "defaultMessage": "Failed to duplicate dashboard. Please try again.",
+    "description": "Dashboard duplication failure error"
+  },
+  "widgetLayout.hooks.exportFailed": {
+    "defaultMessage": "Failed to export dashboard",
+    "description": "Dashboard export failure error fallback"
+  },
+  "widgetLayout.hooks.fetchConfigFailedDescription": {
+    "defaultMessage": "Try reloading the page.",
+    "description": "Dashboard config fetch failure notification description"
+  },
+  "widgetLayout.hooks.fetchConfigFailedTitle": {
+    "defaultMessage": "Failed to fetch dashboard template",
+    "description": "Dashboard config fetch failure notification title"
+  },
+  "widgetLayout.hooks.fetchTemplateFailed": {
+    "defaultMessage": "Failed to fetch dashboard template",
+    "description": "Dashboard template fetch failure error fallback"
+  },
+  "widgetLayout.hooks.importFailed": {
+    "defaultMessage": "Failed to import dashboard. Please try again.",
+    "description": "Dashboard import failure error"
+  },
+  "widgetLayout.hooks.invalidJson": {
+    "defaultMessage": "Invalid JSON format. Please check your configuration string.",
+    "description": "Invalid configuration string error"
+  },
+  "widgetLayout.hooks.networkError": {
+    "defaultMessage": "Network error. Please check your connection and try again.",
+    "description": "Network error"
+  },
+  "widgetLayout.hooks.noHomepageDescription": {
+    "defaultMessage": "Set a dashboard as your homepage in the Dashboard Hub, or create a new one.",
+    "description": "No homepage dashboard warning notification description"
+  },
+  "widgetLayout.hooks.noHomepageTitle": {
+    "defaultMessage": "No homepage dashboard set",
+    "description": "No homepage dashboard warning notification title"
+  },
+  "widgetLayout.hooks.patchFailedDescription": {
+    "defaultMessage": "Your dashboard changes were unable to be saved.",
+    "description": "Dashboard config save failure notification description"
+  },
+  "widgetLayout.hooks.patchFailedTitle": {
+    "defaultMessage": "Failed to patch dashboard configuration",
+    "description": "Dashboard config save failure notification title"
+  },
+  "widgetLayout.hooks.serverUnavailable": {
+    "defaultMessage": "The server is currently unavailable. Please try again later.",
+    "description": "Server unavailable error"
+  },
+  "widgetLayout.hooks.unexpectedError": {
+    "defaultMessage": "An unexpected error occurred. Please try again.",
+    "description": "Unexpected error fallback"
+  },
+  "widgetLayout.icon404.title": {
+    "defaultMessage": "404: page not found",
+    "description": "404 illustration title"
+  },
+  "widgetLayout.importModal.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label"
+  },
+  "widgetLayout.importModal.create": {
+    "defaultMessage": "Create dashboard",
+    "description": "Create dashboard button label"
+  },
+  "widgetLayout.importModal.description": {
+    "defaultMessage": "Copy/paste a config string from any other Hybrid Cloud Console dashboard (ie. a string shared with you from another person in your organization) to have that dashboard recreated in your account. Learn about using config strings.",
+    "description": "Import config string modal description"
+  },
+  "widgetLayout.importModal.importFailed": {
+    "defaultMessage": "Import failed",
+    "description": "Import error alert title"
+  },
+  "widgetLayout.importModal.importedNotification": {
+    "defaultMessage": "Dashboard ''{name}'' imported successfully",
+    "description": "Dashboard imported success notification"
+  },
+  "widgetLayout.importModal.importing": {
+    "defaultMessage": "Importing...",
+    "description": "Importing in-progress button label"
+  },
+  "widgetLayout.importModal.importingAria": {
+    "defaultMessage": "Importing dashboard",
+    "description": "Importing dashboard spinner aria label"
+  },
+  "widgetLayout.importModal.nameLabel": {
+    "defaultMessage": "New dashboard name",
+    "description": "New dashboard name field label"
+  },
+  "widgetLayout.importModal.pasteLabel": {
+    "defaultMessage": "Paste configuration string",
+    "description": "Paste configuration string field label"
+  },
+  "widgetLayout.importModal.title": {
+    "defaultMessage": "Import configuration string",
+    "description": "Import config string modal title"
+  }
+}

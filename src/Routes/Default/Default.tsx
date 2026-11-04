@@ -13,6 +13,7 @@ import { LayoutTypes } from '../../api/dashboard-templates';
 import '../../App.scss';
 import Portal from '@redhat-cloud-services/frontend-components-notifications/Portal';
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
+import { IntlMessagesProvider, useChromeLocale } from '../../shared/i18n';
 import { resolvedWidgetMappingAtom } from '../../state/widgetMappingAtom';
 
 const DefaultRouteInner = (props: { layoutType: LayoutTypes }) => {
@@ -48,10 +49,20 @@ const DefaultRouteInner = (props: { layoutType: LayoutTypes }) => {
   );
 };
 
-const DefaultRoute = (props: { layoutType: LayoutTypes }) => (
-  <Provider store={store}>
-    <DefaultRouteInner {...props} />
-  </Provider>
-);
+/**
+ * Federation entry for `./WidgetLayout`. Carries its own locale boundary so the
+ * module works when loaded directly by the shell, which does not mount this
+ * app's catalog loader.
+ */
+const DefaultRoute = (props: { layoutType: LayoutTypes }) => {
+  const locale = useChromeLocale();
+  return (
+    <Provider store={store}>
+      <IntlMessagesProvider locale={locale}>
+        <DefaultRouteInner {...props} />
+      </IntlMessagesProvider>
+    </Provider>
+  );
+};
 
 export default DefaultRoute;

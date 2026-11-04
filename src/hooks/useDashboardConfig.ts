@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { defineMessages, useIntl } from 'react-intl';
 import { useAtom, useSetAtom } from 'jotai';
 import DebouncePromise from 'awesome-debounce-promise';
 import { templateAtom, templateIdAtom } from '../state/templateAtom';
@@ -19,7 +20,41 @@ import { useFlag } from '@unleash/proxy-client-react';
 
 const sidebarBreakpoints = { xl: 1250, lg: 1100, md: 800, sm: 500 };
 
+const messages = defineMessages({
+  noHomepageTitle: {
+    id: 'widgetLayout.hooks.noHomepageTitle',
+    description: 'No homepage dashboard warning notification title',
+    defaultMessage: 'No homepage dashboard set',
+  },
+  noHomepageDescription: {
+    id: 'widgetLayout.hooks.noHomepageDescription',
+    description: 'No homepage dashboard warning notification description',
+    defaultMessage: 'Set a dashboard as your homepage in the Dashboard Hub, or create a new one.',
+  },
+  fetchFailedTitle: {
+    id: 'widgetLayout.hooks.fetchConfigFailedTitle',
+    description: 'Dashboard config fetch failure notification title',
+    defaultMessage: 'Failed to fetch dashboard template',
+  },
+  fetchFailedDescription: {
+    id: 'widgetLayout.hooks.fetchConfigFailedDescription',
+    description: 'Dashboard config fetch failure notification description',
+    defaultMessage: 'Try reloading the page.',
+  },
+  patchFailedTitle: {
+    id: 'widgetLayout.hooks.patchFailedTitle',
+    description: 'Dashboard config save failure notification title',
+    defaultMessage: 'Failed to patch dashboard configuration',
+  },
+  patchFailedDescription: {
+    id: 'widgetLayout.hooks.patchFailedDescription',
+    description: 'Dashboard config save failure notification description',
+    defaultMessage: 'Your dashboard changes were unable to be saved.',
+  },
+});
+
 const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => {
+  const intl = useIntl();
   const isNewBackend = useFlag('platform.widget-layout.new-backend');
   const mappedLayoutType = !isNewBackend && layoutType === 'landing-landingPage' ? 'landingPage' : layoutType;
   const [isLoaded, setIsLoaded] = useState(false);
@@ -73,14 +108,14 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
         if (err instanceof Error && err.message === 'No custom default template found') {
           addNotification({
             variant: 'warning',
-            title: 'No homepage dashboard set',
-            description: 'Set a dashboard as your homepage in the Dashboard Hub, or create a new one.',
+            title: intl.formatMessage(messages.noHomepageTitle),
+            description: intl.formatMessage(messages.noHomepageDescription),
           });
         } else {
           addNotification({
             variant: 'danger',
-            title: 'Failed to fetch dashboard template',
-            description: 'Try reloading the page.',
+            title: intl.formatMessage(messages.fetchFailedTitle),
+            description: intl.formatMessage(messages.fetchFailedDescription),
           });
         }
       })
@@ -117,8 +152,8 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
         console.error(error);
         addNotification({
           variant: 'danger',
-          title: 'Failed to patch dashboard configuration',
-          description: 'Your dashboard changes were unable to be saved.',
+          title: intl.formatMessage(messages.patchFailedTitle),
+          description: intl.formatMessage(messages.patchFailedDescription),
         });
       }
     },

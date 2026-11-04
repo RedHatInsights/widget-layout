@@ -1,8 +1,62 @@
 import { Alert, Button, Checkbox, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, TextInput } from '@patternfly/react-core';
 import React, { useEffect } from 'react';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { ThIcon } from '@patternfly/react-icons';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { useCreateBlankDashboard } from '../../hooks/useCreateBlankDashboard';
+
+const messages = defineMessages({
+  title: {
+    id: 'widgetLayout.createModal.title',
+    description: 'Create blank dashboard modal title',
+    defaultMessage: 'Create new blank dashboard',
+  },
+  creationFailed: {
+    id: 'widgetLayout.createModal.creationFailed',
+    description: 'Create blank dashboard error alert title',
+    defaultMessage: 'Creation failed',
+  },
+  namePlaceholder: {
+    id: 'widgetLayout.createModal.namePlaceholder',
+    description: 'New dashboard name field placeholder',
+    defaultMessage: 'from-scratch dashboard',
+  },
+  nameLabel: {
+    id: 'widgetLayout.createModal.nameLabel',
+    description: 'New dashboard name field label',
+    defaultMessage: 'New dashboard name',
+  },
+  setAsHomepage: {
+    id: 'widgetLayout.createModal.setAsHomepage',
+    description: 'Set as homepage checkbox label',
+    defaultMessage: 'Set as homepage',
+  },
+  creatingAria: {
+    id: 'widgetLayout.createModal.creatingAria',
+    description: 'Creating dashboard spinner aria label',
+    defaultMessage: 'Creating dashboard',
+  },
+  creating: {
+    id: 'widgetLayout.createModal.creating',
+    description: 'Creating in-progress button label',
+    defaultMessage: 'Creating...',
+  },
+  create: {
+    id: 'widgetLayout.createModal.create',
+    description: 'Create dashboard button label',
+    defaultMessage: 'Create dashboard',
+  },
+  cancel: {
+    id: 'widgetLayout.createModal.cancel',
+    description: 'Cancel button label',
+    defaultMessage: 'Cancel',
+  },
+  createdNotification: {
+    id: 'widgetLayout.createModal.createdNotification',
+    description: 'Dashboard created success notification',
+    defaultMessage: "Dashboard ''{name}'' created successfully",
+  },
+});
 
 interface CreateModalProps {
   isOpen: boolean;
@@ -12,6 +66,7 @@ interface CreateModalProps {
 }
 
 export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen, onClose, onSuccess, layoutType }) => {
+  const intl = useIntl();
   const { name, setName, setAsHomepage, setSetAsHomepage, isLoading, error, isFormValid, createDashboard, reset } =
     useCreateBlankDashboard(layoutType);
   const addNotification = useAddNotification();
@@ -29,7 +84,7 @@ export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen,
     if (result) {
       addNotification({
         variant: 'success',
-        title: `Dashboard '${name}' created successfully`,
+        title: intl.formatMessage(messages.createdNotification, { name }),
       });
       onSuccess?.();
       onClose();
@@ -51,15 +106,15 @@ export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen,
       aria-labelledby="create-blank-modal-title"
       aria-describedby="modal-box-body-create-blank"
     >
-      <ModalHeader title="Create new blank dashboard" titleIconVariant={ThIcon} labelId="create-blank-modal-title" />
+      <ModalHeader title={intl.formatMessage(messages.title)} titleIconVariant={ThIcon} labelId="create-blank-modal-title" />
       <ModalBody id="modal-box-body-create-blank">
         {error && (
-          <Alert variant="danger" title="Creation failed" isInline className="pf-v6-u-mb-md">
+          <Alert variant="danger" title={intl.formatMessage(messages.creationFailed)} isInline className="pf-v6-u-mb-md">
             {error}
           </Alert>
         )}
         <Form>
-          <FormGroup label="New dashboard name" isRequired>
+          <FormGroup label={intl.formatMessage(messages.nameLabel)} isRequired>
             <TextInput
               value={name}
               isRequired
@@ -67,12 +122,17 @@ export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen,
               type="text"
               id="blank-dashboard-name"
               name="blank-dashboard-name"
-              placeholder="from-scratch dashboard"
+              placeholder={intl.formatMessage(messages.namePlaceholder)}
               onChange={handleNameChange}
             />
           </FormGroup>
           <FormGroup>
-            <Checkbox label="Set as homepage" id="set-as-homepage" isChecked={setAsHomepage} onChange={handleHomepageChange} />
+            <Checkbox
+              label={intl.formatMessage(messages.setAsHomepage)}
+              id="set-as-homepage"
+              isChecked={setAsHomepage}
+              onChange={handleHomepageChange}
+            />
           </FormGroup>
         </Form>
       </ModalBody>
@@ -83,12 +143,12 @@ export const CreateModal: React.FunctionComponent<CreateModalProps> = ({ isOpen,
           onClick={handleSubmit}
           isDisabled={!isFormValid || isLoading}
           isLoading={isLoading}
-          spinnerAriaLabel="Creating dashboard"
+          spinnerAriaLabel={intl.formatMessage(messages.creatingAria)}
         >
-          {isLoading ? 'Creating...' : 'Create dashboard'}
+          {isLoading ? <FormattedMessage {...messages.creating} /> : <FormattedMessage {...messages.create} />}
         </Button>
         <Button key="cancel" variant="link" onClick={onClose} isDisabled={isLoading}>
-          Cancel
+          <FormattedMessage {...messages.cancel} />
         </Button>
       </ModalFooter>
     </Modal>

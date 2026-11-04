@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { defineMessages, useIntl } from 'react-intl';
 import DebouncePromise from 'awesome-debounce-promise';
 import {
   DashboardTemplate,
@@ -60,7 +61,16 @@ const remapWidgetTypes = (extendedTemplate: ExtendedTemplateConfig, widgetMappin
   return result;
 };
 
+const messages = defineMessages({
+  fetchFailed: {
+    id: 'widgetLayout.hooks.fetchTemplateFailed',
+    description: 'Dashboard template fetch failure error fallback',
+    defaultMessage: 'Failed to fetch dashboard template',
+  },
+});
+
 const useDashboardTemplate = (id: number) => {
+  const intl = useIntl();
   const [template, setTemplate] = useState<ExtendedTemplateConfig>({ sm: [], md: [], lg: [], xl: [] });
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -89,7 +99,7 @@ const useDashboardTemplate = (id: number) => {
         const remappedTemplate = remapWidgetTypes(normalized, widgetMap);
         setTemplate(remappedTemplate);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch dashboard template'));
+        setError(err instanceof Error ? err : new Error(intl.formatMessage(messages.fetchFailed)));
       } finally {
         setIsLoaded(true);
       }

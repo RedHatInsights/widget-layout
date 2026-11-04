@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { defineMessages, useIntl } from 'react-intl';
 import { DashboardTemplate, DashboardTemplatesError } from '../api/dashboard-templates';
 import { useSetAtom } from 'jotai';
 import { duplicateDashboardAtom } from '../state/dashboardsAtom';
+import { dashboardMutationErrors } from './messages/dashboardMutationErrors';
 
 interface DuplicateDashboardState {
   name: string;
@@ -28,7 +30,16 @@ type UseDuplicateDashboardReturn = DuplicateDashboardState & {
   reset: () => void;
 };
 
+const messages = defineMessages({
+  duplicateFailed: {
+    id: 'widgetLayout.hooks.duplicateFailed',
+    description: 'Dashboard duplication failure error',
+    defaultMessage: 'Failed to duplicate dashboard. Please try again.',
+  },
+});
+
 export const useDuplicateDashboard = (): UseDuplicateDashboardReturn => {
+  const intl = useIntl();
   const [state, setState] = useState<DuplicateDashboardState>(initState);
   const create = useSetAtom(duplicateDashboardAtom);
 
@@ -57,13 +68,13 @@ export const useDuplicateDashboard = (): UseDuplicateDashboardReturn => {
     } catch (err) {
       let errorMessage: string;
       if (err instanceof DashboardTemplatesError && err.status >= 500) {
-        errorMessage = 'The server is currently unavailable. Please try again later.';
+        errorMessage = intl.formatMessage(dashboardMutationErrors.serverUnavailable);
       } else if (err instanceof DashboardTemplatesError) {
-        errorMessage = 'Failed to duplicate dashboard. Please try again.';
+        errorMessage = intl.formatMessage(messages.duplicateFailed);
       } else if (err instanceof TypeError) {
-        errorMessage = 'Network error. Please check your connection and try again.';
+        errorMessage = intl.formatMessage(dashboardMutationErrors.networkError);
       } else {
-        errorMessage = 'An unexpected error occurred. Please try again.';
+        errorMessage = intl.formatMessage(dashboardMutationErrors.unexpectedError);
       }
       setState((prev) => ({ ...prev, error: errorMessage, isLoading: false }));
       return null;

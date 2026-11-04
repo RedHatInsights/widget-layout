@@ -22,16 +22,32 @@ import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import HeaderIcon from '../Icons/HeaderIcon';
 import { WidgetConfiguration } from '../../api/dashboard-templates';
 import { currentlyUsedWidgetsAtom } from '../../state/currentlyUsedWidgetsAtom';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import './WidgetDrawer.scss';
+
+const messages = defineMessages({
+  moveWidget: {
+    id: 'widgetLayout.drawer.moveWidget',
+    description: 'Move widget tooltip',
+    defaultMessage: 'Move widget',
+  },
+  drawerTitle: {
+    id: 'widgetLayout.drawer.drawerTitle',
+    description: 'Widget drawer usage instructions',
+    defaultMessage:
+      'Add new and previously removed widgets by clicking the {gripIcon} icon, then drag and drop to a new location. Drag the corners of the cards to resize widgets.',
+  },
+});
 
 export type AddWidgetDrawerProps = React.PropsWithChildren<{
   dismissible?: boolean;
 }>;
 
 const WidgetWrapper = ({ widgetType, config }: React.PropsWithChildren<{ widgetType: string; config?: WidgetConfiguration }>) => {
+  const intl = useIntl();
   const setDropInItem = useSetAtom(currentDropInItemAtom);
   const headerActions = (
-    <Tooltip content={<p>Move widget</p>}>
+    <Tooltip content={<p>{intl.formatMessage(messages.moveWidget)}</p>}>
       <Icon className="pf-v6-u-pt-md widg-c-drawer__drag-handle">
         <GripVerticalIcon style={{ fill: 'var(--pf-t--global--icon--color--regular)' }} />
       </Icon>
@@ -90,8 +106,7 @@ const AddWidgetDrawer = ({ children }: AddWidgetDrawerProps) => {
       <Split className="widg-l-split--add-widget pf-v6-u-align-items-center">
         <SplitItem isFilled>
           <Title headingLevel="h2" size="md">
-            Add new and previously removed widgets by clicking the <GripVerticalIcon /> icon, then drag and drop to a new location. Drag the corners
-            of the cards to resize widgets.
+            <FormattedMessage {...messages.drawerTitle} values={{ gripIcon: <GripVerticalIcon /> }} />
           </Title>
         </SplitItem>
         <SplitItem className="pf-v6-u-align-self-flex-start">

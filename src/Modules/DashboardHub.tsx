@@ -10,6 +10,7 @@ import { notificationsAtom, useRemoveNotification } from '../state/notifications
 import { Route, Routes } from 'react-router-dom';
 import GenericDashboardPage from './GenericDashboardPage';
 import { backendFlagAtom, store } from '../state/store';
+import { IntlMessagesProvider, useChromeLocale } from '../shared/i18n';
 
 const DashboardHubInner = () => {
   const notifications = useAtomValue(notificationsAtom);
@@ -42,10 +43,20 @@ const DashboardHubInner = () => {
   );
 };
 
-const DashboardHub = () => (
-  <Provider store={store}>
-    <DashboardHubInner />
-  </Provider>
-);
+/**
+ * Federation entry for `./DashboardHub` (routed at /dashboard-hub by the
+ * Frontend CRD). Carries its own locale boundary so the module works when
+ * loaded directly by the shell.
+ */
+const DashboardHub = () => {
+  const locale = useChromeLocale();
+  return (
+    <Provider store={store}>
+      <IntlMessagesProvider locale={locale}>
+        <DashboardHubInner />
+      </IntlMessagesProvider>
+    </Provider>
+  );
+};
 
 export default DashboardHub;
