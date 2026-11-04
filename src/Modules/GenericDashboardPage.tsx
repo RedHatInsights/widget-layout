@@ -1,5 +1,6 @@
 import { Breadcrumb, BreadcrumbItem, PageSection } from '@patternfly/react-core';
 import React, { useEffect, useRef } from 'react';
+import { defineMessages, useIntl } from 'react-intl';
 import GridLayout from '../Components/DnDLayout/GridLayout';
 import { Provider, useAtomValue, useSetAtom } from 'jotai';
 import { lockedLayoutAtom } from '../state/lockedLayoutAtom';
@@ -14,7 +15,20 @@ import Portal from '@redhat-cloud-services/frontend-components-notifications/Por
 import { backendFlagAtom, store } from '../state/store';
 import { useFlag } from '@unleash/proxy-client-react';
 
+const messages = defineMessages({
+  breadcrumbHome: {
+    id: 'widgetLayout.genericDashboardPage.breadcrumbHome',
+    description: 'Home breadcrumb item',
+    defaultMessage: 'Home',
+  },
+  breadcrumbDashboardHub: {
+    id: 'widgetLayout.genericDashboardPage.breadcrumbDashboardHub',
+    description: 'Dashboard Hub breadcrumb item',
+    defaultMessage: 'Dashboard Hub',
+  },
+});
 const GenericDashboardPageInner = () => {
+  const intl = useIntl();
   const { id } = useParams<{ id: string }>();
   const isLayoutLocked = useAtomValue(lockedLayoutAtom);
   const { template, saveTemplate, renameDashboard, isLoaded, dashboard } = useDashboardTemplate(Number(id));
@@ -44,10 +58,10 @@ const GenericDashboardPageInner = () => {
       <PageSection className="pf-v6-u-pb-0">
         <Breadcrumb>
           <BreadcrumbItem>
-            <Link to="/">Home</Link>
+            <Link to="/">{intl.formatMessage(messages.breadcrumbHome)}</Link>
           </BreadcrumbItem>
           <BreadcrumbItem>
-            <Link to="/dashboard-hub">Dashboard Hub</Link>
+            <Link to="/dashboard-hub">{intl.formatMessage(messages.breadcrumbDashboardHub)}</Link>
           </BreadcrumbItem>
           <BreadcrumbItem isActive>{dashboard?.dashboardName}</BreadcrumbItem>
         </Breadcrumb>

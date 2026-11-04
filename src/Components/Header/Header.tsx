@@ -23,6 +23,7 @@ import {
   ToolbarItem,
 } from '@patternfly/react-core';
 import React, { useRef, useState } from 'react';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { CodeIcon, CopyIcon, EditAltIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon, TimesIcon } from '@patternfly/react-icons';
 import { useAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
@@ -38,7 +39,101 @@ import { ImportModal } from '../DashboardHub/ImportModal/ImportModal';
 import { DuplicateModal } from '../DuplicateModal/DuplicateModal';
 import ConversionBanner from './ConversionBanner';
 
+const messages = defineMessages({
+  kebabDropdownToggle: {
+    id: 'widgetLayout.header.kebabDropdownToggle',
+    description: 'Kebab dropdown toggle aria label',
+    defaultMessage: 'kebab dropdown toggle',
+  },
+  edit: {
+    id: 'widgetLayout.header.edit',
+    description: 'Edit dashboard action aria label',
+    defaultMessage: 'Edit',
+  },
+  createNewDashboard: {
+    id: 'widgetLayout.header.createNewDashboard',
+    description: 'Menu item to create a new dashboard',
+    defaultMessage: 'Create new dashboard',
+  },
+  createFromBlank: {
+    id: 'widgetLayout.header.createFromBlank',
+    description: 'Menu item to create a dashboard from blank',
+    defaultMessage: 'Create from blank',
+  },
+  importFromConfigString: {
+    id: 'widgetLayout.header.importFromConfigString',
+    description: 'Menu item to import a dashboard from a config string',
+    defaultMessage: 'Import from config string',
+  },
+  duplicateExisting: {
+    id: 'widgetLayout.header.duplicateExisting',
+    description: 'Menu item to duplicate an existing dashboard',
+    defaultMessage: 'Duplicate existing',
+  },
+  dashboardHub: {
+    id: 'widgetLayout.header.dashboardHub',
+    description: 'Dashboard Hub link label',
+    defaultMessage: 'Dashboard Hub',
+  },
+  dashboardHubDescription: {
+    id: 'widgetLayout.header.dashboardHubDescription',
+    description: 'Dashboard Hub link description',
+    defaultMessage: 'Create, manage, share dashboards',
+  },
+  resetLayoutTitle: {
+    id: 'widgetLayout.header.resetLayoutTitle',
+    description: 'Reset layout confirmation modal title',
+    defaultMessage: 'Reset layout?',
+  },
+  resetLayoutCheckbox: {
+    id: 'widgetLayout.header.resetLayoutCheckbox',
+    description: 'Reset layout confirmation checkbox label',
+    defaultMessage: 'I understand that this action cannot be undone',
+  },
+  resetLayoutConfirm: {
+    id: 'widgetLayout.header.resetLayoutConfirm',
+    description: 'Reset layout confirmation button label',
+    defaultMessage: 'Reset layout',
+  },
+  resetLayoutBody: {
+    id: 'widgetLayout.header.resetLayoutBody',
+    description: 'Reset layout confirmation modal body',
+    defaultMessage: 'All your widget customizations will be discarded.',
+  },
+  resetToDefault: {
+    id: 'widgetLayout.header.resetToDefault',
+    description: 'Reset to default button label',
+    defaultMessage: 'Reset to default',
+  },
+  addWidgets: {
+    id: 'widgetLayout.header.addWidgets',
+    description: 'Add widgets button label',
+    defaultMessage: 'Add widgets',
+  },
+  closeWidgetPanel: {
+    id: 'widgetLayout.header.closeWidgetPanel',
+    description: 'Close widget panel button label',
+    defaultMessage: 'Close widget panel',
+  },
+  greeting: {
+    id: 'widgetLayout.header.greeting',
+    description: 'Header greeting without a user name',
+    defaultMessage: 'Hi!',
+  },
+  greetingNamed: {
+    id: 'widgetLayout.header.greetingNamed',
+    description: 'Header greeting with the user name',
+    defaultMessage: 'Hi, {name}',
+  },
+  welcome: {
+    id: 'widgetLayout.header.welcome',
+    description: 'Header welcome subtitle',
+    defaultMessage: 'Welcome to your Hybrid Cloud Console.',
+  },
+});
+
 export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
+  const intl = useIntl();
   const navigate = useNavigate();
   const { dashboards } = useGetDashboards();
   const [isOpen, setIsOpen] = useState(false);
@@ -88,7 +183,7 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
   const toggle = (
     <MenuToggle
       ref={toggleRef}
-      aria-label="kebab dropdown toggle"
+      aria-label={intl.formatMessage(messages.kebabDropdownToggle)}
       variant="plain"
       onClick={onToggleClick}
       isExpanded={isOpen}
@@ -122,7 +217,7 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
                       icon={<EditAltIcon />}
                       actionId="edit"
                       onClick={() => navigate(`/dashboard-hub/${dashboard.id}`)}
-                      aria-label="Edit"
+                      aria-label={intl.formatMessage(messages.edit)}
                     />
                   }
                   component={(props) => <Link {...props} to={`/dashboard-hub/${dashboard.id}`} />}
@@ -140,7 +235,7 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
             drilldownMenu={
               <DrilldownMenu id="kebab-drilldownMenuCreate">
                 <MenuItem itemId="group:create_breadcrumb" direction="up" icon={<PlusCircleIcon />}>
-                  Create new dashboard
+                  <FormattedMessage {...messages.createNewDashboard} />
                 </MenuItem>
                 <Divider component="li" />
                 <MenuItem
@@ -151,7 +246,7 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
                     setIsOpen(false);
                   }}
                 >
-                  Create from blank
+                  <FormattedMessage {...messages.createFromBlank} />
                 </MenuItem>
                 <MenuItem
                   itemId="import-config"
@@ -161,7 +256,7 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
                     setIsOpen(false);
                   }}
                 >
-                  Import from config string
+                  <FormattedMessage {...messages.importFromConfigString} />
                 </MenuItem>
                 <MenuItem
                   itemId="duplicate-dashboard"
@@ -171,16 +266,16 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
                     setIsOpen(false);
                   }}
                 >
-                  Duplicate existing
+                  <FormattedMessage {...messages.duplicateExisting} />
                 </MenuItem>
               </DrilldownMenu>
             }
           >
-            Create new dashboard
+            <FormattedMessage {...messages.createNewDashboard} />
           </MenuItem>
           <Divider component="li" key="separator" />
-          <MenuItem component={(props) => <Link {...props} to="/dashboard-hub" />} description="Create, manage, share dashboards">
-            Dashboard Hub
+          <MenuItem component={(props) => <Link {...props} to="/dashboard-hub" />} description={intl.formatMessage(messages.dashboardHubDescription)}>
+            <FormattedMessage {...messages.dashboardHub} />
           </MenuItem>
         </MenuList>
       </MenuContent>
@@ -206,6 +301,7 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
 };
 
 const Controls = () => {
+  const intl = useIntl();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerExpanded, toggleOpen] = useAtom(drawerExpandedAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
@@ -216,9 +312,9 @@ const Controls = () => {
       <WarningModal
         withCheckbox
         isOpen={isOpen}
-        title="Reset layout?"
-        checkboxLabel="I understand that this action cannot be undone"
-        confirmButtonLabel="Reset layout"
+        title={intl.formatMessage(messages.resetLayoutTitle)}
+        checkboxLabel={intl.formatMessage(messages.resetLayoutCheckbox)}
+        confirmButtonLabel={intl.formatMessage(messages.resetLayoutConfirm)}
         confirmButtonVariant={ButtonVariant.danger}
         onClose={() => setIsOpen(false)}
         onConfirm={() => {
@@ -230,7 +326,7 @@ const Controls = () => {
           }
         }}
       >
-        All your widget customizations will be discarded.
+        <FormattedMessage {...messages.resetLayoutBody} />
       </WarningModal>
       <ToolbarGroup className="pf-v6-u-flex-direction-column-reverse pf-v6-u-flex-direction-row-reverse-on-md pf-v6-u-flex-direction-row-on-lg">
         <ToolbarItem>
@@ -241,7 +337,7 @@ const Controls = () => {
             }}
             variant={ButtonVariant.link}
           >
-            Reset to default
+            <FormattedMessage {...messages.resetToDefault} />
           </Button>
         </ToolbarItem>
         <ToolbarItem className="pf-v6-u-pr-sm pf-v6-u-pr-0-on-lg pf-v6-u-pb-xs pf-v6-u-pb-0-on-lg">
@@ -253,7 +349,7 @@ const Controls = () => {
             icon={isDrawerExpanded ? <TimesIcon /> : <PlusCircleIcon />}
             ouiaId="add-widget-button"
           >
-            {isDrawerExpanded ? 'Close widget panel' : 'Add widgets'}
+            {isDrawerExpanded ? <FormattedMessage {...messages.closeWidgetPanel} /> : <FormattedMessage {...messages.addWidgets} />}
           </Button>
         </ToolbarItem>
       </ToolbarGroup>
@@ -270,9 +366,11 @@ const Header = ({ layoutType }: { layoutType?: string }) => {
       <Flex className="widg-l-flex--header" direction={{ default: 'column', lg: 'row' }}>
         <FlexItem alignSelf={{ default: 'alignSelfFlexStart' }}>
           <Content>
-            <Content component="h1">Hi{userName ? `, ${userName}` : '!'}</Content>
+            <Content component="h1">
+              {userName ? <FormattedMessage {...messages.greetingNamed} values={{ name: userName }} /> : <FormattedMessage {...messages.greeting} />}
+            </Content>
             <Content component="h2" className="pf-v6-u-mt-0">
-              Welcome to your Hybrid Cloud Console.
+              <FormattedMessage {...messages.welcome} />
             </Content>
           </Content>
         </FlexItem>

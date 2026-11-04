@@ -1,5 +1,6 @@
 import { Divider, Dropdown, DropdownItem, DropdownList, MenuToggle, MenuToggleElement } from '@patternfly/react-core';
 import React, { Ref, useState } from 'react';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { CodeIcon, CopyIcon, EllipsisVIcon, HomeIcon, TrashIcon } from '@patternfly/react-icons';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { DashboardTemplate } from '../../api/dashboard-templates';
@@ -11,11 +12,70 @@ import { DuplicateModal } from '../DuplicateModal/DuplicateModal';
 import { useAddNotification } from '../../state/notificationsAtom';
 import { useNavigate } from 'react-router-dom';
 
+const messages = defineMessages({
+  kebabToggleAria: {
+    id: 'widgetLayout.genericDropdown.kebabToggleAria',
+    description: 'Kebab dropdown toggle aria label',
+    defaultMessage: 'kebab dropdown toggle',
+  },
+  alreadyHomepage: {
+    id: 'widgetLayout.genericDropdown.alreadyHomepage',
+    description: 'Tooltip when the dashboard is already the homepage',
+    defaultMessage: 'This dashboard is already set as your homepage',
+  },
+  setAsHomepage: {
+    id: 'widgetLayout.genericDropdown.setAsHomepage',
+    description: 'Set as homepage menu item',
+    defaultMessage: 'Set as homepage',
+  },
+  duplicateDashboard: {
+    id: 'widgetLayout.genericDropdown.duplicateDashboard',
+    description: 'Duplicate dashboard menu item',
+    defaultMessage: 'Duplicate dashboard',
+  },
+  copyConfiguration: {
+    id: 'widgetLayout.genericDropdown.copyConfiguration',
+    description: 'Copy configuration string menu item',
+    defaultMessage: 'Copy configuration string',
+  },
+  deleteDashboard: {
+    id: 'widgetLayout.genericDropdown.deleteDashboard',
+    description: 'Delete dashboard menu item',
+    defaultMessage: 'Delete dashboard',
+  },
+  setAsHomepageSuccess: {
+    id: 'widgetLayout.genericDropdown.setAsHomepageSuccess',
+    description: 'Dashboard set as homepage notification',
+    defaultMessage: "''{name}'' has been set as homepage",
+  },
+  setAsHomepageFailed: {
+    id: 'widgetLayout.genericDropdown.setAsHomepageFailed',
+    description: 'Dashboard set as homepage failure notification',
+    defaultMessage: "Failed to set ''{name}'' as homepage",
+  },
+  copiedToClipboard: {
+    id: 'widgetLayout.genericDropdown.copiedToClipboard',
+    description: 'Dashboard copied to clipboard notification',
+    defaultMessage: "''{name}'' has been copied to clipboard",
+  },
+  copyFailed: {
+    id: 'widgetLayout.genericDropdown.copyFailed',
+    description: 'Dashboard copy to clipboard failure notification',
+    defaultMessage: "Failed to copy ''{name}'' to clipboard",
+  },
+  deletedNotification: {
+    id: 'widgetLayout.genericDropdown.deletedNotification',
+    description: 'Dashboard deleted notification',
+    defaultMessage: "''{name}'' has been deleted and removed from Dashboard Hub",
+  },
+});
+
 interface GenericHeaderDropdownProps {
   dashboard: DashboardTemplate;
 }
 
 const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
+  const intl = useIntl();
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
@@ -33,12 +93,12 @@ const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
       await setDefaultDashboard(dashboard.id);
       addNotification({
         variant: 'success',
-        title: `'${dashboard.dashboardName}' has been set as homepage`,
+        title: intl.formatMessage(messages.setAsHomepageSuccess, { name: dashboard.dashboardName }),
       });
     } catch (err) {
       addNotification({
         variant: 'danger',
-        title: `Failed to set '${dashboard.dashboardName}' as homepage`,
+        title: intl.formatMessage(messages.setAsHomepageFailed, { name: dashboard.dashboardName }),
       });
     }
     setIsOpen(false);
@@ -52,13 +112,13 @@ const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
         await navigator.clipboard.writeText(configString);
         addNotification({
           variant: 'success',
-          title: `'${dashboard.dashboardName}' has been copied to clipboard`,
+          title: intl.formatMessage(messages.copiedToClipboard, { name: dashboard.dashboardName }),
         });
       } catch (err) {
         console.error('Failed to copy to clipboard:', err);
         addNotification({
           variant: 'danger',
-          title: `Failed to copy '${dashboard.dashboardName}' to clipboard`,
+          title: intl.formatMessage(messages.copyFailed, { name: dashboard.dashboardName }),
         });
       }
     }
@@ -75,7 +135,7 @@ const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
     setIsDeleteModalOpen(false);
     addNotification({
       variant: 'danger',
-      title: `'${dashboard.dashboardName}' has been deleted and removed from Dashboard Hub`,
+      title: intl.formatMessage(messages.deletedNotification, { name: dashboard.dashboardName }),
     });
     navigate('/dashboard-hub');
   };
@@ -87,7 +147,7 @@ const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
         toggle={(toggleRef: Ref<MenuToggleElement>) => (
           <MenuToggle
             ref={toggleRef}
-            aria-label="kebab dropdown toggle"
+            aria-label={intl.formatMessage(messages.kebabToggleAria)}
             variant="plain"
             onClick={() => setIsOpen(!isOpen)}
             isExpanded={isOpen}
@@ -102,15 +162,15 @@ const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
             icon={<HomeIcon />}
             isAriaDisabled={isHomepage}
             onClick={handleSetAsHomepage}
-            tooltipProps={isHomepage ? { content: 'This dashboard is already set as your homepage' } : undefined}
+            tooltipProps={isHomepage ? { content: intl.formatMessage(messages.alreadyHomepage) } : undefined}
           >
-            Set as homepage
+            <FormattedMessage {...messages.setAsHomepage} />
           </DropdownItem>
           <DropdownItem icon={<CopyIcon />} onClick={handleDuplicate}>
-            Duplicate dashboard
+            <FormattedMessage {...messages.duplicateDashboard} />
           </DropdownItem>
           <DropdownItem icon={<CodeIcon />} onClick={handleCopyConfiguration}>
-            Copy configuration string
+            <FormattedMessage {...messages.copyConfiguration} />
           </DropdownItem>
           <Divider />
           <DropdownItem
@@ -120,7 +180,7 @@ const GenericHeaderDropdown = ({ dashboard }: GenericHeaderDropdownProps) => {
               setIsDeleteModalOpen(true);
             }}
           >
-            Delete dashboard
+            <FormattedMessage {...messages.deleteDashboard} />
           </DropdownItem>
         </DropdownList>
       </Dropdown>

@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { useIntl } from 'react-intl';
 import { DashboardTemplate, DashboardTemplatesError, TemplateConfig } from '../api/dashboard-templates';
 import { useSetAtom } from 'jotai';
 import { createDashboardAtom } from '../state/dashboardsAtom';
+import { dashboardMutationErrors } from './messages/dashboardMutationErrors';
+import { defineMessages } from 'react-intl';
 
 interface CreateBlankDashboardState {
   name: string;
@@ -32,7 +35,16 @@ type UseCreateBlankDashboardReturn = CreateBlankDashboardState & {
   reset: () => void;
 };
 
+const messages = defineMessages({
+  createFailed: {
+    id: 'widgetLayout.hooks.createFailed',
+    description: 'Dashboard creation failure error',
+    defaultMessage: 'Failed to create dashboard. Please try again.',
+  },
+});
+
 export const useCreateBlankDashboard = (layoutType = 'landing-landingPage'): UseCreateBlankDashboardReturn => {
+  const intl = useIntl();
   const [state, setState] = useState<CreateBlankDashboardState>(initState);
   const create = useSetAtom(createDashboardAtom);
 
@@ -71,13 +83,13 @@ export const useCreateBlankDashboard = (layoutType = 'landing-landingPage'): Use
     } catch (err) {
       let errorMessage: string;
       if (err instanceof DashboardTemplatesError && err.status >= 500) {
-        errorMessage = 'The server is currently unavailable. Please try again later.';
+        errorMessage = intl.formatMessage(dashboardMutationErrors.serverUnavailable);
       } else if (err instanceof DashboardTemplatesError) {
-        errorMessage = 'Failed to create dashboard. Please try again.';
+        errorMessage = intl.formatMessage(messages.createFailed);
       } else if (err instanceof TypeError) {
-        errorMessage = 'Network error. Please check your connection and try again.';
+        errorMessage = intl.formatMessage(dashboardMutationErrors.networkError);
       } else {
-        errorMessage = 'An unexpected error occurred. Please try again.';
+        errorMessage = intl.formatMessage(dashboardMutationErrors.unexpectedError);
       }
       setState((prev) => ({ ...prev, error: errorMessage, isLoading: false }));
       return null;

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { defineMessages, useIntl } from 'react-intl';
 import { Table, Tbody, Td, Th, ThProps, Thead, Tr } from '@patternfly/react-table';
 import { ActionsColumn } from '@patternfly/react-table';
 import { Alert, Button, Tooltip, TooltipPosition } from '@patternfly/react-core';
@@ -22,13 +23,107 @@ interface Dashboard {
   isDefault: boolean;
 }
 
+const messages = defineMessages({
+  duplicateAria: {
+    id: 'widgetLayout.dashboardTable.duplicateAria',
+    description: 'Duplicate button aria label',
+    defaultMessage: 'Duplicate',
+  },
+  tableAria: {
+    id: 'widgetLayout.dashboardTable.tableAria',
+    description: 'Dashboards table aria label',
+    defaultMessage: 'Dashboards table',
+  },
+  homepageColumn: {
+    id: 'widgetLayout.dashboardTable.homepageColumn',
+    description: 'Homepage column screen reader text',
+    defaultMessage: 'Homepage',
+  },
+  actionsColumn: {
+    id: 'widgetLayout.dashboardTable.actionsColumn',
+    description: 'Actions column screen reader text',
+    defaultMessage: 'Actions',
+  },
+  duplicateDashboard: {
+    id: 'widgetLayout.dashboardTable.duplicateDashboard',
+    description: 'Duplicate dashboard tooltip',
+    defaultMessage: 'Duplicate dashboard',
+  },
+  noHomepageAlert: {
+    id: 'widgetLayout.dashboardTable.noHomepageAlert',
+    description: 'Warning shown when no homepage dashboard is set',
+    defaultMessage: 'No homepage dashboard set. Please set a dashboard as your homepage.',
+  },
+  editDashboard: {
+    id: 'widgetLayout.dashboardTable.editDashboard',
+    description: 'Edit dashboard row action',
+    defaultMessage: 'Edit dashboard',
+  },
+  setAsHomepage: {
+    id: 'widgetLayout.dashboardTable.setAsHomepage',
+    description: 'Set as homepage row action',
+    defaultMessage: 'Set as homepage',
+  },
+  alreadyHomepage: {
+    id: 'widgetLayout.dashboardTable.alreadyHomepage',
+    description: 'Set as homepage row action tooltip',
+    defaultMessage: 'This dashboard is already set as your homepage',
+  },
+  alreadyHomepageTooltip: {
+    id: 'widgetLayout.dashboardTable.alreadyHomepageTooltip',
+    description: 'Tooltip when the dashboard is already the homepage',
+    defaultMessage: 'This dashboard is already set to your homepage',
+  },
+  copyConfiguration: {
+    id: 'widgetLayout.dashboardTable.copyConfiguration',
+    description: 'Copy configuration string row action',
+    defaultMessage: 'Copy configuration string',
+  },
+  shareDashboard: {
+    id: 'widgetLayout.dashboardTable.shareDashboard',
+    description: 'Share dashboard row action',
+    defaultMessage: 'Share dashboard',
+  },
+  deleteDashboard: {
+    id: 'widgetLayout.dashboardTable.deleteDashboard',
+    description: 'Delete dashboard row action',
+    defaultMessage: 'Delete dashboard',
+  },
+  copiedToClipboard: {
+    id: 'widgetLayout.dashboardTable.copiedToClipboard',
+    description: 'Dashboard copied to clipboard notification',
+    defaultMessage: "''{name}'' has been copied to clipboard",
+  },
+  copyFailed: {
+    id: 'widgetLayout.dashboardTable.copyFailed',
+    description: 'Dashboard copy to clipboard failure notification',
+    defaultMessage: "Failed to copy ''{name}'' to clipboard",
+  },
+  setAsHomepageSuccess: {
+    id: 'widgetLayout.dashboardTable.setAsHomepageSuccess',
+    description: 'Dashboard set as homepage notification',
+    defaultMessage: "''{name}'' has been set as homepage",
+  },
+  setAsHomepageFailed: {
+    id: 'widgetLayout.dashboardTable.setAsHomepageFailed',
+    description: 'Dashboard set as homepage failure notification',
+    defaultMessage: "Failed to set ''{name}'' as homepage",
+  },
+  deletedNotification: {
+    id: 'widgetLayout.dashboardTable.deletedNotification',
+    description: 'Dashboard deleted notification',
+    defaultMessage: "''{name}'' has been deleted and removed from Dashboard Hub",
+  },
+});
+
 interface DashboardTableProps {
   dashboards: DashboardTemplate[];
   onRefetchDashboards: () => void;
 }
 
 export const ButtonCopy: React.FunctionComponent<{ onClick: () => void }> = ({ onClick }) => {
-  return <Button variant="plain" aria-label="Duplicate" icon={<CopyIcon />} onClick={onClick} />;
+  const intl = useIntl();
+  return <Button variant="plain" aria-label={intl.formatMessage(messages.duplicateAria)} icon={<CopyIcon />} onClick={onClick} />;
 };
 
 export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ dashboards, onRefetchDashboards }) => {
@@ -49,11 +144,19 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
     isDefault: dashboard.default,
   }));
 
-  const columnNames = {
-    name: 'Name',
-    lastModified: 'Last Modified',
-    actions: '',
-  };
+  const intl = useIntl();
+  const columnNames = defineMessages({
+    name: {
+      id: 'widgetLayout.dashboardTable.column.name',
+      description: 'Dashboards table Name column',
+      defaultMessage: 'Name',
+    },
+    lastModified: {
+      id: 'widgetLayout.dashboardTable.column.lastModified',
+      description: 'Dashboards table Last Modified column',
+      defaultMessage: 'Last Modified',
+    },
+  });
 
   // Sorting state
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -66,12 +169,12 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
         await navigator.clipboard.writeText(configString);
         addNotification({
           variant: 'success',
-          title: `'${dashboard.name}' has been copied to clipboard`,
+          title: intl.formatMessage(messages.copiedToClipboard, { name: dashboard.name }),
         });
       } catch (err) {
         addNotification({
           variant: 'danger',
-          title: `Failed to copy '${dashboard.name}' to clipboard`,
+          title: intl.formatMessage(messages.copyFailed, { name: dashboard.name }),
         });
       }
     }
@@ -82,12 +185,12 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
       await setDefaultDashboard(dashboard.id);
       addNotification({
         variant: 'success',
-        title: `'${dashboard.name}' has been set as homepage`,
+        title: intl.formatMessage(messages.setAsHomepageSuccess, { name: dashboard.name }),
       });
     } catch (err) {
       addNotification({
         variant: 'danger',
-        title: `Failed to set '${dashboard.name}' as homepage`,
+        title: intl.formatMessage(messages.setAsHomepageFailed, { name: dashboard.name }),
       });
     }
   };
@@ -116,28 +219,30 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
   const getRowActions = (dashboard: Dashboard) => [
     {
       icon: <EditAltIcon />,
-      title: 'Edit dashboard',
+      title: intl.formatMessage(messages.editDashboard),
       component: (props: React.HTMLProps<HTMLAnchorElement>) => (
         <Link {...props} to={`/dashboard-hub/${dashboard.id}`} style={{ color: 'inherit', textDecoration: 'inherit' }} />
       ),
     },
     {
       icon: <HomeIcon />,
-      title: 'Set as homepage',
+      title: intl.formatMessage(messages.setAsHomepage),
       isAriaDisabled: dashboard.isDefault,
-      tooltipProps: dashboard.isDefault ? { content: 'This dashboard is already set to your homepage', position: TooltipPosition.left } : undefined,
+      tooltipProps: dashboard.isDefault
+        ? { content: intl.formatMessage(messages.alreadyHomepageTooltip), position: TooltipPosition.left }
+        : undefined,
       onClick: () => handleSetAsHomepage(dashboard),
     },
     {
       icon: <CodeIcon />,
-      title: 'Copy configuration string',
+      title: intl.formatMessage(messages.copyConfiguration),
       onClick: () => handleCopyConfiguration(dashboard),
     },
     ...(isEnabledShare
       ? [
           {
             icon: <UsersIcon />,
-            title: 'Share dashboard',
+            title: intl.formatMessage(messages.shareDashboard),
             isDisabled: true,
             onClick: () => console.log(`Share dashboard ${dashboard.id}`),
           },
@@ -150,7 +255,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
           },
           {
             icon: <TrashIcon />,
-            title: 'Delete dashboard',
+            title: intl.formatMessage(messages.deleteDashboard),
             onClick: () => setDashboardToDelete(dashboard),
           },
         ]
@@ -166,7 +271,7 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
       setDashboardToDelete(null);
       addNotification({
         variant: 'danger',
-        title: `'${name}' has been deleted and removed from Dashboard Hub`,
+        title: intl.formatMessage(messages.deletedNotification, { name }),
       });
     }
   };
@@ -185,29 +290,29 @@ export const DashboardTable: React.FunctionComponent<DashboardTableProps> = ({ d
         onClose={() => setDashboardToDelete(null)}
         onDelete={handleDeleteConfirm}
       />
-      {!hasHomepage && <Alert variant="warning" isInline title="No homepage dashboard set. Please set a dashboard as your homepage." />}
-      <Table aria-label="Dashboards table" ouiaId="DashboardsTable">
+      {!hasHomepage && <Alert variant="warning" isInline title={intl.formatMessage(messages.noHomepageAlert)} />}
+      <Table aria-label={intl.formatMessage(messages.tableAria)} ouiaId="DashboardsTable">
         <Thead>
           <Tr>
-            <Th screenReaderText="Homepage" modifier="fitContent" />
-            <Th sort={getSortParams()}>{columnNames.name}</Th>
-            <Th>{columnNames.lastModified}</Th>
-            <Th screenReaderText="Actions" />
+            <Th screenReaderText={intl.formatMessage(messages.homepageColumn)} modifier="fitContent" />
+            <Th sort={getSortParams()}>{intl.formatMessage(columnNames.name)}</Th>
+            <Th>{intl.formatMessage(columnNames.lastModified)}</Th>
+            <Th screenReaderText={intl.formatMessage(messages.actionsColumn)} />
           </Tr>
         </Thead>
         <Tbody>
           {sortedDashboards.map((dashboard) => (
             <Tr key={dashboard.id}>
               <Td>{dashboard.isDefault && <HomeIcon />}</Td>
-              <Td dataLabel={columnNames.name}>
+              <Td dataLabel={intl.formatMessage(columnNames.name)}>
                 <Link to={`/dashboard-hub/${dashboard.id}`}>{dashboard.name}</Link>
               </Td>
-              <Td dataLabel={columnNames.lastModified}>
+              <Td dataLabel={intl.formatMessage(columnNames.lastModified)}>
                 <DateFormat date={dashboard.lastModified} />
               </Td>
               <Td isActionCell>
                 <Td className="pf-v6-u-display-flex pf-v6-u-align-items-center pf-v6-u-gap-sm">
-                  <Tooltip content="Duplicate dashboard" position={TooltipPosition.left}>
+                  <Tooltip content={intl.formatMessage(messages.duplicateDashboard)} position={TooltipPosition.left}>
                     <ButtonCopy onClick={() => setDuplicateDashboardId(dashboard.id)} />
                   </Tooltip>
                   <ActionsColumn items={getRowActions(dashboard)} />
