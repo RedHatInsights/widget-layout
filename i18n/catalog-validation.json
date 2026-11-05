@@ -1,15 +1,7 @@
 {
   "version": 1,
-  "checks": [
-    {
-      "source": {
-        "path": "translations/messages.json",
-        "adapter": "formatjs-json",
-        "locale": "en"
-      },
-      "targets": []
-    }
-  ],
+  "tmsConfig": "i18n/phrase-tms.json",
+  "checks": [],
   "generated": [
     {
       "path": "translations/messages.json",
@@ -22,7 +14,7 @@
       "strictStderrWarnings": true
     }
   ],
-  "catalogDirectories": [{ "path": "translations" }],
+  "catalogDirectories": [{ "path": "translations" }, { "path": "messages" }],
   "sourceLint": {
     "files": ["src/**/*.{ts,tsx}"],
     "catalog": "translations/messages.json"

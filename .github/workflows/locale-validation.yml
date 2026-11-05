@@ -6,6 +6,7 @@ on:
       - .github/workflows/locale-validation.yml
       - i18n/**
       - translations/**
+      - messages/**
       - src/**
       - package.json
       - package-lock.json
