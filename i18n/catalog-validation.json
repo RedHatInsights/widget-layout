@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "checks": [
+    {
+      "source": {
+        "path": "translations/messages.json",
+        "adapter": "formatjs-json",
+        "locale": "en"
+      },
+      "targets": []
+    }
+  ],
+  "generated": [
+    {
+      "path": "translations/messages.json",
+      "adapter": "formatjs-json",
+      "locale": "en",
+      "role": "source",
+      "command": "npm",
+      "args": ["run", "extract:messages", "--", "--out-file", "{output}"],
+      "updateCommand": "npm run extract:messages",
+      "strictStderrWarnings": true
+    }
+  ],
+  "catalogDirectories": [{ "path": "translations" }],
+  "sourceLint": {
+    "files": ["src/**/*.{ts,tsx}"],
+    "catalog": "translations/messages.json"
+  }
+}

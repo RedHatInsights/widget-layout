@@ -22,6 +22,7 @@
     "postinstall": "ts-patch install && rimraf .cache",
     "verify": "npm-run-all build lint test",
     "static": "BETA=true PROXY=true fec static",
+    "translations:validate": "i18n-pipeline validate-ci --mode error",
     "extract:messages": "npx @formatjs/cli extract 'src/**/*.{ts,tsx}' --ignore '**/*.test.*' --ignore '**/__tests__/**' --ignore '**/__mocks__/**' --out-file ./translations/messages.json"
   },
   "dependencies": {
