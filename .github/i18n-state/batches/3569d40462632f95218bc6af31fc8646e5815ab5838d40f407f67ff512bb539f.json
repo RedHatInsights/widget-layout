@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "key": "3569d40462632f95218bc6af31fc8646e5815ab5838d40f407f67ff512bb539f",
-  "phase": "importing",
+  "phase": "ready",
   "repository": "RedHatInsights/widget-layout",
   "baseRef": "master",
   "sourceCommit": "804535ec6834394494f8067f74f92bba75b755e6",
@@ -47,95 +47,179 @@
   "jobs": [
     {
       "uid": "BMsn17JA8Hhw8qeZti2HS4",
+      "innerId": "17",
       "status": "NEW",
       "providers": [],
+      "sourceLang": "en_us",
       "targetLang": "zh_cn",
       "workflowLevel": 1,
       "workflowStep": {
         "name": "Translation",
         "id": "225677",
-        "uid": "Vm1j1nqsDSxM343cSZb17g",
         "order": 10,
-        "lqaEnabled": true
+        "workflowLevel": 1
       },
       "filename": "widget-layout.ui.en.json",
       "dateDue": null,
-      "dateCreated": "2026-11-05T14:41:12+0000",
+      "wordsCount": 584,
+      "beginIndex": 0,
+      "endIndex": 126,
+      "isParentJobSplit": false,
       "updateSourceDate": null,
-      "imported": false,
-      "jobAssignedEmailTemplate": null,
-      "notificationIntervalInMinutes": 0,
+      "updateTargetDate": null,
+      "dateCreated": "2026-11-05T14:41:12+0000",
+      "jobReference": {
+        "uid": "sYtkmdHJa1mS42zyG0z9K2",
+        "filename": "widget-layout.ui.en.json"
+      },
+      "project": {
+        "name": "hcc-ui",
+        "uid": "LFsYhKphLpXQ0WWa47VZ19"
+      },
+      "lastWorkflowLevel": 1,
+      "workUnit": null,
+      "importStatus": {
+        "status": "OK",
+        "errorMessage": null
+      },
+      "imported": true,
       "continuous": false,
-      "sourceFileUid": "ADV2s8sbHfrVddSuzX7Jr2"
+      "continuousJobInfo": null,
+      "originalFileDirectory": "",
+      "allWorkflowStepsSplit": true,
+      "serverTaskId": "ih1VOT38a318m9XG1_dc11"
     },
     {
       "uid": "x0PAalxkiuM9ni87FUpAq7",
+      "innerId": "18",
       "status": "NEW",
       "providers": [],
+      "sourceLang": "en_us",
       "targetLang": "fr",
       "workflowLevel": 1,
       "workflowStep": {
         "name": "Translation",
         "id": "225677",
-        "uid": "Vm1j1nqsDSxM343cSZb17g",
         "order": 10,
-        "lqaEnabled": true
+        "workflowLevel": 1
       },
       "filename": "widget-layout.ui.en.json",
       "dateDue": null,
-      "dateCreated": "2026-11-05T14:41:12+0000",
+      "wordsCount": 584,
+      "beginIndex": 0,
+      "endIndex": 126,
+      "isParentJobSplit": false,
       "updateSourceDate": null,
-      "imported": false,
-      "jobAssignedEmailTemplate": null,
-      "notificationIntervalInMinutes": 0,
+      "updateTargetDate": null,
+      "dateCreated": "2026-11-05T14:41:12+0000",
+      "jobReference": {
+        "uid": "3q8AT9PpU69O2dzS9uZhP2",
+        "filename": "widget-layout.ui.en.json"
+      },
+      "project": {
+        "name": "hcc-ui",
+        "uid": "LFsYhKphLpXQ0WWa47VZ19"
+      },
+      "lastWorkflowLevel": 1,
+      "workUnit": null,
+      "importStatus": {
+        "status": "OK",
+        "errorMessage": null
+      },
+      "imported": true,
       "continuous": false,
-      "sourceFileUid": "ADV2s8sbHfrVddSuzX7Jr2"
+      "continuousJobInfo": null,
+      "originalFileDirectory": "",
+      "allWorkflowStepsSplit": true,
+      "serverTaskId": "AagQzm30wI18m9XG1_dc11"
     },
     {
       "uid": "yBN0Xg3l0sJW19Pw60hXik",
+      "innerId": "19",
       "status": "NEW",
       "providers": [],
+      "sourceLang": "en_us",
       "targetLang": "ko",
       "workflowLevel": 1,
       "workflowStep": {
         "name": "Translation",
         "id": "225677",
-        "uid": "Vm1j1nqsDSxM343cSZb17g",
         "order": 10,
-        "lqaEnabled": true
+        "workflowLevel": 1
       },
       "filename": "widget-layout.ui.en.json",
       "dateDue": null,
-      "dateCreated": "2026-11-05T14:41:12+0000",
+      "wordsCount": 584,
+      "beginIndex": 0,
+      "endIndex": 126,
+      "isParentJobSplit": false,
       "updateSourceDate": null,
-      "imported": false,
-      "jobAssignedEmailTemplate": null,
-      "notificationIntervalInMinutes": 0,
+      "updateTargetDate": null,
+      "dateCreated": "2026-11-05T14:41:12+0000",
+      "jobReference": {
+        "uid": "JupzBm0BF1LQg4Jw8Mayf1",
+        "filename": "widget-layout.ui.en.json"
+      },
+      "project": {
+        "name": "hcc-ui",
+        "uid": "LFsYhKphLpXQ0WWa47VZ19"
+      },
+      "lastWorkflowLevel": 1,
+      "workUnit": null,
+      "importStatus": {
+        "status": "OK",
+        "errorMessage": null
+      },
+      "imported": true,
       "continuous": false,
-      "sourceFileUid": "ADV2s8sbHfrVddSuzX7Jr2"
+      "continuousJobInfo": null,
+      "originalFileDirectory": "",
+      "allWorkflowStepsSplit": true,
+      "serverTaskId": "eELWfkw5Tc4ylOKq_dc12"
     },
     {
       "uid": "xlC6pZtNa8r8aVSyCp0rJ7",
+      "innerId": "20",
       "status": "NEW",
       "providers": [],
+      "sourceLang": "en_us",
       "targetLang": "ja",
       "workflowLevel": 1,
       "workflowStep": {
         "name": "Translation",
         "id": "225677",
-        "uid": "Vm1j1nqsDSxM343cSZb17g",
         "order": 10,
-        "lqaEnabled": true
+        "workflowLevel": 1
       },
       "filename": "widget-layout.ui.en.json",
       "dateDue": null,
-      "dateCreated": "2026-11-05T14:41:12+0000",
+      "wordsCount": 584,
+      "beginIndex": 0,
+      "endIndex": 126,
+      "isParentJobSplit": false,
       "updateSourceDate": null,
-      "imported": false,
-      "jobAssignedEmailTemplate": null,
-      "notificationIntervalInMinutes": 0,
+      "updateTargetDate": null,
+      "dateCreated": "2026-11-05T14:41:12+0000",
+      "jobReference": {
+        "uid": "aiT43Yseah82fxCzyKqT52",
+        "filename": "widget-layout.ui.en.json"
+      },
+      "project": {
+        "name": "hcc-ui",
+        "uid": "LFsYhKphLpXQ0WWa47VZ19"
+      },
+      "lastWorkflowLevel": 1,
+      "workUnit": null,
+      "importStatus": {
+        "status": "OK",
+        "errorMessage": null
+      },
+      "imported": true,
       "continuous": false,
-      "sourceFileUid": "ADV2s8sbHfrVddSuzX7Jr2"
+      "continuousJobInfo": null,
+      "originalFileDirectory": "",
+      "allWorkflowStepsSplit": true,
+      "serverTaskId": "ALzC4Hj8lW2ylOKq_dc12"
     }
   ],
   "warningCount": 0,
