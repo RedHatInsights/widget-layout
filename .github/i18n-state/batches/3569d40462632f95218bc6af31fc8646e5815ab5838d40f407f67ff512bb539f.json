@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "key": "3569d40462632f95218bc6af31fc8646e5815ab5838d40f407f67ff512bb539f",
+  "phase": "creating",
+  "repository": "RedHatInsights/widget-layout",
+  "baseRef": "master",
+  "sourceCommit": "804535ec6834394494f8067f74f92bba75b755e6",
+  "sourceDigest": "29d83530d5c6efd41c4600f8d8f8d4031d86f22583f8f8b02d02117da75d4bf6",
+  "config": {
+    "projectUid": "LFsYhKphLpXQ0WWa47VZ19",
+    "region": "eu",
+    "sourceCatalog": {
+      "path": "translations/messages.json",
+      "filename": "widget-layout.ui.en.json",
+      "adapter": "formatjs-json",
+      "locale": "en",
+      "useProjectFileImportSettings": true
+    },
+    "targetAdapter": "formatjs-json",
+    "targetLocales": [
+      {
+        "phraseLocale": "fr",
+        "repositoryLocale": "fr",
+        "outputPath": "messages/fr.json"
+      },
+      {
+        "phraseLocale": "ja",
+        "repositoryLocale": "ja",
+        "outputPath": "messages/ja.json"
+      },
+      {
+        "phraseLocale": "ko",
+        "repositoryLocale": "ko",
+        "outputPath": "messages/ko.json"
+      },
+      {
+        "phraseLocale": "zh_cn",
+        "repositoryLocale": "zh-CN",
+        "outputPath": "messages/zh-CN.json"
+      }
+    ],
+    "completionPolicy": {
+      "default": "per-locale"
+    }
+  },
+  "createdAt": "2026-11-05T14:41:07.780Z",
+  "jobs": [],
+  "warningCount": 0,
+  "locales": {
+    "fr": {
+      "phase": "pending"
+    },
+    "ja": {
+      "phase": "pending"
+    },
+    "ko": {
+      "phase": "pending"
+    },
+    "zh_cn": {
+      "phase": "pending"
+    }
+  }
+}
