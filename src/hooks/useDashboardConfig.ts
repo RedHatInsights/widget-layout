@@ -51,6 +51,16 @@ const messages = defineMessages({
     description: 'Dashboard config save failure notification description',
     defaultMessage: 'Your dashboard changes were unable to be saved.',
   },
+  notSavedTitle: {
+    id: 'widgetLayout.hooks.notSavedTitle',
+    description: 'Warning notification title when changes are dropped because no dashboard template is loaded',
+    defaultMessage: 'Changes not saved',
+  },
+  notSavedDescription: {
+    id: 'widgetLayout.hooks.notSavedDescription',
+    description: 'Warning notification description when changes are dropped because no dashboard template is loaded',
+    defaultMessage: 'No dashboard is loaded, so your changes were not saved. Reload the page or create a dashboard first.',
+  },
 });
 
 const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => {
@@ -83,7 +93,10 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
     api
       .getDashboardTemplates(mappedLayoutType)
       .then((templates) => {
-        const customDefaultTemplate = getDefaultTemplate(templates);
+        // Fall back to the first template of the type when none is marked default,
+        // so the dashboard still loads and edits can be saved instead of silently
+        // rendering an editable grid whose changes are dropped.
+        const customDefaultTemplate = getDefaultTemplate(templates) ?? templates[0];
         if (!customDefaultTemplate) {
           throw new Error('No custom default template found');
         }
@@ -126,7 +139,15 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
 
   const saveTemplate = useCallback(
     async (newTemplate: ExtendedTemplateConfig) => {
-      if (templateId < 0) {
+      if (!(templateId >= 0)) {
+        // Warn instead of silently dropping changes when no dashboard template
+        // was loaded (e.g. none exists for this layout type). NaN-safe: the
+        // reset flow sets the id to NaN while reloading.
+        addNotification({
+          variant: 'warning',
+          title: intl.formatMessage(messages.notSavedTitle),
+          description: intl.formatMessage(messages.notSavedDescription),
+        });
         return;
       }
 

@@ -5,6 +5,7 @@ import GridLayout from './GridLayout';
 import convertWidgetMapping from './ConvertWidgetMapping';
 import { widgetMappingAtom } from '../../state/widgetMappingAtom';
 import { layoutVariantAtom } from '../../state/layoutAtom';
+import { currentDropInItemAtom } from '../../state/currentDropInItemAtom';
 import { WidgetMapping as ScalprumWidgetMapping } from '../../api/dashboard-templates';
 
 // Polyfill crypto.randomUUID for jsdom
@@ -101,6 +102,7 @@ function renderWithStore(ui: React.ReactElement, storeOverrides?: Record<string,
   const store = createStore();
   if (storeOverrides?.widgetMapping) store.set(widgetMappingAtom, storeOverrides.widgetMapping as ScalprumWidgetMapping);
   if (storeOverrides?.layoutVariant) store.set(layoutVariantAtom, storeOverrides.layoutVariant as any);
+  if (storeOverrides?.currentDropInItem !== undefined) store.set(currentDropInItemAtom, storeOverrides.currentDropInItem as string);
   return render(<Provider store={store}>{ui}</Provider>);
 }
 
@@ -202,6 +204,15 @@ describe('GridLayout rendering states', () => {
     const emptyTemplate = { sm: [], md: [], lg: [], xl: [] };
     renderWithStore(<GridLayout template={emptyTemplate} saveTemplate={mockSaveTemplate} isLoaded={true} />, { widgetMapping: mockScalprumMapping });
     expect(screen.getByText('No dashboard content')).toBeInTheDocument();
+  });
+
+  it('hides empty state while a widget is being dragged (drop-in progress)', () => {
+    const emptyTemplate = { sm: [], md: [], lg: [], xl: [] };
+    renderWithStore(
+      <GridLayout template={emptyTemplate} saveTemplate={mockSaveTemplate} isLoaded={true} />,
+      { widgetMapping: mockScalprumMapping, currentDropInItem: 'rhel-widget' }
+    );
+    expect(screen.queryByText('No dashboard content')).not.toBeInTheDocument();
   });
 
   it('renders widget tiles when template has widgets', () => {

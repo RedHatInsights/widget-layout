@@ -137,7 +137,7 @@ const GridLayout = ({ template, saveTemplate, isLoaded, isLayoutLocked = false, 
 
   return (
     <div id="widget-layout-container" style={{ position: 'relative' }} ref={layoutRef}>
-      {activeLayout.length === 0 && isLoaded && <LayoutEmptyState />}
+      {activeLayout.length === 0 && isLoaded && !currentDropInItem && <LayoutEmptyState />}
       {Object.keys(widgetMapping).length > 0 && (
         <PatternFlyGridLayout
           widgetMapping={widgetMapping}
