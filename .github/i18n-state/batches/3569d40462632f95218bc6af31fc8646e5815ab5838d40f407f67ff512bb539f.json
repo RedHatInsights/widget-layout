@@ -286,8 +286,10 @@
       "pullRequestUrl": "https://github.com/RedHatInsights/widget-layout/pull/398",
       "pullRequestBranch": "i18n/phrase-3569d40462632f95-zh-CN",
       "pullRequestBatchKey": "3569d40462632f95218bc6af31fc8646e5815ab5838d40f407f67ff512bb539f",
-      "pullRequestAssigneesPending": true,
-      "toolingCommitSha": "2d6db93e83f5f6ba3c52b4cf25f76e173f45137a"
+      "toolingCommitSha": "2d6db93e83f5f6ba3c52b4cf25f76e173f45137a",
+      "pullRequestAssignees": [
+        "riccardo-forina"
+      ]
     }
   },
   "importAsyncRequestId": "1907194718"
