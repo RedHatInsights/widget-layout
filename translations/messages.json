@@ -447,6 +447,14 @@
     "defaultMessage": "No homepage dashboard set",
     "description": "No homepage dashboard warning notification title"
   },
+  "widgetLayout.hooks.notSavedDescription": {
+    "defaultMessage": "No dashboard is loaded, so your changes were not saved. Reload the page or create a dashboard first.",
+    "description": "Warning notification description when changes are dropped because no dashboard template is loaded"
+  },
+  "widgetLayout.hooks.notSavedTitle": {
+    "defaultMessage": "Changes not saved",
+    "description": "Warning notification title when changes are dropped because no dashboard template is loaded"
+  },
   "widgetLayout.hooks.patchFailedDescription": {
     "defaultMessage": "Your dashboard changes were unable to be saved.",
     "description": "Dashboard config save failure notification description"
