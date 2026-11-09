@@ -275,11 +275,19 @@
       "phase": "pending"
     },
     "zh_cn": {
-      "phase": "exporting",
+      "phase": "pr-created",
       "toolingCommitShas": [
         "f862009407020927e4c07273ad4113f261966d24",
         "2d6db93e83f5f6ba3c52b4cf25f76e173f45137a"
-      ]
+      ],
+      "validationErrors": [],
+      "validationWarnings": [],
+      "pullRequestBodyDigest": "df821a64eca56cb619b2ea66e6f9134e9b1f4f1aa546c7d18019cb87f8c4f5e6",
+      "pullRequestUrl": "https://github.com/RedHatInsights/widget-layout/pull/398",
+      "pullRequestBranch": "i18n/phrase-3569d40462632f95-zh-CN",
+      "pullRequestBatchKey": "3569d40462632f95218bc6af31fc8646e5815ab5838d40f407f67ff512bb539f",
+      "pullRequestAssigneesPending": true,
+      "toolingCommitSha": "2d6db93e83f5f6ba3c52b4cf25f76e173f45137a"
     }
   },
   "importAsyncRequestId": "1907194718"
