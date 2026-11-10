@@ -264,7 +264,10 @@
       "phase": "pending"
     },
     "zh_cn": {
-      "phase": "exporting"
+      "phase": "exporting",
+      "toolingCommitShas": [
+        "95a45407fc2e0dd5db24ea4fc72a7f7a8e607f87"
+      ]
     }
   },
   "importAsyncRequestId": "1912533764"
