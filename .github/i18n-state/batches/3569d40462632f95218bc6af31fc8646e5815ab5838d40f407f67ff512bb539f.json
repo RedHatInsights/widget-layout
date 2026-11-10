@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "key": "3569d40462632f95218bc6af31fc8646e5815ab5838d40f407f67ff512bb539f",
-  "phase": "ready",
+  "phase": "superseded",
   "repository": "RedHatInsights/widget-layout",
   "baseRef": "master",
   "sourceCommit": "804535ec6834394494f8067f74f92bba75b755e6",
@@ -292,5 +292,6 @@
       ]
     }
   },
-  "importAsyncRequestId": "1907194718"
+  "importAsyncRequestId": "1907194718",
+  "failureReason": "Source catalog changed on the recorded PR base ref"
 }
