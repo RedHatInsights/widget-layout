@@ -291,7 +291,8 @@
         "riccardo-forina"
       ],
       "pullRequestSupersededCheckedAt": "2026-11-10T12:30:15.711Z",
-      "pullRequestSupersededNoticePosted": true
+      "pullRequestSupersededNoticePosted": true,
+      "pullRequestFinalized": true
     }
   },
   "importAsyncRequestId": "1907194718",
