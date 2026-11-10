@@ -264,10 +264,18 @@
       "phase": "pending"
     },
     "zh_cn": {
-      "phase": "exporting",
+      "phase": "pr-created",
       "toolingCommitShas": [
         "95a45407fc2e0dd5db24ea4fc72a7f7a8e607f87"
-      ]
+      ],
+      "validationErrors": [],
+      "validationWarnings": [],
+      "pullRequestBodyDigest": "b9b3f0d907c1f48e58850db01a1f918255ec1d8ec76d7059e77de74b1c7c6e9c",
+      "pullRequestUrl": "https://github.com/RedHatInsights/widget-layout/pull/399",
+      "pullRequestBranch": "i18n/phrase-963e81e5544c2545-zh-CN",
+      "pullRequestBatchKey": "963e81e5544c25453f41ffaa6f643e53f58c85842b4ba065fee3e5f331fdedda",
+      "pullRequestAssigneesPending": true,
+      "toolingCommitSha": "95a45407fc2e0dd5db24ea4fc72a7f7a8e607f87"
     }
   },
   "importAsyncRequestId": "1912533764"
