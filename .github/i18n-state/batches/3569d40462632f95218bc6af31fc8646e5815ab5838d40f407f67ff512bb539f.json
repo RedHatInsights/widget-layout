@@ -289,7 +289,8 @@
       "toolingCommitSha": "2d6db93e83f5f6ba3c52b4cf25f76e173f45137a",
       "pullRequestAssignees": [
         "riccardo-forina"
-      ]
+      ],
+      "pullRequestSupersededCheckedAt": "2026-11-10T12:30:15.711Z"
     }
   },
   "importAsyncRequestId": "1907194718",
