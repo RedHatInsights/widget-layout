@@ -305,7 +305,6 @@
       "pullRequestUrl": "https://github.com/RedHatInsights/widget-layout/pull/401",
       "pullRequestBranch": "i18n/phrase-963e81e5544c2545-ko",
       "pullRequestBatchKey": "963e81e5544c25453f41ffaa6f643e53f58c85842b4ba065fee3e5f331fdedda",
-      "pullRequestAssigneesPending": true,
       "toolingCommitSha": "ae0d69e566fbb705750c22d8bf1ca2d66c4e3f8f"
     },
     "zh_cn": {
