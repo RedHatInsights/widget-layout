@@ -105,8 +105,19 @@
     {
       "uid": "8hX7AZK9W3XzbVcVfh2BM1",
       "innerId": "50",
-      "status": "NEW",
-      "providers": [],
+      "status": "COMPLETED",
+      "providers": [
+        {
+          "type": "USER",
+          "id": "285168",
+          "uid": "2sHjdtUUmG8d39nW3yQ216",
+          "userName": "croe",
+          "firstName": "Corina",
+          "lastName": "Roe",
+          "email": "croe@redhat.com",
+          "active": true
+        }
+      ],
       "sourceLang": "en_us",
       "targetLang": "fr",
       "workflowLevel": 1,
@@ -151,8 +162,19 @@
     {
       "uid": "RSr9UyTT3YFXcRIvsO9Co1",
       "innerId": "51",
-      "status": "NEW",
-      "providers": [],
+      "status": "COMPLETED",
+      "providers": [
+        {
+          "type": "USER",
+          "id": "288744",
+          "uid": "IZsb0q3D4BMA8a2mNLjNj2",
+          "userName": "eukim",
+          "firstName": "Eun-Ju",
+          "lastName": "Kim",
+          "email": "eukim@redhat.com",
+          "active": true
+        }
+      ],
       "sourceLang": "en_us",
       "targetLang": "ko",
       "workflowLevel": 1,
