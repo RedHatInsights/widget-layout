@@ -277,10 +277,20 @@
   "warningCount": 0,
   "locales": {
     "fr": {
-      "phase": "exporting",
+      "phase": "pr-created",
       "toolingCommitShas": [
         "393bfd4ab892bcb1ff646c28c19f6653b417bfe8"
-      ]
+      ],
+      "validationErrors": [
+        "ICU argument mismatches: \"widgetLayout.deleteModal.title\": source [name], target []"
+      ],
+      "validationWarnings": [],
+      "pullRequestBodyDigest": "bb3f4bd19a54703942b8b63a9bf9ab2d78fd47eab57c4c2e9069e261c1b0376a",
+      "pullRequestUrl": "https://github.com/RedHatInsights/widget-layout/pull/400",
+      "pullRequestBranch": "i18n/phrase-963e81e5544c2545-fr",
+      "pullRequestBatchKey": "963e81e5544c25453f41ffaa6f643e53f58c85842b4ba065fee3e5f331fdedda",
+      "pullRequestAssigneesPending": true,
+      "toolingCommitSha": "393bfd4ab892bcb1ff646c28c19f6653b417bfe8"
     },
     "ja": {
       "phase": "pending"
