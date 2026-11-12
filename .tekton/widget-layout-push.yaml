@@ -9,7 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: '3'
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
       == "master"
-    pipelinesascode.tekton.dev/pipeline: https://github.com/RedHatInsights/konflux-pipelines/raw/main/pipelines/platform-ui/docker-build-run-unit-tests.yaml
+    pipelinesascode.tekton.dev/pipeline: https://raw.githubusercontent.com/RedHatInsights/konflux-pipelines/9f8ad2eb4d845111b361e465edc87b656787c1e7/pipelines/platform-ui/docker-build-run-unit-tests.yaml
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: widget-layout
@@ -26,21 +26,36 @@ spec:
     - name: output-image
       value: quay.io/redhat-user-workloads/hcc-platex-services-tenant/hcc-platex-services/widget-layout:{{revision}}
     - name: dockerfile
-      value: Dockerfile.hermetic
+      value: build-tools/Dockerfile.hermetic
     - name: hermetic
       value: "true"
     - name: prefetch-input
       value: '{"type": "npm", "path": "."}'
+    - name: target-stage
+      value: deploy
+    - name: build-args
+      value:
+        - "LABEL_COMPONENT=widget-layout-hermetic"
+        - "LABEL_DESCRIPTION=Widget Layout Frontend - Hermetic Build"
+        - "LABEL_URL=https://github.com/RedHatInsights/widget-layout"
+        - "LABEL_SUMMARY=Widget Layout Frontend"
     - name: unit-tests-script
       value: |
         #!/bin/bash
-        set -ex
+        set -euo pipefail
 
         npm install
         npm run lint
-        npm test --  --runInBand --no-cache
+        npm test -- --runInBand --no-cache
   pipelineRef:
-    name: docker-build
+    resolver: git
+    params:
+      - name: url
+        value: https://github.com/RedHatInsights/konflux-pipelines
+      - name: revision
+        value: 9f8ad2eb4d845111b361e465edc87b656787c1e7
+      - name: pathInRepo
+        value: pipelines/platform-ui/docker-build-run-unit-tests.yaml
   taskRunTemplate:
     serviceAccountName: build-pipeline-widget-layout
   workspaces:
