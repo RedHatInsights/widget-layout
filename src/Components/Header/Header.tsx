@@ -136,6 +136,7 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
   const intl = useIntl();
   const navigate = useNavigate();
   const { dashboards } = useGetDashboards();
+  const [templateId] = useAtom(templateIdAtom);
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -211,7 +212,7 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
                 <MenuItem
                   key={dashboard.id}
                   itemId={`dashboard-${dashboard.id}`}
-                  isSelected={dashboard.default}
+                  isSelected={dashboard.id === templateId}
                   actions={
                     <MenuItemAction
                       icon={<EditAltIcon />}
