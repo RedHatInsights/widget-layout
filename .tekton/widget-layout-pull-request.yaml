@@ -10,7 +10,7 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: '3'
     pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
       == "master"
-    pipelinesascode.tekton.dev/pipeline: https://raw.githubusercontent.com/RedHatInsights/konflux-pipelines/9f8ad2eb4d845111b361e465edc87b656787c1e7/pipelines/platform-ui/docker-build-run-all-tests-v3.yaml
+    pipelinesascode.tekton.dev/pipeline: https://raw.githubusercontent.com/RedHatInsights/konflux-pipelines/main/pipelines/platform-ui/docker-build-run-all-tests-v3.yaml
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: widget-layout
@@ -86,7 +86,7 @@ spec:
       - name: url
         value: https://github.com/RedHatInsights/konflux-pipelines
       - name: revision
-        value: 9f8ad2eb4d845111b361e465edc87b656787c1e7
+        value: main
       - name: pathInRepo
         value: pipelines/platform-ui/docker-build-run-all-tests-v3.yaml
   taskRunTemplate:
