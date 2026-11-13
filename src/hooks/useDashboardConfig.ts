@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { useAtom, useSetAtom } from 'jotai';
 import DebouncePromise from 'awesome-debounce-promise';
-import { templateAtom, templateIdAtom } from '../state/templateAtom';
+import { initialTemplate, loadedLayoutTypeAtom, templateAtom, templateIdAtom } from '../state/templateAtom';
 import { layoutVariantAtom } from '../state/layoutAtom';
 import {
   ExtendedTemplateConfig,
@@ -70,6 +70,8 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
   const [isLoaded, setIsLoaded] = useState(false);
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
+  const [loadedLayoutType, setLoadedLayoutType] = useAtom(loadedLayoutTypeAtom);
+  const lastNotifiedFailureRef = useRef<LayoutTypes | undefined>(undefined);
   const [, setLayoutVariant] = useAtom(layoutVariantAtom);
   const { currentUser } = useCurrentUser();
   const addNotification = useAddNotification();
@@ -83,16 +85,21 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
       return;
     }
 
-    if (templateId >= 0) {
+    if (templateId >= 0 && loadedLayoutType === layoutType) {
       setIsLoaded(true);
       return;
     }
 
     setDrawerExpanded(false);
+    let cancelled = false;
 
     api
       .getDashboardTemplates(mappedLayoutType)
       .then((templates) => {
+        if (cancelled) {
+          return;
+        }
+        lastNotifiedFailureRef.current = undefined;
         // Fall back to the first template of the type when none is marked default,
         // so the dashboard still loads and edits can be saved instead of silently
         // rendering an editable grid whose changes are dropped.
@@ -114,28 +121,43 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
         }
         setTemplate(extendedTemplateConfig);
         setTemplateId(customDefaultTemplate.id);
+        setLoadedLayoutType(layoutType);
         setLayoutVariant(targetVariant);
       })
       .catch((err) => {
+        if (cancelled) {
+          return;
+        }
         console.error(err);
-        if (err instanceof Error && err.message === 'No custom default template found') {
-          addNotification({
-            variant: 'warning',
-            title: intl.formatMessage(messages.noHomepageTitle),
-            description: intl.formatMessage(messages.noHomepageDescription),
-          });
-        } else {
-          addNotification({
-            variant: 'danger',
-            title: intl.formatMessage(messages.fetchFailedTitle),
-            description: intl.formatMessage(messages.fetchFailedDescription),
-          });
+        setTemplate(initialTemplate);
+
+        setTemplateId(NaN);
+
+        if (lastNotifiedFailureRef.current !== layoutType) {
+          lastNotifiedFailureRef.current = layoutType;
+          if (err instanceof Error && err.message === 'No custom default template found') {
+            addNotification({
+              variant: 'warning',
+              title: intl.formatMessage(messages.noHomepageTitle),
+              description: intl.formatMessage(messages.noHomepageDescription),
+            });
+          } else {
+            addNotification({
+              variant: 'danger',
+              title: intl.formatMessage(messages.fetchFailedTitle),
+              description: intl.formatMessage(messages.fetchFailedDescription),
+            });
+          }
         }
       })
       .finally(() => {
         setIsLoaded(true);
       });
-  }, [currentUser, templateId]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser, templateId, layoutType, loadedLayoutType]);
 
   const saveTemplate = useCallback(
     async (newTemplate: ExtendedTemplateConfig) => {

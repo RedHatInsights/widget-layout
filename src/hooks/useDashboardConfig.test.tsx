@@ -2,7 +2,7 @@ import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { Provider, createStore } from 'jotai';
 import useDashboardConfig from './useDashboardConfig';
-import { templateIdAtom } from '../state/templateAtom';
+import { loadedLayoutTypeAtom, templateAtom, templateIdAtom } from '../state/templateAtom';
 import { notificationsAtom } from '../state/notificationsAtom';
 
 // Polyfill crypto.randomUUID for jsdom
@@ -36,10 +36,9 @@ jest.mock('@unleash/proxy-client-react', () => ({
 
 const emptyTemplateConfig = { sm: [], md: [], lg: [], xl: [] };
 
-function renderConfigHook() {
-  const store = createStore();
+function renderConfigHook(layoutType: string = 'dashboard-insightsDashboard', store = createStore()) {
   const wrapper = ({ children }: { children?: React.ReactNode }) => <Provider store={store}>{children}</Provider>;
-  return { store, ...renderHook(() => useDashboardConfig('dashboard-insightsDashboard'), { wrapper }) };
+  return { store, ...renderHook(() => useDashboardConfig(layoutType as never), { wrapper }) };
 }
 
 // --- Tests ---
@@ -74,7 +73,7 @@ describe('useDashboardConfig', () => {
     mockGetDashboardTemplates.mockResolvedValue([]);
     const { store, result } = renderConfigHook();
     await waitFor(() => expect(result.current.isLoaded).toBe(true));
-    expect(store.get(templateIdAtom)).toBe(-1);
+    expect(store.get(templateIdAtom)).toBeNaN();
 
     await act(async () => {
       await result.current.saveTemplate({ ...emptyTemplateConfig });
@@ -98,5 +97,69 @@ describe('useDashboardConfig', () => {
     expect(mockPatchDashboardTemplate).toHaveBeenCalledWith(55, expect.anything());
     const titles = store.get(notificationsAtom).map((notification) => notification.title);
     expect(titles).not.toContain('Changes not saved');
+  });
+
+  it('re-resolves the default when a different layout type mounts with the shared store', async () => {
+    mockGetDashboardTemplates.mockResolvedValue([{ id: 11, default: true, templateConfig: emptyTemplateConfig }]);
+    const first = renderConfigHook('landing-landingPage');
+    await waitFor(() => expect(first.store.get(templateIdAtom)).toBe(11));
+    expect(mockGetDashboardTemplates).toHaveBeenCalledWith('landing-landingPage');
+    first.unmount();
+
+    mockGetDashboardTemplates.mockResolvedValue([{ id: 22, default: true, templateConfig: emptyTemplateConfig }]);
+    const second = renderConfigHook('dashboard-insightsDashboard', first.store);
+    await waitFor(() => expect(second.store.get(templateIdAtom)).toBe(22));
+    expect(mockGetDashboardTemplates).toHaveBeenCalledWith('dashboard-insightsDashboard');
+    expect(second.store.get(loadedLayoutTypeAtom)).toBe('dashboard-insightsDashboard');
+  });
+
+  it('keeps the selected template without refetching when the same layout type remounts', async () => {
+    mockGetDashboardTemplates.mockResolvedValue([{ id: 11, default: true, templateConfig: emptyTemplateConfig }]);
+    const first = renderConfigHook('dashboard-insightsDashboard');
+    await waitFor(() => expect(first.store.get(templateIdAtom)).toBe(11));
+    expect(mockGetDashboardTemplates).toHaveBeenCalledTimes(1);
+    first.unmount();
+
+    const second = renderConfigHook('dashboard-insightsDashboard', first.store);
+    await waitFor(() => expect(second.result.current.isLoaded).toBe(true));
+    expect(mockGetDashboardTemplates).toHaveBeenCalledTimes(1);
+    expect(second.store.get(templateIdAtom)).toBe(11);
+  });
+
+  it('clears the stale selection when the new layout type fails to load, so edits cannot cross-save', async () => {
+    mockGetDashboardTemplates.mockResolvedValue([{ id: 11, default: true, templateConfig: emptyTemplateConfig }]);
+    const first = renderConfigHook('landing-landingPage');
+    await waitFor(() => expect(first.store.get(templateIdAtom)).toBe(11));
+    first.unmount();
+
+    mockGetDashboardTemplates.mockResolvedValue([]);
+    const second = renderConfigHook('dashboard-insightsDashboard', first.store);
+    await waitFor(() => expect(second.result.current.isLoaded).toBe(true));
+
+    expect(second.store.get(templateIdAtom)).toBeNaN();
+    expect(second.store.get(templateAtom)).toEqual(emptyTemplateConfig);
+
+    await act(async () => {
+      await second.result.current.saveTemplate({ ...emptyTemplateConfig });
+    });
+    expect(mockPatchDashboardTemplate).not.toHaveBeenCalled();
+    const titles = second.store.get(notificationsAtom).map((notification) => notification.title);
+    expect(titles).toContain('Changes not saved');
+  });
+
+  it('notifies only once even though the failed load is retried once', async () => {
+    mockGetDashboardTemplates.mockRejectedValue(new Error('boom'));
+    const { store } = renderConfigHook();
+    await waitFor(() => expect(mockGetDashboardTemplates).toHaveBeenCalledTimes(2));
+    expect(store.get(notificationsAtom).length).toBe(1);
+  });
+
+  it('recovers when the automatic retry succeeds', async () => {
+    mockGetDashboardTemplates
+      .mockRejectedValueOnce(new Error('transient network error'))
+      .mockResolvedValue([{ id: 22, default: true, templateConfig: emptyTemplateConfig }]);
+    const { store } = renderConfigHook();
+    await waitFor(() => expect(store.get(templateIdAtom)).toBe(22));
+    expect(store.get(loadedLayoutTypeAtom)).toBe('dashboard-insightsDashboard');
   });
 });
