@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { Provider, createStore } from 'jotai';
 import useDashboardConfig from './useDashboardConfig';
 import { loadedLayoutTypeAtom, templateAtom, templateIdAtom } from '../state/templateAtom';
@@ -161,5 +161,45 @@ describe('useDashboardConfig', () => {
     const { store } = renderConfigHook();
     await waitFor(() => expect(store.get(templateIdAtom)).toBe(22));
     expect(store.get(loadedLayoutTypeAtom)).toBe('dashboard-insightsDashboard');
+    // a transient first failure that the retry survives never notifies
+    expect(store.get(notificationsAtom).length).toBe(0);
+  });
+
+  it('hides the stale selection and blocks saves while the new layout type is still loading', async () => {
+    mockGetDashboardTemplates.mockResolvedValue([{ id: 11, default: true, templateConfig: emptyTemplateConfig }]);
+    const first = renderConfigHook('landing-landingPage');
+    await waitFor(() => expect(first.store.get(templateIdAtom)).toBe(11));
+    first.unmount();
+
+    // hold the new layout's fetch pending — the shared store still holds
+    // the landing page's selection during this window
+    let resolveSecond!: (templates: unknown[]) => void;
+    mockGetDashboardTemplates.mockImplementation(() => new Promise((resolve) => (resolveSecond = resolve)));
+    const second = renderConfigHook('dashboard-insightsDashboard', first.store);
+
+    // the previous page's dashboard is not exposed to the new page
+    expect(second.result.current.template).toEqual(emptyTemplateConfig);
+    expect(second.result.current.templateId).toBeNaN();
+    expect(second.result.current.isLoaded).toBe(false);
+
+    // a save during the window must not patch the previous dashboard
+    await act(async () => {
+      await second.result.current.saveTemplate({ ...emptyTemplateConfig });
+    });
+    expect(mockPatchDashboardTemplate).not.toHaveBeenCalled();
+    const titles = second.store.get(notificationsAtom).map((notification) => notification.title);
+    expect(titles).toContain('Changes not saved');
+
+    // once the new layout resolves, its dashboard is exposed and savable
+    await act(async () => {
+      resolveSecond([{ id: 22, default: true, templateConfig: emptyTemplateConfig }]);
+    });
+    await waitFor(() => expect(second.result.current.templateId).toBe(22));
+    expect(second.result.current.isLoaded).toBe(true);
+
+    await act(async () => {
+      await second.result.current.saveTemplate({ ...emptyTemplateConfig });
+    });
+    expect(mockPatchDashboardTemplate).toHaveBeenCalledWith(22, expect.anything());
   });
 });

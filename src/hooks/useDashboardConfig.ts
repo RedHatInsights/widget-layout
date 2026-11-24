@@ -131,9 +131,17 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
         console.error(err);
         setTemplate(initialTemplate);
 
+        // NaN both marks "nothing loaded" for the save guard and triggers
+        // exactly one automatic retry (the effect re-runs on the id
+        // change). The layout type is marked loaded as well, so this
+        // failed state is not mistaken for a stale cross-type selection.
+        const isRetry = Number.isNaN(templateId);
         setTemplateId(NaN);
+        setLoadedLayoutType(layoutType);
 
-        if (lastNotifiedFailureRef.current !== layoutType) {
+        // Notify only when the automatic retry also failed — a transient
+        // first failure that the retry survives never reaches the user.
+        if (isRetry && lastNotifiedFailureRef.current !== layoutType) {
           lastNotifiedFailureRef.current = layoutType;
           if (err instanceof Error && err.message === 'No custom default template found') {
             addNotification({
@@ -161,10 +169,12 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
 
   const saveTemplate = useCallback(
     async (newTemplate: ExtendedTemplateConfig) => {
-      if (!(templateId >= 0)) {
+      if (!(templateId >= 0) || loadedLayoutType !== layoutType) {
         // Warn instead of silently dropping changes when no dashboard template
-        // was loaded (e.g. none exists for this layout type). NaN-safe: the
-        // reset flow sets the id to NaN while reloading.
+        // was loaded (e.g. none exists for this layout type), or while another
+        // layout type's selection is still in the shared store — saving then
+        // would patch the previous page's dashboard. NaN-safe: the reset flow
+        // sets the id to NaN while reloading.
         addNotification({
           variant: 'warning',
           title: intl.formatMessage(messages.notSavedTitle),
@@ -200,13 +210,20 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
         });
       }
     },
-    [templateId, setTemplate, addNotification]
+    [templateId, loadedLayoutType, layoutType, setTemplate, addNotification]
   );
 
+  // While the shared store still holds another layout type's selection
+  // (slow cross-type navigation), don't expose it — the new page must
+  // not render, save, or reset the previous page's dashboard. An
+  // undefined loadedLayoutType means nothing ever loaded, so the store
+  // holds only initial values and there is nothing stale to hide.
+  const isStaleSelection = loadedLayoutType !== undefined && loadedLayoutType !== layoutType;
+
   return {
-    template,
-    templateId,
-    isLoaded,
+    template: isStaleSelection ? initialTemplate : template,
+    templateId: isStaleSelection ? NaN : templateId,
+    isLoaded: !isStaleSelection && isLoaded,
     saveTemplate,
     layoutRef,
   };

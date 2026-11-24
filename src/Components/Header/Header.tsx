@@ -27,7 +27,7 @@ import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { CodeIcon, CopyIcon, EditAltIcon, EllipsisVIcon, PlusCircleIcon, PlusIcon, ThIcon, TimesIcon } from '@patternfly/react-icons';
 import { useAtom } from 'jotai';
 import { drawerExpandedAtom } from '../../state/drawerExpandedAtom';
-import { templateIdAtom } from '../../state/templateAtom';
+import { loadedLayoutTypeAtom, templateIdAtom } from '../../state/templateAtom';
 import { useApi } from '../../hooks/useApi';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import { WarningModal } from '@patternfly/react-component-groups';
@@ -300,12 +300,18 @@ export const KebabDropdown = ({ layoutType }: { layoutType?: string }) => {
   );
 };
 
-const Controls = () => {
+export const Controls = ({ layoutType }: { layoutType?: string }) => {
   const intl = useIntl();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerExpanded, toggleOpen] = useAtom(drawerExpandedAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
+  const [loadedLayoutType] = useAtom(loadedLayoutTypeAtom);
   const api = useApi();
+
+  // The shared store can still hold the previous page's selection while
+  // this layout type loads — resetting then would discard the previous
+  // dashboard's customizations, so the action is gated on a type match.
+  const isStaleSelection = layoutType !== undefined && loadedLayoutType !== layoutType;
 
   return (
     <>
@@ -319,7 +325,7 @@ const Controls = () => {
         onClose={() => setIsOpen(false)}
         onConfirm={() => {
           setIsOpen(false);
-          if (templateId > 0) {
+          if (templateId > 0 && !isStaleSelection) {
             api.resetDashboardTemplate(templateId).then(() => {
               setTemplateId(NaN);
             });
@@ -336,6 +342,7 @@ const Controls = () => {
               setIsOpen(true);
             }}
             variant={ButtonVariant.link}
+            isDisabled={isStaleSelection}
           >
             <FormattedMessage {...messages.resetToDefault} />
           </Button>
@@ -377,7 +384,7 @@ const Header = ({ layoutType }: { layoutType?: string }) => {
         <FlexItem align={{ default: 'alignLeft', lg: 'alignRight' }}>
           <Toolbar>
             <ToolbarContent>
-              <Controls />
+              <Controls layoutType={layoutType} />
               {isDashboardHub && (
                 <ToolbarItem>
                   <KebabDropdown layoutType={layoutType} />
