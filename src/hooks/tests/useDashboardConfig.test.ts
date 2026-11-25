@@ -11,7 +11,7 @@ import {
 } from '../../api/dashboard-templates-new';
 import useCurrentUser from '../useCurrentUser';
 import { useAddNotification } from '../../state/notificationsAtom';
-import { templateIdAtom } from '../../state/templateAtom';
+import { templateIdAtom, loadedLayoutTypeAtom } from '../../state/templateAtom';
 
 jest.mock('awesome-debounce-promise', () => ({
   __esModule: true,
@@ -112,7 +112,7 @@ describe('useDashboardConfig', () => {
     expect(mockedGetDashboardTemplates).not.toHaveBeenCalled();
   });
 
-  it('should not fetch when templateId >= 0', async () => {
+  it('should not fetch when the loaded template matches the layout type', async () => {
     // Simulate templateId already set by pre-loading atom
     mockedUseCurrentUser.mockReturnValue({
       currentUser: { username: 'test-user' } as ReturnType<typeof useCurrentUser>['currentUser'],
@@ -121,6 +121,7 @@ describe('useDashboardConfig', () => {
 
     const { wrapper, store } = createWrapper();
     store.set(templateIdAtom, 5);
+    store.set(loadedLayoutTypeAtom, 'landingPage');
 
     renderHook(() => useDashboardConfig('landingPage'), { wrapper });
 

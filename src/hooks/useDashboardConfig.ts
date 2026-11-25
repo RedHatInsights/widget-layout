@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { useAtom, useSetAtom } from 'jotai';
 import DebouncePromise from 'awesome-debounce-promise';
-import { templateAtom, templateIdAtom } from '../state/templateAtom';
+import { initialTemplate, loadedLayoutTypeAtom, templateAtom, templateIdAtom } from '../state/templateAtom';
 import { layoutVariantAtom } from '../state/layoutAtom';
 import {
   ExtendedTemplateConfig,
@@ -70,6 +70,8 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
   const [isLoaded, setIsLoaded] = useState(false);
   const [template, setTemplate] = useAtom(templateAtom);
   const [templateId, setTemplateId] = useAtom(templateIdAtom);
+  const [loadedLayoutType, setLoadedLayoutType] = useAtom(loadedLayoutTypeAtom);
+  const lastNotifiedFailureRef = useRef<LayoutTypes | undefined>(undefined);
   const [, setLayoutVariant] = useAtom(layoutVariantAtom);
   const { currentUser } = useCurrentUser();
   const addNotification = useAddNotification();
@@ -83,16 +85,21 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
       return;
     }
 
-    if (templateId >= 0) {
+    if (templateId >= 0 && loadedLayoutType === layoutType) {
       setIsLoaded(true);
       return;
     }
 
     setDrawerExpanded(false);
+    let cancelled = false;
 
     api
       .getDashboardTemplates(mappedLayoutType)
       .then((templates) => {
+        if (cancelled) {
+          return;
+        }
+        lastNotifiedFailureRef.current = undefined;
         // Fall back to the first template of the type when none is marked default,
         // so the dashboard still loads and edits can be saved instead of silently
         // rendering an editable grid whose changes are dropped.
@@ -114,35 +121,60 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
         }
         setTemplate(extendedTemplateConfig);
         setTemplateId(customDefaultTemplate.id);
+        setLoadedLayoutType(layoutType);
         setLayoutVariant(targetVariant);
       })
       .catch((err) => {
+        if (cancelled) {
+          return;
+        }
         console.error(err);
-        if (err instanceof Error && err.message === 'No custom default template found') {
-          addNotification({
-            variant: 'warning',
-            title: intl.formatMessage(messages.noHomepageTitle),
-            description: intl.formatMessage(messages.noHomepageDescription),
-          });
-        } else {
-          addNotification({
-            variant: 'danger',
-            title: intl.formatMessage(messages.fetchFailedTitle),
-            description: intl.formatMessage(messages.fetchFailedDescription),
-          });
+        setTemplate(initialTemplate);
+
+        // NaN both marks "nothing loaded" for the save guard and triggers
+        // exactly one automatic retry (the effect re-runs on the id
+        // change). The layout type is marked loaded as well, so this
+        // failed state is not mistaken for a stale cross-type selection.
+        const isRetry = Number.isNaN(templateId);
+        setTemplateId(NaN);
+        setLoadedLayoutType(layoutType);
+
+        // Notify only when the automatic retry also failed — a transient
+        // first failure that the retry survives never reaches the user.
+        if (isRetry && lastNotifiedFailureRef.current !== layoutType) {
+          lastNotifiedFailureRef.current = layoutType;
+          if (err instanceof Error && err.message === 'No custom default template found') {
+            addNotification({
+              variant: 'warning',
+              title: intl.formatMessage(messages.noHomepageTitle),
+              description: intl.formatMessage(messages.noHomepageDescription),
+            });
+          } else {
+            addNotification({
+              variant: 'danger',
+              title: intl.formatMessage(messages.fetchFailedTitle),
+              description: intl.formatMessage(messages.fetchFailedDescription),
+            });
+          }
         }
       })
       .finally(() => {
         setIsLoaded(true);
       });
-  }, [currentUser, templateId]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser, templateId, layoutType, loadedLayoutType]);
 
   const saveTemplate = useCallback(
     async (newTemplate: ExtendedTemplateConfig) => {
-      if (!(templateId >= 0)) {
+      if (!(templateId >= 0) || loadedLayoutType !== layoutType) {
         // Warn instead of silently dropping changes when no dashboard template
-        // was loaded (e.g. none exists for this layout type). NaN-safe: the
-        // reset flow sets the id to NaN while reloading.
+        // was loaded (e.g. none exists for this layout type), or while another
+        // layout type's selection is still in the shared store — saving then
+        // would patch the previous page's dashboard. NaN-safe: the reset flow
+        // sets the id to NaN while reloading.
         addNotification({
           variant: 'warning',
           title: intl.formatMessage(messages.notSavedTitle),
@@ -178,13 +210,20 @@ const useDashboardConfig = (layoutType: LayoutTypes = 'landing-landingPage') => 
         });
       }
     },
-    [templateId, setTemplate, addNotification]
+    [templateId, loadedLayoutType, layoutType, setTemplate, addNotification]
   );
 
+  // While the shared store still holds another layout type's selection
+  // (slow cross-type navigation), don't expose it — the new page must
+  // not render, save, or reset the previous page's dashboard. An
+  // undefined loadedLayoutType means nothing ever loaded, so the store
+  // holds only initial values and there is nothing stale to hide.
+  const isStaleSelection = loadedLayoutType !== undefined && loadedLayoutType !== layoutType;
+
   return {
-    template,
-    templateId,
-    isLoaded,
+    template: isStaleSelection ? initialTemplate : template,
+    templateId: isStaleSelection ? NaN : templateId,
+    isLoaded: !isStaleSelection && isLoaded,
     saveTemplate,
     layoutRef,
   };
