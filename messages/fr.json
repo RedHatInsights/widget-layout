@@ -42,7 +42,7 @@
   "widgetLayout.deleteModal.confirm": "Je comprends que cette action ne peut être annulée.",
   "widgetLayout.deleteModal.delete": "Supprimer le tableau de bord",
   "widgetLayout.deleteModal.description": "La suppression du tableau de bord le supprimera de votre Hub de tableaux de bord et toutes les personnalisations qui y ont été apportées devront être reconfigurées si vous souhaitez le recréer.",
-  "widgetLayout.deleteModal.title": "Supprimer le tableau de bord",
+  "widgetLayout.deleteModal.title": "Supprimer le tableau de bord « {name} »",
   "widgetLayout.drawer.drawerTitle": "Ajoutez de nouveaux widgets et supprimez ceux précédemment supprimés en cliquant sur le bouton{gripIcon}, puis faites-la glisser vers un nouvel emplacement. Redimensionnez les widgets en faisant glisser les coins des cartes.",
   "widgetLayout.drawer.moveWidget": "Déplacer le widget",
   "widgetLayout.duplicateModal.cancel": "Annuler",
