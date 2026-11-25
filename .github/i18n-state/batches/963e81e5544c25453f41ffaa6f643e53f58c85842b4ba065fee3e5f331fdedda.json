@@ -279,7 +279,8 @@
     "fr": {
       "phase": "pr-created",
       "toolingCommitShas": [
-        "393bfd4ab892bcb1ff646c28c19f6653b417bfe8"
+        "393bfd4ab892bcb1ff646c28c19f6653b417bfe8",
+        "cb0006710f73dfe046b56a09dcf27ead6fc50cd8"
       ],
       "validationErrors": [
         "ICU argument mismatches: \"widgetLayout.deleteModal.title\": source [name], target []"
